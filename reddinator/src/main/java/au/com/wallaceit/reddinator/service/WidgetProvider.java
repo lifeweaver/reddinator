@@ -62,7 +62,7 @@ public class WidgetProvider extends WidgetProviderBase {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent pendIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendIntent = PendingIntent.getActivity(context, 0, intent, Utilities.pendingFlags(false));
 
             // PICK Subreddit BUTTON
             Intent subredditIntent = new Intent(context, SubredditSelectActivity.class);
@@ -70,7 +70,7 @@ public class WidgetProvider extends WidgetProviderBase {
             subredditIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             subredditIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             subredditIntent.setData(Uri.parse(subredditIntent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent subredditPendingIntent = PendingIntent.getActivity(context, 0, subredditIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent subredditPendingIntent = PendingIntent.getActivity(context, 0, subredditIntent, Utilities.pendingFlags(false));
 
             // REMOTE DATA
             Intent serviceIntent = new Intent(context, WidgetService.class);
@@ -83,14 +83,14 @@ public class WidgetProvider extends WidgetProviderBase {
             refreshIntent.setPackage(context.getPackageName());
             refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             refreshIntent.setData(Uri.parse(refreshIntent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent, Utilities.pendingFlags(false));
 
             // ITEM CLICK
             Intent clickIntent = new Intent(context, WidgetProvider.class);
             clickIntent.setAction(WidgetCommon.ACTION_ITEM_CLICK);
             clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             clickIntent.setData(Uri.parse(clickIntent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, Utilities.pendingFlags(true));
 
             // ADD ALL TO REMOTE VIEWS
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
@@ -106,7 +106,7 @@ public class WidgetProvider extends WidgetProviderBase {
                 appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 appIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 appIntent.setData(Uri.parse(subredditIntent.toUri(Intent.URI_INTENT_SCHEME)));
-                PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, Utilities.pendingFlags(false));
                 views.setOnClickPendingIntent(R.id.widget_logo, appPendingIntent);
             } else {
                 views.setOnClickPendingIntent(R.id.widget_logo, subredditPendingIntent);

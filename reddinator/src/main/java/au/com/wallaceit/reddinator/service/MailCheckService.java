@@ -37,6 +37,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.activity.MessagesActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
+import au.com.wallaceit.reddinator.core.Utilities;
 
 public class MailCheckService extends JobIntentService {
     public static String MAIL_CHECK_COMPLETE = "reddinator.mail.check.complete";
@@ -134,7 +135,7 @@ public class MailCheckService extends JobIntentService {
                     .setContentText(global.getResources().getString(R.string.new_messages_text))
                     .setLargeIcon(BitmapFactory.decodeResource(global.getResources(), R.drawable.reddinator_logo))
                     .setSmallIcon(R.drawable.ic_notify)
-                    .setContentIntent(PendingIntent.getActivity(global, 0 ,notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(PendingIntent.getActivity(global, 0 ,notifyIntent, Utilities.pendingFlags(false)))
                     .build();
 
             NotificationManager notificationManager = (NotificationManager) global.getSystemService(NOTIFICATION_SERVICE);

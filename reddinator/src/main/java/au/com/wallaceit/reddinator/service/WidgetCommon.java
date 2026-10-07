@@ -37,6 +37,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
+import au.com.wallaceit.reddinator.core.Utilities;
 
 public class WidgetCommon {
 
@@ -165,7 +166,7 @@ public class WidgetCommon {
         intent.setAction(WidgetCommon.ACTION_AUTO_UPDATE);
         intent.setPackage(context.getPackageName());
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-        PendingIntent updateIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent updateIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, intent, Utilities.pendingFlags(false));
         final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         int ids[] = getAllAppWidgetIds(context);
