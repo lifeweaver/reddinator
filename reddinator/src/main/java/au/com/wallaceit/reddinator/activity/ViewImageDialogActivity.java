@@ -73,7 +73,6 @@ public class ViewImageDialogActivity extends Activity {
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setAppCacheEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
             webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         boolean multi = getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);

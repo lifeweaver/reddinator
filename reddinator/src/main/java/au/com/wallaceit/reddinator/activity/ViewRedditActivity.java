@@ -56,7 +56,6 @@ import android.widget.Toast;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
-import com.kobakei.ratethisapp.RateThisApp;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
@@ -240,15 +239,6 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         // load post data; once loaded comment data is passed to the comment fragment
         // The content view is also loaded if postUrl is not provided via extras
         loadPostTask = new LoadPostTask(global, this).execute(postPermalink, "best");
-
-        // Init rate dialog
-        RateThisApp.Config config = new RateThisApp.Config();
-        config.setTitle(R.string.rate_reddinator);
-        RateThisApp.init(config);
-        // Monitor launch times and interval from installation
-        RateThisApp.onCreate(this);
-        // If the condition is satisfied, "Rate this app" dialog will be shown
-        RateThisApp.showRateDialogIfNeeded(new ContextThemeWrapper(this, R.style.RateThisAppDialog));
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

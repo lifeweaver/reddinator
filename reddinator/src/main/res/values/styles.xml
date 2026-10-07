@@ -62,7 +62,4 @@
     <style name="ButtonStyle" parent="Base.Widget.AppCompat.Button">
         <item name="android:minHeight">0dp</item>
     </style>
-    <!-- RateThisApp library needs AppCompat theme -->
-    <style name="RateThisAppDialog" parent="Theme.AppCompat.Light.Dialog">
-    </style>
 </resources>
