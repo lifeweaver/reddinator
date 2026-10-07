@@ -93,6 +93,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
 
     private String lastItemId = "0";
     private boolean endOfFeed = false;
+    private static final int MAX_FILL_PAGES = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -747,54 +748,45 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             String curFeed = subredditPath;
             boolean isAll = subredditName.equals("all");
             String sort = subredditSort;
-            JSONArray tempArray;
-            endOfFeed = false;
-            if (loadMore) {
-                // fetch 25 more after current last item and append to the list
-                try {
-                    tempArray = global.mRedditData.getRedditFeed(curFeed, sort, 25, lastItemId);
-                } catch (RedditData.RedditApiException e) {
-                    e.printStackTrace();
-                    exception = e;
-                    return null;
-                }
-            } else {
-                // reloading
-                int limit = Integer.valueOf(global.mSharedPreferences.getString("numitemloadpref", "25"));
-                try {
-                    tempArray = global.mRedditData.getRedditFeed(curFeed, sort, limit, "0");
-                } catch (RedditData.RedditApiException e) {
-                    e.printStackTrace();
-                    exception = e;
-                    return null;
-                }
-            }
-            // check if end of feed, if not, run filters and return data
-            if (tempArray.length() == 0) {
-                endOfFeed = true;
-            } else {
-                // exclude all non theme posts if viewThemes mode is true (used to browse themes on /r/reddinator)
-                if (viewThemes) {
-                    tempArray = filterThemes(tempArray);
-                } else {
-                    tempArray = global.getSubredditManager().filterFeed(0, tempArray, loadMore?data:null, isAll, !global.mRedditData.isLoggedIn());
-                }
-                if (tempArray.length() == 0)
-                    endOfFeed = true;
-            }
-            // set last item id
-            if (endOfFeed){
-                lastItemId = "0";
-            } else {
-                try {
-                    lastItemId = tempArray.getJSONObject(tempArray.length() - 1).getJSONObject("data").getString("name"); // name is actually the unique id we want
-                } catch (JSONException e) {
-                    lastItemId = "0"; // Could not get last item ID; perform a reload next time
-                    e.printStackTrace();
-                }
-            }
+            int pageSize = loadMore ? 25 : Integer.valueOf(global.mSharedPreferences.getString("numitemloadpref", "25"));
+            String after = loadMore ? lastItemId : "0";
+            JSONArray added = new JSONArray();
+            boolean end = false;
 
-            return tempArray;
+            for (int page = 0; page < MAX_FILL_PAGES && added.length() < pageSize && !end; page++) {
+                JSONArray raw;
+                try {
+                    raw = global.mRedditData.getRedditFeed(curFeed, sort, pageSize, after);
+                } catch (RedditData.RedditApiException e) {
+                    e.printStackTrace();
+                    exception = e;
+                    return null;
+                }
+                if (raw.length() == 0) {
+                    end = true;
+                    break;
+                }
+                try {
+                    after = raw.getJSONObject(raw.length() - 1).getJSONObject("data").getString("name");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    end = true;
+                }
+                // viewThemes mode benefits too: theme posts are sparse, so it now scans several pages
+                JSONArray filtered = viewThemes
+                        ? filterThemes(raw)
+                        : global.getSubredditManager().filterFeed(0, raw, loadMore ? data : null, isAll, !global.mRedditData.isLoggedIn());
+                for (int i = 0; i < filtered.length(); i++) {
+                    try {
+                        added.put(filtered.get(i));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            endOfFeed = end;
+            lastItemId = end ? "0" : after;
+            return added;
         }
 
         private JSONArray filterThemes(JSONArray feed){

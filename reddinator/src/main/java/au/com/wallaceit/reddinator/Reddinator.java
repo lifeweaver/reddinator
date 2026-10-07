@@ -90,6 +90,7 @@ public class Reddinator extends Application {
     public ThemeManager mThemeManager;
     private SubredditManager mSubManager;
     public SharedPreferences mSharedPreferences;
+    public final static int ALL_FILTER_SERVER_LIMIT = 100; // Reddit's cap on the /r/all filter
 
     @Override
     public void onCreate() {
@@ -289,7 +290,7 @@ public class Reddinator extends Application {
             // On the very first sync, push local entries up to the server, up to the cap.
             if (mSharedPreferences.getLong("last_sync_time", 0)==0) {
                 for (String name : current) {
-                    if (remote.size() >= 100) break;
+                    if (remote.size() >= ALL_FILTER_SERVER_LIMIT) break;
                     if (!remote.contains(name)) {
                         mRedditData.addFilterSubreddit("all", name);
                         remote.add(name);

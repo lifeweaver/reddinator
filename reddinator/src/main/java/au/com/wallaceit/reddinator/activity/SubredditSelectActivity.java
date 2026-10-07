@@ -1389,8 +1389,11 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             if (mode==MODE_MULTI) {
                 new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_SUB_ADD).execute(multiPath, subreddit);
             } else {
-                if (global.mRedditData.isLoggedIn())
+                // Past the server cap the entry is kept locally only
+                if (global.mRedditData.isLoggedIn() && subsList.size() < Reddinator.ALL_FILTER_SERVER_LIMIT) {
                     new SubscriptionEditTask(global, SubredditSelectActivity.this, null, SubscriptionEditTask.ACTION_FILTER_SUB_ADD).execute("all", subreddit);
+                }
+
                 subsList.add(subreddit);
                 global.getSubredditManager().setAllFilter(subsList);
                 System.out.println(global.getSubredditManager().getCurrentFeedName(mAppWidgetId));

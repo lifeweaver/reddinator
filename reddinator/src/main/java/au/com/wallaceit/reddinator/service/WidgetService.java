@@ -78,6 +78,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private boolean hideInf = false;
     private boolean showItemSubreddit = false;
     private Bitmap[] images;
+    private static final int MAX_FILL_PAGES = 5; // max requests per load when filters remove most items
 
     ListRemoteViewsFactory(Context context, Intent intent) {
         this.mContext = context;
@@ -489,75 +490,73 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         String curFeed = global.getSubredditManager().getCurrentFeedPath(appWidgetId);
         boolean isAll = global.getSubredditManager().getCurrentFeedName(appWidgetId).equals("all");
         String sort = mSharedPreferences.getString("sort-" + appWidgetId, "hot");
-        JSONArray tempArray;
-        endOfFeed = false;
-        // Load more or initial load/reload?
+        JSONArray added;
+
         if (loadMore) {
-            // fetch 25 more after current last item and append to the list
             try {
-                tempArray = global.mRedditData.getRedditFeed(curFeed, sort, 25, lastItemId);
+                added = fetchFiltered(curFeed, sort, 25, lastItemId, data, isAll);
             } catch (RedditData.RedditApiException e) {
                 e.printStackTrace();
                 hideWidgetLoader(false, true, e.getMessage()); // don't go to top of list and show error icon
                 return;
             }
-            if (tempArray.length() == 0) {
-                endOfFeed = true;
-            } else {
-                tempArray = global.getSubredditManager().filterFeed(appWidgetId, tempArray, data, isAll, !global.mRedditData.isLoggedIn());
-
-                int i = 0;
-                while (i < tempArray.length()) {
-                    try {
-                        data.put(tempArray.get(i));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    i++;
+            for (int i = 0; i < added.length(); i++) {
+                try {
+                    data.put(added.get(i));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         } else {
-            // trigger cache clean
             global.triggerThunbnailCacheClean();
-            // reload feed
             int limit = Integer.valueOf(mSharedPreferences.getString("numitemloadpref", "25"));
             try {
-                tempArray = global.mRedditData.getRedditFeed(curFeed, sort, limit, "0");
+                added = fetchFiltered(curFeed, sort, limit, "0", null, isAll);
             } catch (RedditData.RedditApiException e) {
                 e.printStackTrace();
-                hideWidgetLoader(false, true, e.getMessage()); // don't go to top of list and show error icon
+                hideWidgetLoader(false, true, e.getMessage());
                 return;
             }
-            // check if end of feed, if not process & set feed data
-            if (tempArray.length() == 0) {
-                endOfFeed = true;
-            } else {
-                tempArray = global.getSubredditManager().filterFeed(appWidgetId, tempArray, null, isAll, !global.mRedditData.isLoggedIn());
-            }
-            data = tempArray;
-        }
-        // Save feed data
-        global.setFeed(appWidgetId, data);
-        // set last item id for "loadmore use"
-        // Damn reddit doesn't allow you to specify a start index for the data, instead you have to reference the last item id from the prev page :(
-        if (endOfFeed){
-            lastItemId = "0";
-        } else {
-            try {
-                lastItemId = data.getJSONObject(data.length() - 1).getJSONObject("data").getString("name"); // name is actually the unique id we want
-            } catch (JSONException e) {
-                lastItemId = "0"; // Could not get last item ID :(
-                endOfFeed = true;
-                e.printStackTrace();
-            }
+            data = added;
         }
 
-        // hide loader
-        if (loadMore) {
-            hideWidgetLoader(false, false, null); // don't go to top of list
-        } else {
-            hideWidgetLoader(true, false, null); // go to top
+        global.setFeed(appWidgetId, data);
+        hideWidgetLoader(!loadMore, false, null); // go to top only on a full reload
+    }
+
+    // Fetches pages after afterId, filtering each, until pageSize items survive, the feed ends,
+    // or MAX_FILL_PAGES is hit. lastItemId is the last RAW item fetched, not the last shown one.
+    // Fields are only updated on success, so an API error leaves state untouched.
+    private JSONArray fetchFiltered(String curFeed, String sort, int pageSize, String afterId,
+                                    JSONArray existing, boolean isAll) throws RedditData.RedditApiException {
+        JSONArray added = new JSONArray();
+        String after = afterId;
+        boolean end = false;
+
+        for (int page = 0; page < MAX_FILL_PAGES && added.length() < pageSize && !end; page++) {
+            JSONArray raw = global.mRedditData.getRedditFeed(curFeed, sort, pageSize, after);
+            if (raw.length() == 0) {
+                end = true;
+                break;
+            }
+            try {
+                after = raw.getJSONObject(raw.length() - 1).getJSONObject("data").getString("name");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                end = true; // can't page further, but still use this page
+            }
+            JSONArray filtered = global.getSubredditManager().filterFeed(appWidgetId, raw, existing, isAll, !global.mRedditData.isLoggedIn());
+            for (int i = 0; i < filtered.length(); i++) {
+                try {
+                    added.put(filtered.get(i));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+        endOfFeed = end;
+        lastItemId = end ? "0" : after;
+        return added;
     }
 
     // hide appwidget loader
