@@ -30,6 +30,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
@@ -172,6 +175,34 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                 intent.setData(Uri.parse("https://reddit.com/r/reddinator"));
                 intent.putExtra("view_themes", true);
                 startActivity(intent);
+                break;
+            case R.id.action_export_themes:
+                String exportJson = global.mThemeManager.exportCustomThemes();
+                if (exportJson == null) {
+                    Toast.makeText(this, R.string.no_themes_to_export, Toast.LENGTH_LONG).show();
+                } else {
+                    ClipboardManager exportCm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    exportCm.setPrimaryClip(ClipData.newPlainText("Reddinator themes", exportJson));
+                    Toast.makeText(this, R.string.themes_exported, Toast.LENGTH_SHORT).show();
+                    Utilities.intentActionShareText(this, exportJson);
+                }
+                break;
+            case R.id.action_import_themes:
+                ClipboardManager importCm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                String clipText = null;
+                if (importCm.hasPrimaryClip() && importCm.getPrimaryClip().getItemCount() > 0) {
+                    CharSequence cs = importCm.getPrimaryClip().getItemAt(0).coerceToText(this);
+                    if (cs != null) clipText = cs.toString();
+                }
+                int imported = global.mThemeManager.importThemes(clipText);
+                if (imported > 0) {
+                    themesEdited = true; // an overwritten theme may be the active one
+                    setResult(RESULT_CODE_THEME_UPDATED);
+                    refreshList();
+                    Toast.makeText(this, getString(R.string.themes_imported, imported), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, R.string.themes_import_error, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_about:
                 AboutDialog.show(this, true);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- internal resources: not translated -->
     <string name="on_click_pref" translatable="false">onclickpref</string>
     <string name="logo_open_pref" translatable="false">logoopenpref</string>
@@ -117,6 +117,12 @@
     <string name="text">Text</string>
     <string name="link">Link</string>
     <string name="about">About</string>
+    <string name="export_themes" tools:ignore="MissingTranslation">Export themes</string>
+    <string name="import_themes">Import themes from clipboard</string>
+    <string name="themes_exported">Themes copied to clipboard</string>
+    <string name="no_themes_to_export">You have no custom themes to export</string>
+    <string name="themes_imported">Imported %1$d theme(s)</string>
+    <string name="themes_import_error">Clipboard doesn\'t contain exported Reddinator themes</string>
     <string name="transparency">Transparency</string>
     <string name="github">Github</string>
     <string name="select_color">Select Color</string>

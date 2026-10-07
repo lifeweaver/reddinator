@@ -17,4 +17,13 @@
         android:id="@+id/menu_about"
         android:title="@string/about"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_export_themes"
+        android:title="@string/export_themes"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_import_themes"
+        android:title="@string/import_themes"
+        android:showAsAction="never" />
 </menu>

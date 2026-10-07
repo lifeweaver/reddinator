@@ -272,6 +272,60 @@ public class ThemeManager {
         prefs.edit().putString("userThemes", customThemes.toString()).apply();
     }
 
+    // Bundles all custom themes into a single JSON string for backup/transfer. Returns null if there are none.
+    public String exportCustomThemes(){
+        try {
+            JSONArray list = new JSONArray();
+            Iterator<String> it = customThemes.keys();
+            while (it.hasNext()) {
+                list.put(customThemes.getJSONObject(it.next()));
+            }
+            if (list.length() == 0)
+                return null;
+            JSONObject root = new JSONObject();
+            root.put("reddinator_themes", 1); // format version
+            root.put("themes", list);
+            return root.toString(2);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Imports themes produced by exportCustomThemes(). A theme with the same name as an existing custom
+    // theme replaces it; otherwise it is added. Returns the number imported, or -1 if the text isn't valid.
+    public int importThemes(String text){
+        if (text == null)
+            return -1;
+        try {
+            JSONArray list = new JSONObject(text.trim()).getJSONArray("themes");
+            int count = 0;
+            for (int i = 0; i < list.length(); i++) {
+                JSONObject theme = list.getJSONObject(i);
+                if (!validateThemeJson(theme))
+                    continue;
+                String name = theme.getString("name");
+                String id = null;
+                Iterator<String> it = customThemes.keys();
+                while (it.hasNext()) {
+                    String key = it.next();
+                    if (name.equals(customThemes.getJSONObject(key).optString("name"))) {
+                        id = key;
+                        break;
+                    }
+                }
+                if (id == null)
+                    id = "theme-" + UUID.randomUUID();
+                saveCustomTheme(id, new Theme(theme));
+                count++;
+            }
+            return count;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public class Theme {
         private JSONObject mTheme;
         private JSONObject jsonValues;
