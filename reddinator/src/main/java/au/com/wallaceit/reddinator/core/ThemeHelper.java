@@ -41,14 +41,14 @@ public class ThemeHelper {
         void onThemeResult(boolean updateTheme);
     }
 
-    public static void handleThemeInstall(final Context context, final Reddinator global, final ThemeInstallInterface callback, JSONObject postData, final Runnable openPostRunnable){
+    public static void handleThemeInstall(final Context context, final Reddinator global, final ThemeInstallInterface callback, JSONObject postData, final Runnable openPostRunnable) {
         // extract and parse json from theme
         try {
             String postText = postData.getString("selftext");
             Pattern pattern = Pattern.compile("reddinator_theme=(.*\\}\\})");
             Matcher matcher = pattern.matcher(postText);
 
-            if (matcher.find()){
+            if (matcher.find()) {
                 final JSONObject themeJson = new JSONObject(matcher.group(1));
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -57,7 +57,7 @@ public class ThemeHelper {
                         .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (global.mThemeManager.importTheme(themeJson)){
+                                if (global.mThemeManager.importTheme(themeJson)) {
                                     Toast.makeText(context, R.string.theme_install_success, Toast.LENGTH_LONG).show();
                                 } else {
                                     Toast.makeText(context, R.string.theme_load_error, Toast.LENGTH_LONG).show();
@@ -69,7 +69,7 @@ public class ThemeHelper {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                if (global.mThemeManager.setPreviewTheme(themeJson)){
+                                if (global.mThemeManager.setPreviewTheme(themeJson)) {
                                     //refreshTheme();
                                     WidgetCommon.refreshAllWidgetViews(global);
                                     new AlertDialog.Builder(context)
@@ -88,13 +88,13 @@ public class ThemeHelper {
                                 }
                             }
                         });
-                if (openPostRunnable!=null)
+                if (openPostRunnable != null)
                     builder.setNegativeButton(R.string.view_comments_noicon, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    openPostRunnable.run();
-                                }
-                            });
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            openPostRunnable.run();
+                        }
+                    });
                 builder.show().setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {

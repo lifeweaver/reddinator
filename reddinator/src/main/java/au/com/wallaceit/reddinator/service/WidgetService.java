@@ -126,8 +126,8 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         loadFeedPrefs();
     }
 
-    private void loadFeedPrefs(){
-        themeColors = global.mThemeManager.getActiveTheme("widgettheme-"+appWidgetId).getIntColors();
+    private void loadFeedPrefs() {
+        themeColors = global.mThemeManager.getActiveTheme("widgettheme-" + appWidgetId).getIntColors();
         //int iconColor = Color.parseColor(themeColors[6]);
         int[] shadow = new int[]{3, 4, 4, themeColors.get("icon_shadow")};
         images = new Bitmap[]{
@@ -170,14 +170,14 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         if (position == data.length()) {
             // build load more item
             //System.out.println("load more getViewAt("+position+") firing");
-            RemoteViews loadmorerow = new RemoteViews(mContext.getPackageName(), providerClass==WidgetCommon.WIDGET_CLASS_LIST ? R.layout.listrowloadmore : R.layout.widget_stack_more_row);
+            RemoteViews loadmorerow = new RemoteViews(mContext.getPackageName(), providerClass == WidgetCommon.WIDGET_CLASS_LIST ? R.layout.listrowloadmore : R.layout.widget_stack_more_row);
             if (endOfFeed) {
                 loadmorerow.setTextViewText(R.id.loadmoretxt, mContext.getResources().getString(R.string.nothing_more_here));
             } else {
                 loadmorerow.setTextViewText(R.id.loadmoretxt, mContext.getResources().getString(R.string.load_more));
             }
             loadmorerow.setTextColor(R.id.loadmoretxt, themeColors.get("load_text"));
-            if (providerClass==WidgetCommon.WIDGET_CLASS_STACK)
+            if (providerClass == WidgetCommon.WIDGET_CLASS_STACK)
                 loadmorerow.setInt(R.id.load_row, "setBackgroundColor", themeColors.get("background_color"));
             Intent i = new Intent();
             Bundle extras = new Bundle();
@@ -187,7 +187,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             return loadmorerow;
         } else {
             // create remote view from specified layout
-            if (providerClass==WidgetCommon.WIDGET_CLASS_LIST){
+            if (providerClass == WidgetCommon.WIDGET_CLASS_LIST) {
                 row = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_row);
             } else {
                 row = new RemoteViews(mContext.getPackageName(), R.layout.widget_stack_row);
@@ -218,11 +218,11 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                     JSONObject prevObj = postData.getJSONObject("preview");
                     if (prevObj.has("images")) {
                         JSONArray arr = prevObj.getJSONArray("images");
-                        if (arr.length()>0) {
+                        if (arr.length() > 0) {
                             prevObj = arr.getJSONObject(0);
                             arr = prevObj.getJSONArray("resolutions");
                             // get third resolution (320px wide)
-                            if (arr.length() > 0){
+                            if (arr.length() > 0) {
                                 prevObj = arr.length() < 3 ? arr.getJSONObject(arr.length() - 1) : arr.getJSONObject(2);
                                 previewUrl = Utilities.fromHtml(prevObj.getString("url")).toString();
                             } else {
@@ -243,7 +243,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             row.setTextViewText(R.id.listheading, Utilities.fromHtml(title).toString());
             row.setFloat(R.id.listheading, "setTextSize", Integer.valueOf(titleFontSize)); // use for compatibility setTextViewTextSize only introduced in API 16
             row.setTextColor(R.id.listheading, themeColors.get("headline_text"));
-            row.setTextViewText(R.id.sourcetxt, (showItemSubreddit ? subreddit + " - " :"")+domain);
+            row.setTextViewText(R.id.sourcetxt, (showItemSubreddit ? subreddit + " - " : "") + domain);
             row.setTextColor(R.id.sourcetxt, themeColors.get("source_text"));
             row.setTextColor(R.id.votestxt, themeColors.get("votes_text"));
             row.setTextColor(R.id.commentstxt, themeColors.get("comments_count"));
@@ -278,21 +278,21 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             i.putExtras(extras);
             row.setOnClickFillInIntent(R.id.item_row, i);
             // add intent for upvote
-            Intent uvintent =  new Intent();
+            Intent uvintent = new Intent();
             Bundle uvextras = (Bundle) extras.clone();
             uvextras.putInt(WidgetCommon.ITEM_CLICK_MODE, WidgetCommon.ITEM_CLICK_UPVOTE);
             uvintent.putExtras(uvextras);
             row.setOnClickFillInIntent(R.id.widget_upvote, uvintent);
             // add intent for downvote
-            Intent dvintent =  new Intent();
+            Intent dvintent = new Intent();
             Bundle dvextras = (Bundle) extras.clone();
             dvextras.putInt(WidgetCommon.ITEM_CLICK_MODE, WidgetCommon.ITEM_CLICK_DOWNVOTE);
             dvintent.putExtras(dvextras);
             row.setOnClickFillInIntent(R.id.widget_downvote, dvintent);
             // add intent for post options
-            Intent ointent =  new Intent();
+            Intent ointent = new Intent();
             Bundle oextras = (Bundle) extras.clone();
-            if (Reddinator.SUBREDDIT_REDDINATOR.equals(subreddit) && title.indexOf("[Theme]")==0) {
+            if (Reddinator.SUBREDDIT_REDDINATOR.equals(subreddit) && title.indexOf("[Theme]") == 0) {
                 oextras.putBoolean(FeedItemDialogActivity.EXTRA_IS_THEME, true);
                 oextras.putString(FeedItemDialogActivity.EXTRA_POST_DATA, postData.toString());
             }
@@ -302,7 +302,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
             // Get thumbnail view & hide the other
             int thumbView;
-            if (bigThumbs){
+            if (bigThumbs) {
                 thumbView = R.id.thumbnail_top;
                 row.setViewVisibility(R.id.thumbnail, View.GONE);
             } else {
@@ -312,7 +312,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             // check for preview images & thumbnails
             String imageUrl = null;
             int imageLoadFlag = 0; // 1 for thumbnail, 2 for preview, 3 for default thumbnail
-            if (loadPreviews  && !nsfw && previewUrl!=null){
+            if (loadPreviews && !nsfw && previewUrl != null) {
                 imageUrl = previewUrl;
                 imageLoadFlag = 2;
                 row.setViewVisibility(thumbView, View.GONE);
@@ -354,11 +354,11 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 row.setViewVisibility(R.id.preview, View.GONE);
             }
             // load external images into view
-            if (imageLoadFlag>0){
+            if (imageLoadFlag > 0) {
                 int imageView = imageLoadFlag == 2 ? R.id.preview : thumbView;
                 // skip if default thumbnail, just check for image
                 Bitmap bitmap = null;
-                if (imageLoadFlag!=3) {
+                if (imageLoadFlag != 3) {
                     // check if the image is in cache
                     String fileurl = mContext.getCacheDir() + Reddinator.IMAGE_CACHE_DIR + id + (imageLoadFlag == 2 ? "-preview" : "") + ".png";
                     // check if the image is in cache
@@ -379,8 +379,8 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 }
                 // check if url is image, if so, add ViewImageDialog intent and show indicator
                 // don't show if the image failed to load
-                if ((imageLoadFlag==3 || bitmap!=null) && Utilities.isImageUrl(url)){
-                    Intent imageintent =  new Intent();
+                if ((imageLoadFlag == 3 || bitmap != null) && Utilities.isImageUrl(url)) {
+                    Intent imageintent = new Intent();
                     Bundle imageextras = (Bundle) extras.clone();
                     imageextras.putInt(WidgetCommon.ITEM_CLICK_MODE, WidgetCommon.ITEM_CLICK_IMAGE);
                     imageintent.putExtras(imageextras);
@@ -414,7 +414,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             bmp = BitmapFactory.decodeStream(con.getInputStream());
             global.saveThumbnailToCache(bmp, redditId);
         } catch (Exception e) {
-            Log.d("Reddinator", "Count not load image with URL: "+urlstr, e);
+            Log.d("Reddinator", "Count not load image with URL: " + urlstr, e);
             return null;
         }
         return bmp;
@@ -423,7 +423,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getLoadingView() {
         RemoteViews rowload;
-        if (providerClass==WidgetCommon.WIDGET_CLASS_LIST){
+        if (providerClass == WidgetCommon.WIDGET_CLASS_LIST) {
             rowload = new RemoteViews(mContext.getPackageName(), R.layout.listrowload);
         } else {
             rowload = new RemoteViews(mContext.getPackageName(), R.layout.widget_stack_load_row);
@@ -566,7 +566,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         RemoteViews views = new RemoteViews(mContext.getPackageName(), WidgetCommon.getWidgetLayoutId(providerClass));
         views.setViewVisibility(R.id.srloader, View.INVISIBLE);
         // go to the top of the list view
-        if (providerClass==WidgetCommon.WIDGET_CLASS_LIST && goToTopOfList) {
+        if (providerClass == WidgetCommon.WIDGET_CLASS_LIST && goToTopOfList) {
             // API >= 25: Relative scroll position must be used since this value is persisted for the next update & only a relative value can be reset to keep the current position.
             views.setRelativeScrollPosition(R.id.adapterview, -1000000);
         }
@@ -575,7 +575,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
         mgr.partiallyUpdateAppWidget(appWidgetId, views);
         // show error text if available
-        if (errorTxt!=null) {
+        if (errorTxt != null) {
             Handler handler = new Handler(mContext.getMainLooper());
             handler.post(new Runnable() {
                 @Override

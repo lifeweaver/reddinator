@@ -40,7 +40,7 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
     private ProgressDialog progressDialog = null;
     private int mode;
 
-    public SyncUserDataTask(Context context, Runnable callback, boolean showUI, int mode){
+    public SyncUserDataTask(Context context, Runnable callback, boolean showUI, int mode) {
         this.context = context;
         this.callback = callback;
         this.showUI = showUI;
@@ -79,7 +79,7 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
     }
 
     @Override
-    protected void onProgressUpdate(String... statusText){
+    protected void onProgressUpdate(String... statusText) {
         if (!showUI) return;
         progressDialog.setMessage(statusText[0]);
     }
@@ -89,7 +89,7 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
         if (showUI) {
             if (progressDialog != null)
                 progressDialog.dismiss();
-            if (!result){
+            if (!result) {
                 // check login required
                 if (exception.isAuthError()) global.mRedditData.initiateLogin(context, false);
                 // show error
@@ -99,7 +99,7 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
         if (result)
             global.mSharedPreferences.edit().putLong("last_sync_time", System.currentTimeMillis()).apply();
 
-        if (callback!=null)
+        if (callback != null)
             callback.run();
     }
 }

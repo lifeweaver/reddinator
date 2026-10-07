@@ -20,7 +20,9 @@ package au.com.wallaceit.reddinator.tasks;
  */
 
 import android.os.AsyncTask;
+
 import org.json.JSONObject;
+
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
@@ -52,7 +54,7 @@ public class CommentTask extends AsyncTask<String, Integer, JSONObject> {
         // Do the vote
         JSONObject result = null;
         try {
-            switch (action){
+            switch (action) {
                 case ACTION_DELETE:
                     global.mRedditData.deleteComment(redditId);
                     result = new JSONObject();
@@ -76,7 +78,7 @@ public class CommentTask extends AsyncTask<String, Integer, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject result) {
-        if (callback!=null)
+        if (callback != null)
             callback.onCommentComplete(result, exception, action, redditId);
     }
 }

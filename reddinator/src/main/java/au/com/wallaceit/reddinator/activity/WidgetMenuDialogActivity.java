@@ -76,7 +76,7 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
 
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
-        params.width  = WindowManager.LayoutParams.MATCH_PARENT;
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
 
         popupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.PopupMenuStyle), findViewById(R.id.menu_anchor));
@@ -107,20 +107,20 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
             popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
                 @Override
                 public void onDismiss(PopupMenu menu) {
-                   if (!menuSelected){
-                       WidgetMenuDialogActivity.this.finish();
-                   }
+                    if (!menuSelected) {
+                        WidgetMenuDialogActivity.this.finish();
+                    }
                 }
             });
         }
 
         int iconColor = Utilities.getActionbarIconColor();
-        int inboxColor = global.mRedditData.getInboxCount()>0? Color.parseColor("#E06B6C"): iconColor;
+        int inboxColor = global.mRedditData.getInboxCount() > 0 ? Color.parseColor("#E06B6C") : iconColor;
         MenuItem messageIcon = (menu.findItem(R.id.menu_inbox));
         messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
         MenuItem sortItem = (menu.findItem(R.id.menu_sort));
         sortItem.setIcon(new IconDrawable(this, Iconify.IconValue.fa_sort).color(iconColor).actionBarSize());
-        sortItem.setTitle(getString(R.string.sort_label) + " " + prefs.getString("sort-"+widgetId, "hot"));
+        sortItem.setTitle(getString(R.string.sort_label) + " " + prefs.getString("sort-" + widgetId, "hot"));
         MenuItem sidebarIcon = menu.findItem(R.id.menu_sidebar);
         sidebarIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_book).color(iconColor).actionBarSize());
         if (!global.getSubredditManager().isFeedMulti(widgetId)) {
@@ -139,9 +139,9 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
 
         int subCap = global.getSubredditManager().getSubredditSubscribeCapability(global.getSubredditManager().getCurrentFeedName(widgetId));
 
-        if (subCap > 0){
+        if (subCap > 0) {
 
-            if (subCap == 1){
+            if (subCap == 1) {
                 (menu.findItem(R.id.menu_subscribe))
                         .setIcon(new IconDrawable(this, Iconify.IconValue.fa_plus_circle).color(iconColor).actionBarSize())
                         .setVisible(true);
@@ -192,7 +192,7 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
                 break;
 
             case R.id.menu_inbox:
-                if (!global.mRedditData.isLoggedIn()){
+                if (!global.mRedditData.isLoggedIn()) {
                     global.mRedditData.initiateLogin(this, false);
                     Toast.makeText(this, "Reddit login required", Toast.LENGTH_LONG).show();
                     this.finish();
@@ -206,7 +206,7 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
                 break;
 
             case R.id.menu_account:
-                if (!global.mRedditData.isLoggedIn()){
+                if (!global.mRedditData.isLoggedIn()) {
                     global.mRedditData.initiateLogin(this, false);
                     Toast.makeText(this, "Reddit login required", Toast.LENGTH_LONG).show();
                     this.finish();
@@ -266,7 +266,7 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
 
         String path = global.getSubredditManager().getCurrentFeedPath(widgetId);
 
-        if (path.equals("") || path.equals("/default")){
+        if (path.equals("") || path.equals("/default")) {
             sorts.add(5, "best");
         }
 
@@ -314,7 +314,8 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
     }
 
     private boolean needsUpdate = false;
-    private void showFeedPrefsDialog(){
+
+    private void showFeedPrefsDialog() {
         needsUpdate = false;
         final CharSequence[] names = {getString(R.string.image_previews), getString(R.string.thumbnails), getString(R.string.thumbnails_on_top), getString(R.string.hide_post_info)};
         final String widgetIdStr = String.valueOf(widgetId);
@@ -362,7 +363,8 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
     }
 
     private ProgressDialog sidebarProg;
-    private void openSidebar(){
+
+    private void openSidebar() {
         sidebarProg = new ProgressDialog(this);
         sidebarProg.setIndeterminate(true);
         sidebarProg.setTitle(R.string.loading);
@@ -373,28 +375,28 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
 
     @Override
     public void onSubredditInfoLoaded(JSONObject result, RedditData.RedditApiException exception) {
-        if (result!=null){
+        if (result != null) {
             try {
-                String html = "&lt;p&gt;"+result.getString("subscribers")+" readers&lt;br/&gt;"+result.getString("accounts_active")+" users here now&lt;/p&gt;";
+                String html = "&lt;p&gt;" + result.getString("subscribers") + " readers&lt;br/&gt;" + result.getString("accounts_active") + " users here now&lt;/p&gt;";
                 html += result.getString("description_html");
                 HtmlDialog.init(this, global.getSubredditManager().getCurrentFeedPath(widgetId), Utilities.fromHtml(html).toString())
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            WidgetMenuDialogActivity.this.finish();
-                        }
-                    });
+                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                WidgetMenuDialogActivity.this.finish();
+                            }
+                        });
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(this, "Error loading sidebar: "+exception.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error loading sidebar: " + exception.getMessage(), Toast.LENGTH_LONG).show();
         }
-        if (sidebarProg!=null)
+        if (sidebarProg != null)
             sidebarProg.dismiss();
     }
 
-    private void startActivityAndFinish(Intent intent){
+    private void startActivityAndFinish(Intent intent) {
         startActivity(intent);
         this.finish();
     }
@@ -411,8 +413,8 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
         if (result) {
 
             if (action == SubscriptionEditTask.ACTION_SUBSCRIBE ||
-                action == SubscriptionEditTask.ACTION_SUBSCRIBE_BY_PATH ||
-                action == SubscriptionEditTask.ACTION_UNSUBSCRIBE) {
+                    action == SubscriptionEditTask.ACTION_SUBSCRIBE_BY_PATH ||
+                    action == SubscriptionEditTask.ACTION_UNSUBSCRIBE) {
 
                 boolean subscribed = action != SubscriptionEditTask.ACTION_UNSUBSCRIBE;
 
@@ -424,7 +426,7 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
             }
 
         } else {
-            Toast.makeText(this, "Error: "+(exception!=null ? exception.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error: " + (exception != null ? exception.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
             return;
         }
 

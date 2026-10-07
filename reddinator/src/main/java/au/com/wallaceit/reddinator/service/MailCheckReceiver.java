@@ -33,7 +33,7 @@ public class MailCheckReceiver extends BroadcastReceiver {
 
     private static String CHECK_ACTION = "reddinator.background.mailcheck";
 
-    public static void setAlarm(Context context){
+    public static void setAlarm(Context context) {
 
         Intent intent = new Intent(context.getApplicationContext(), MailCheckReceiver.class);
         intent.setPackage(context.getPackageName());

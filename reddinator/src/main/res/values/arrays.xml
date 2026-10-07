@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resources
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Translate -->
     <string-array name="onclick_list_preference">
         <item>Open Reddinator View</item>

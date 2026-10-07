@@ -54,7 +54,7 @@ public class SimpleTabsWidget {
         this.scrollView = scrollView;
     }
 
-    public void setViewPager(ViewPager viewPager){
+    public void setViewPager(ViewPager viewPager) {
         this.viewPager = viewPager;
         initTabs();
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -75,16 +75,16 @@ public class SimpleTabsWidget {
         setTab(viewPager.getCurrentItem());
     }
 
-    private void initTabs(){
+    private void initTabs() {
         PagerAdapter adapter = viewPager.getAdapter();
         int tabCount = adapter.getCount();
-        for (int i=0; i<tabCount; i++){
+        for (int i = 0; i < tabCount; i++) {
             String title = adapter.getPageTitle(i).toString();
             insertTab(i, title);
         }
     }
 
-    private void insertTab(int index, String text){
+    private void insertTab(int index, String text) {
 
         TabClickListener clickListener = new TabClickListener(index);
         LinearLayout tabContainer = (LinearLayout) inflater.inflate(R.layout.tab, tabWidget, false);
@@ -103,47 +103,49 @@ public class SimpleTabsWidget {
         tabWidget.addView(tabContainer);
     }
 
-    public void setTab(int position){
-        for (int i=0; i<indicatorItems.size(); i++){
-            if (i==position){
+    public void setTab(int position) {
+        for (int i = 0; i < indicatorItems.size(); i++) {
+            if (i == position) {
                 indicatorItems.get(i).setVisibility(View.VISIBLE);
             } else {
                 indicatorItems.get(i).setVisibility(View.INVISIBLE);
             }
         }
-        if (scrollView!=null)
+        if (scrollView != null)
             scrollView.smoothScrollTo(tabWidget.getChildAt(position).getRight() - (tabWidget.getWidth() / 2), 0);
     }
 
     class TabClickListener implements View.OnClickListener {
         private int index;
-        public TabClickListener(int index){
+
+        public TabClickListener(int index) {
             this.index = index;
         }
+
         @Override
-        public void onClick(View view){
+        public void onClick(View view) {
             setTab(index);
-            if (viewPager!=null)
+            if (viewPager != null)
                 viewPager.setCurrentItem(index);
         }
     }
 
-    public void setBackgroundColor(int color){
+    public void setBackgroundColor(int color) {
         tabWidget.setBackgroundColor(color);
-        if (scrollView!=null)
+        if (scrollView != null)
             scrollView.setBackgroundColor(color);
     }
 
-    public void setTextColor(int color){
+    public void setTextColor(int color) {
         colors[0] = color;
-        for (int i=0; i<tabItems.size(); i++){
+        for (int i = 0; i < tabItems.size(); i++) {
             tabItems.get(i).setTextColor(color);
         }
     }
 
-    public void setInidicatorColor(int color){
+    public void setInidicatorColor(int color) {
         colors[1] = color;
-        for (int i=0; i<indicatorItems.size(); i++){
+        for (int i = 0; i < indicatorItems.size(); i++) {
             indicatorItems.get(i).setBackgroundColor(color);
         }
     }

@@ -56,7 +56,7 @@ public class MarkMessageTask extends AsyncTask<String, Integer, Boolean> {
             global.clearUnreadMessages();
         } else {
             // show error
-            Toast.makeText(global.getApplicationContext(), "Failed to mark message read: "+exception.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(global.getApplicationContext(), "Failed to mark message read: " + exception.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }

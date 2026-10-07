@@ -21,7 +21,6 @@ package au.com.wallaceit.reddinator.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
@@ -34,7 +33,7 @@ public class HidePostTask extends AsyncTask<String, Long, Boolean> {
     private Runnable callback;
     private boolean fromWidget = false;
 
-    public HidePostTask(Context context, boolean fromWidget, Runnable callback){
+    public HidePostTask(Context context, boolean fromWidget, Runnable callback) {
         this.context = context;
         this.fromWidget = fromWidget;
         this.callback = callback;
@@ -44,7 +43,7 @@ public class HidePostTask extends AsyncTask<String, Long, Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
         try {
-            if (params[0].equals("unhide")){
+            if (params[0].equals("unhide")) {
                 global.mRedditData.unHide(params[1]);
             } else {
                 global.mRedditData.hide(params[0]);
@@ -59,13 +58,13 @@ public class HidePostTask extends AsyncTask<String, Long, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (!result){
+        if (!result) {
             // check login required
             if (exception.isAuthError()) global.mRedditData.initiateLogin(context, fromWidget);
             // show error
             Utilities.showApiErrorToastOrDialog(context, exception);
         }
-        if (callback!=null)
+        if (callback != null)
             callback.run();
     }
 }

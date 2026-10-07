@@ -35,8 +35,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.service.MailCheckReceiver;
 
@@ -144,15 +144,15 @@ public class OAuthView extends Activity {
         }
 
         @Override
-        protected void onProgressUpdate(String... statusText){
+        protected void onProgressUpdate(String... statusText) {
             loginDialog.setTitle(resources.getString(R.string.loading));
             loginDialog.setMessage(statusText[0]);
         }
 
         protected void onPostExecute(Boolean success) {
             OAuthView.this.loginDialog.dismiss();
-            if (!success){
-                if (!loginSuccess){
+            if (!success) {
+                if (!loginSuccess) {
                     Toast.makeText(OAuthView.this, resources.getString(R.string.reddit_login_failed) + "\n" + exception.getMessage(), Toast.LENGTH_LONG).show();
                     return;
                 } else {
@@ -177,7 +177,7 @@ public class OAuthView extends Activity {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         if (wv != null) {
             wv.removeAllViews();

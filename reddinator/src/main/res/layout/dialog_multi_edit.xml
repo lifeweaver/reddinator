@@ -8,7 +8,7 @@
         android:id="@+id/multi_tab_widget"
         layout="@layout/tabs"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/multi_pager"
@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <ListView
                 android:id="@+id/multi_subredditList"
                 android:layout_width="match_parent"
@@ -37,7 +38,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:text="@string/save"/>
+                android:text="@string/save" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -45,11 +46,13 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignBottom="@id/multi_save_button"
                 android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
+
                     <TextView
                         android:id="@+id/multi_pname"
                         android:layout_width="0dp"
@@ -58,14 +61,16 @@
                         android:layout_marginStart="10dp"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:gravity="center_vertical"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1" />
+
                     <Button
                         android:id="@+id/multi_rename_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/rename"
-                        android:gravity="start|center_vertical"/>
+                        android:gravity="start|center_vertical" />
                 </LinearLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -75,12 +80,14 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/display_name"
                     android:layout_gravity="start" />
+
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/multi_name"
                     android:layout_gravity="center_horizontal"
                     android:hint="@string/display_name" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,12 +97,14 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/description"
                     android:layout_gravity="start" />
+
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/multi_description"
                     android:layout_gravity="center_horizontal"
                     android:hint="@string/description" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -105,11 +114,13 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/icon"
                     android:layout_gravity="start" />
+
                 <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/multi_icon"
                     android:layout_gravity="center_horizontal" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -119,12 +130,14 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/color"
                     android:layout_gravity="start" />
+
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/multi_color"
                     android:layout_gravity="center_horizontal"
                     android:hint="@string/color_hint" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -134,11 +147,13 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/visibility"
                     android:layout_gravity="start" />
+
                 <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/multi_visibility"
                     android:layout_gravity="center_horizontal" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -148,6 +163,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/weighting"
                     android:layout_gravity="start" />
+
                 <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

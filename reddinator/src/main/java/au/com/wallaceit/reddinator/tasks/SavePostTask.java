@@ -36,7 +36,7 @@ public class SavePostTask extends AsyncTask<String, Long, Boolean> {
     private boolean fromWidget = false;
     private boolean unsave = false;
 
-    public SavePostTask(Context context, boolean fromWidget, Runnable callback){
+    public SavePostTask(Context context, boolean fromWidget, Runnable callback) {
         this.context = context;
         this.fromWidget = fromWidget;
         this.callback = callback;
@@ -46,7 +46,7 @@ public class SavePostTask extends AsyncTask<String, Long, Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
         try {
-            if (params[0].equals("unsave")){
+            if (params[0].equals("unsave")) {
                 global.mRedditData.unSave(params[1]);
                 unsave = true;
             } else {
@@ -62,7 +62,7 @@ public class SavePostTask extends AsyncTask<String, Long, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (!result){
+        if (!result) {
             // check login required
             if (exception.isAuthError()) global.mRedditData.initiateLogin(context, fromWidget);
             // show error
@@ -71,7 +71,7 @@ public class SavePostTask extends AsyncTask<String, Long, Boolean> {
             if (!unsave)
                 Toast.makeText(context, context.getString(R.string.post_saved), Toast.LENGTH_SHORT).show();
         }
-        if (callback!=null)
+        if (callback != null)
             callback.run();
     }
 }

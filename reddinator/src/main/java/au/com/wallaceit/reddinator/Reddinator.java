@@ -17,6 +17,8 @@
  */
 package au.com.wallaceit.reddinator;
 
+import static android.content.Intent.ACTION_VIEW;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -53,12 +55,10 @@ import au.com.wallaceit.reddinator.activity.MainActivity;
 import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.activity.WebViewActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
+import au.com.wallaceit.reddinator.core.SeenPostStore;
 import au.com.wallaceit.reddinator.core.SubredditManager;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-import au.com.wallaceit.reddinator.core.SeenPostStore;
-
-import static android.content.Intent.ACTION_VIEW;
 
 public class Reddinator extends Application {
 
@@ -138,7 +138,7 @@ public class Reddinator extends Application {
             if (record.getString("name").equals(id)) {
                 JSONObject postData = data.getJSONObject(position).getJSONObject("data");
                 postData.put("likes", val);
-                postData.put("score", postData.getInt("score")+netVote);
+                postData.put("score", postData.getInt("score") + netVote);
                 // save feed
                 setFeed(feedId, data);
             }
@@ -150,7 +150,7 @@ public class Reddinator extends Application {
     // set get current feeds from cache
     public void setFeed(int feedId, JSONArray feedData) {
         File feedFile = new File(getApplicationInfo().dataDir + FEED_DATA_DIR, "feed_" + feedId + ".json");
-        if (!feedFile.exists() && !feedFile.getParentFile().exists()){
+        if (!feedFile.exists() && !feedFile.getParentFile().exists()) {
             //noinspection ResultOfMethodCallIgnored
             feedFile.getParentFile().mkdirs();
         }
@@ -183,7 +183,7 @@ public class Reddinator extends Application {
         return new JSONArray();
     }
 
-    public void deleteFeed(int feedId){
+    public void deleteFeed(int feedId) {
         File feedFile = new File(getApplicationInfo().dataDir + FEED_DATA_DIR, "feed_" + feedId + ".json");
         if (feedFile.exists())
             //noinspection ResultOfMethodCallIgnored
@@ -203,15 +203,15 @@ public class Reddinator extends Application {
         return null;
     }
 
-    public void removePostFromFeed(int widgetId, int position, String redditId){
+    public void removePostFromFeed(int widgetId, int position, String redditId) {
         JSONArray data = getFeed(widgetId);
         try {
             JSONObject item = data.getJSONObject(position).getJSONObject("data");
             if (item.getString("name").equals(redditId)) {
                 // remove post: fuck android for not having REMOVE in JSONArray until API 19.
                 JSONArray finalData = new JSONArray();
-                for (int i = 0; i<data.length(); i++){
-                    if (i!=position)
+                for (int i = 0; i < data.length(); i++) {
+                    if (i != position)
                         finalData.put(data.get(i));
                 }
                 // save new feed
@@ -223,11 +223,11 @@ public class Reddinator extends Application {
     }
 
     // used when appwidgets are destroyed
-    public void clearFeedDataAndPreferences(int feedId){
+    public void clearFeedDataAndPreferences(int feedId) {
         deleteFeed(feedId);
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.remove("currentfeed-" + feedId);
-        editor.remove("widgettheme-"+ feedId);
+        editor.remove("widgettheme-" + feedId);
         String widgetIdStr = (feedId == 0 ? "app" : String.valueOf(feedId));
         editor.remove("sort-" + widgetIdStr);
         editor.remove("thumbnails-" + widgetIdStr);
@@ -251,8 +251,8 @@ public class Reddinator extends Application {
     }
 
     // subreddit list, settings & filter management
-    public SubredditManager getSubredditManager(){
-        if (mSubManager==null) {
+    public SubredditManager getSubredditManager() {
+        if (mSubManager == null) {
             mSubManager = new SubredditManager(mRedditData, mSharedPreferences, getSeenPostStore());
         }
 
@@ -260,7 +260,7 @@ public class Reddinator extends Application {
     }
 
     public synchronized SeenPostStore getSeenPostStore() {
-        if (mSeenStore==null) {
+        if (mSeenStore == null) {
             mSeenStore = new SeenPostStore(new File(getApplicationInfo().dataDir, "seen_posts.txt"));
         }
 
@@ -269,7 +269,7 @@ public class Reddinator extends Application {
 
     public int loadAccountSubreddits() throws RedditData.RedditApiException {
 
-        final JSONArray list= mRedditData.getMySubreddits();
+        final JSONArray list = mRedditData.getMySubreddits();
         getSubredditManager().setSubreddits(list);
         return list.length();
     }
@@ -281,7 +281,7 @@ public class Reddinator extends Application {
         return list.length();
     }
 
-    public boolean syncAllFilters(){
+    public boolean syncAllFilters() {
         try {
             JSONObject filter = mRedditData.getFilter("all");
             JSONArray subreddits = filter.getJSONObject("data").getJSONArray("subreddits");
@@ -290,16 +290,16 @@ public class Reddinator extends Application {
 
             // Merge: anything on the server is added locally. Local-only entries are KEPT
             // (they're the overflow beyond Reddit's server-side limit).
-            for (int i=0; i<subreddits.length(); i++){
+            for (int i = 0; i < subreddits.length(); i++) {
                 String name = subreddits.getJSONObject(i).getString("name");
-                if (!current.contains(name)){
+                if (!current.contains(name)) {
                     current.add(name);
                 }
                 remote.add(name);
             }
 
             // On the very first sync, push local entries up to the server, up to the cap.
-            if (mSharedPreferences.getLong("last_sync_time", 0)==0) {
+            if (mSharedPreferences.getLong("last_sync_time", 0) == 0) {
                 for (String name : current) {
                     if (remote.size() >= ALL_FILTER_SERVER_LIMIT) break;
                     if (!remote.contains(name)) {
@@ -318,10 +318,11 @@ public class Reddinator extends Application {
     }
 
     // unread message storage
-    public void setUnreadMessages(JSONArray messages){
+    public void setUnreadMessages(JSONArray messages) {
         mSharedPreferences.edit().putString("unreadMail", messages.toString()).apply();
     }
-    public JSONArray getUnreadMessages(){
+
+    public JSONArray getUnreadMessages() {
         try {
             return new JSONArray(mSharedPreferences.getString("unreadMail", "[]"));
         } catch (JSONException e) {
@@ -330,7 +331,8 @@ public class Reddinator extends Application {
         }
         return new JSONArray();
     }
-    public void clearUnreadMessages(){
+
+    public void clearUnreadMessages() {
         // clear unread message cache and count
         mSharedPreferences.edit().remove("unreadMail").apply();
         mRedditData.clearStoredInboxCount();
@@ -378,24 +380,24 @@ public class Reddinator extends Application {
                 .show();
     }
 
-    public String getRedditMobileSite(boolean beta){
-        if (beta){
+    public String getRedditMobileSite(boolean beta) {
+        if (beta) {
             return REDDIT_MOBILE_BETA_URL;
         } else {
             return REDDIT_MOBILE_URL;
         }
     }
 
-    public String getDefaultMobileSite(){
+    public String getDefaultMobileSite() {
         return getRedditMobileSite(mSharedPreferences.getBoolean("redditmobilepref", false));
     }
 
-    public String getDefaultCommentsMobileSite(){
+    public String getDefaultCommentsMobileSite() {
         return getRedditMobileSite(mSharedPreferences.getBoolean("mobilecommentspref", true));
     }
 
-    public void handleLink(Context context, String url){
-        if (url.indexOf(REDDIT_BASE_URL)==0){
+    public void handleLink(Context context, String url) {
+        if (url.indexOf(REDDIT_BASE_URL) == 0) {
             // open in native view if supported
             handleRedditLink(context, url);
         } else {
@@ -404,22 +406,22 @@ public class Reddinator extends Application {
         }
     }
 
-    public void handleRedditLink(Context context, String url){
+    public void handleRedditLink(Context context, String url) {
         //System.out.println(url);
         Pattern pattern = Pattern.compile(".*reddit.com(/r/[^/]*)(/comments/[^/]*/[^/]*/)?([^/]*)?/?$");
         Matcher matcher = pattern.matcher(url);
         Intent i;
         boolean match = matcher.find();
-        if (match && matcher.group(3)!=null && !matcher.group(3).equals("")){
+        if (match && matcher.group(3) != null && !matcher.group(3).equals("")) {
             // reddit comment links
             i = new Intent(context, CommentsContextDialogActivity.class);
             i.setData(Uri.parse(url));
-        } else if (match && matcher.group(2)!=null){
+        } else if (match && matcher.group(2) != null) {
             // reddit post link
             i = new Intent(context, ViewRedditActivity.class);
             i.setAction(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
-        } else if (match && matcher.group(1)!=null) {
+        } else if (match && matcher.group(1) != null) {
             // subreddit feed
             openSubredditFeed(context, url);
             return;
@@ -432,28 +434,28 @@ public class Reddinator extends Application {
         context.startActivity(i);
     }
 
-    public void openSubredditFeed(Context context, String url){
+    public void openSubredditFeed(Context context, String url) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(ACTION_VIEW);
         intent.setData(Uri.parse(url));
         context.startActivity(intent);
     }
 
-    public static boolean doShowWelcomeDialog(final Activity context){
+    public static boolean doShowWelcomeDialog(final Activity context) {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         String lastVersion = preferences.getString("changelogLastVersion", "");
         String thisVersion = Utilities.getPackageInfo(context).versionName;
         // Only show changelog if major or minor version has changed
-        if (!Utilities.compareVersionWithoutBuild(lastVersion, thisVersion)){
+        if (!Utilities.compareVersionWithoutBuild(lastVersion, thisVersion)) {
             AboutDialog.show(context, false);
             return true;
         }
         return false;
     }
 
-    public boolean saveThumbnailToCache(Bitmap image, String imageId){
+    public boolean saveThumbnailToCache(Bitmap image, String imageId) {
         try {
             File file = new File(getCacheDir().getPath() + Reddinator.IMAGE_CACHE_DIR, imageId + ".png");
             if (!file.getParentFile().exists()) {
@@ -470,25 +472,25 @@ public class Reddinator extends Application {
         }
     }
 
-    public void triggerThunbnailCacheClean(){
+    public void triggerThunbnailCacheClean() {
         clearImageCache(86400000); // clear images older than 24h
     }
 
     // clears cache files older than the specified time, or all if time == 0
-    public void clearImageCache(int time){
+    public void clearImageCache(int time) {
         File cacheDir = new File(getCacheDir().getPath() + IMAGE_CACHE_DIR);
         clearDir(cacheDir, time);
     }
 
-    public void clearFeedData(){
+    public void clearFeedData() {
         File feedDir = new File(getApplicationInfo().dataDir + FEED_DATA_DIR);
         clearDir(feedDir, 0);
     }
 
-    public void clearDir(File dir, int time){
+    public void clearDir(File dir, int time) {
         if (dir.exists() && dir.isDirectory())
             for (File file : dir.listFiles()) {
-                if (time>0) {
+                if (time > 0) {
                     long diff = System.currentTimeMillis() - file.lastModified();
                     if (diff < time) // don't delete the image if age is less than specified
                         continue;

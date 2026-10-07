@@ -17,6 +17,8 @@
  */
 package au.com.wallaceit.reddinator.activity;
 
+import static android.content.Intent.ACTION_VIEW;
+
 import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -50,14 +52,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
-import au.com.wallaceit.reddinator.core.SubredditManager;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-
-import static android.content.Intent.ACTION_VIEW;
 
 public class ViewAllSubredditsActivity extends ListActivity {
     public static final int RESULT_ADD_TO_MULTI = 3;
@@ -237,10 +236,10 @@ public class ViewAllSubredditsActivity extends ListActivity {
         t.start();
     }
 
-    private void returnResult(JSONObject subObj, boolean addAction){
+    private void returnResult(JSONObject subObj, boolean addAction) {
         Intent intent = new Intent();
         intent.putExtra("subredditObj", subObj.toString());
-        if (action!=null && action.equals(ACTION_ADD_MULTI_SUB)){
+        if (action != null && action.equals(ACTION_ADD_MULTI_SUB)) {
             intent.putExtra("multipath", getIntent().getStringExtra("multipath"));
             setResult(RESULT_ADD_TO_MULTI, intent);
         } else {
@@ -322,7 +321,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
                     ViewAllSubredditsActivity.this.startActivity(intent);
                 }
             });
-            if ("true".equals(subscribed)){
+            if ("true".equals(subscribed)) {
                 viewHolder.subscribedIcon.setVisibility(View.VISIBLE);
             } else {
                 viewHolder.subscribedIcon.setVisibility(View.GONE);
@@ -345,6 +344,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
 
     private class DLTask extends AsyncTask<String, Integer, ArrayList<JSONObject>> {
         RedditData.RedditApiException exception;
+
         @Override
         protected ArrayList<JSONObject> doInBackground(String... string) {
             // load popular subreddits
@@ -374,7 +374,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
         }
 
         protected void onPostExecute(ArrayList<JSONObject> resultlist) {
-            if (resultlist==null){
+            if (resultlist == null) {
                 Toast.makeText(ViewAllSubredditsActivity.this, resources.getString(R.string.subreddit_load_failed) + exception.getMessage(), Toast.LENGTH_LONG).show();
                 return;
             }

@@ -43,7 +43,7 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
         global = (Reddinator) getApplicationContext();
         resources = getResources();
 
-        charsLeft= (TextView) findViewById(R.id.subject_chars_left);
+        charsLeft = (TextView) findViewById(R.id.subject_chars_left);
         subjectField = (EditText) findViewById(R.id.subject);
         toField = (EditText) findViewById(R.id.to);
         textField = (EditText) findViewById(R.id.text);
@@ -82,7 +82,7 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!global.mRedditData.isLoggedIn()){
+                if (!global.mRedditData.isLoggedIn()) {
                     global.mRedditData.initiateLogin(ComposeMessageActivity.this, false);
                 } else {
                     if (validateInput()) {
@@ -96,22 +96,22 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
         });
     }
 
-    private boolean validateInput(){
+    private boolean validateInput() {
         String toText = subjectField.getText().toString();
-        if (toText.equals("")){
+        if (toText.equals("")) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_recipient_error));
             return false;
         }
         String subjectText = subjectField.getText().toString();
-        if (subjectText.equals("")){
+        if (subjectText.equals("")) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_subject_error));
             return false;
-        } else if (subjectText.length()>100){
+        } else if (subjectText.length() > 100) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.subject_too_long_error));
             return false;
         }
         String content = textField.getText().toString();
-        if (content.equals("")){
+        if (content.equals("")) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_message_text_error));
             return false;
         }
@@ -132,7 +132,7 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
 
     @Override
     public void onMessageSent(boolean result, RedditData.RedditApiException exception, String[] args) {
-        if (result){
+        if (result) {
             setResult(1);
             finish();
             Toast.makeText(this, resources.getString(R.string.message_sent), Toast.LENGTH_LONG).show();

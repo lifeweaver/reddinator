@@ -18,6 +18,7 @@ package au.com.wallaceit.reddinator.tasks;
  *
  * Created by michael on 6/02/16.
  */
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -59,7 +60,7 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
         void onSubscriptionEditComplete(boolean result, RedditData.RedditApiException exception, int action, Object[] params, JSONObject data);
     }
 
-    public SubscriptionEditTask(Reddinator global, Context context, Callback callback, int action){
+    public SubscriptionEditTask(Reddinator global, Context context, Callback callback, int action) {
         switch (action) {
             case ACTION_SUBSCRIBE:
             case ACTION_SUBSCRIBE_BY_PATH:
@@ -94,7 +95,7 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
         this.action = action;
     }
 
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         if (contextRef.get() != null)
             progressDialog = ProgressDialog.show(contextRef.get(), loadingMessage, loadingMessage, true);
     }
@@ -104,7 +105,7 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
         this.params = strParams;
         String id;
         try {
-            switch (action){
+            switch (action) {
                 case ACTION_SUBSCRIBE:
                     id = ((JSONObject) strParams[0]).getString("name");
                     data = global.mRedditData.subscribe(id, true);
@@ -191,7 +192,7 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
 
-        if (callback!=null)
+        if (callback != null)
             callback.onSubscriptionEditComplete(result, exception, action, params, this.data);
     }
 }

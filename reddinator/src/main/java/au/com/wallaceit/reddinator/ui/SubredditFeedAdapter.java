@@ -81,7 +81,9 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
 
     public interface ActivityInterface {
         void loadMore();
+
         void showLoader();
+
         void hideLoader();
     }
 
@@ -95,7 +97,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         this.showItemSubreddit = hasMultipleSubs;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // load the caches items
-        if (data!=null) {
+        if (data != null) {
             this.data = data;
         } else {
             this.data = new JSONArray();
@@ -106,7 +108,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         setMaxDisplayPixels((Activity) context);
     }
 
-    public void setFeed(JSONArray data, boolean canLoadMore, boolean hasMultipleSubs){
+    public void setFeed(JSONArray data, boolean canLoadMore, boolean hasMultipleSubs) {
         this.data = data;
         this.canLoadMore = canLoadMore;
         this.showItemSubreddit = hasMultipleSubs;
@@ -120,10 +122,10 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
     }
 
     public void removePostAtPosition(int position) {
-        if (position>-1) {
+        if (position > -1) {
             JSONArray tempArr = new JSONArray();
-            for (int i = 0; i<data.length(); i++){
-                if (i!=position)
+            for (int i = 0; i < data.length(); i++) {
+                if (i != position)
                     try {
                         tempArr.put(data.get(i));
                     } catch (JSONException e) {
@@ -135,13 +137,13 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         }
     }
 
-    public void initialiseVote(int listposition, int direction){
+    public void initialiseVote(int listposition, int direction) {
         // Get data by position in list
         JSONObject item = getItem(listposition);
         String redditid;
         int curVote = 0;
         try {
-            if (item.getBoolean("archived")){
+            if (item.getBoolean("archived")) {
                 Toast.makeText(context, R.string.archived_post_error, Toast.LENGTH_LONG).show();
                 return;
             }
@@ -151,7 +153,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 curVote = Utilities.voteDirectionToInt(item.getString("likes"));
             new VoteTask(global, this, redditid, listposition, direction, curVote).execute();
         } catch (JSONException e) {
-            Toast.makeText(context, "Error initializing vote: "+e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error initializing vote: " + e.getMessage(), Toast.LENGTH_LONG).show();
             feedInterface.hideLoader();
         }
     }
@@ -171,10 +173,10 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         feedInterface.hideLoader();
     }
 
-    public Bundle getItemExtras(int position){
+    public Bundle getItemExtras(int position) {
         JSONObject item = getItem(position);
         Bundle extras = new Bundle();
-        if (item==null){
+        if (item == null) {
             return null;
         }
         try {
@@ -200,7 +202,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 // update in current data (already updated in saved feed)
                 JSONObject post = data.getJSONObject(position).getJSONObject("data");
                 post.put("likes", val);
-                post.put("score", post.getInt("score")+netVote);
+                post.put("score", post.getInt("score") + netVote);
                 notifyDataSetChanged();
             }
         } catch (JSONException e) {
@@ -243,7 +245,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
 
     @Override
     public int getCount() {
-        return data.length()>0 ? (data.length() + 1) : 0; // plus 1 advertises the "load more" item to the listview without having to add it to the data source
+        return data.length() > 0 ? (data.length() + 1) : 0; // plus 1 advertises the "load more" item to the listview without having to add it to the data source
     }
 
     @Override
@@ -316,11 +318,11 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                     JSONObject prevObj = tempobj.getJSONObject("preview");
                     if (prevObj.has("images")) {
                         JSONArray arr = prevObj.getJSONArray("images");
-                        if (arr.length()>0) {
+                        if (arr.length() > 0) {
                             prevObj = arr.getJSONObject(0);
                             arr = prevObj.getJSONArray("resolutions");
                             // get third resolution (320px wide)
-                            if (arr.length() > 0){
+                            if (arr.length() > 0) {
                                 prevObj = arr.length() < 3 ? arr.getJSONObject(arr.length() - 1) : arr.getJSONObject(2);
                                 previewUrl = Utilities.fromHtml(prevObj.getString("url")).toString();
                             } else {
@@ -338,7 +340,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             viewHolder.listheading.setText(Utilities.fromHtml(name).toString());
             viewHolder.listheading.setTextSize(Integer.valueOf(titleFontSize)); // use for compatibility setTextViewTextSize only introduced in API 16
             viewHolder.listheading.setTextColor(themeColors.get("headline_text"));
-            String sourceText = (showItemSubreddit?subreddit+" - ":"")+domain;
+            String sourceText = (showItemSubreddit ? subreddit + " - " : "") + domain;
             viewHolder.sourcetxt.setText(sourceText);
             viewHolder.sourcetxt.setTextColor(themeColors.get("source_text"));
             viewHolder.votestxt.setText(Utilities.getScoreText(score));
@@ -375,7 +377,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             });
             // Get thumbnail view & hide the other
             ImageView thumbView;
-            if (bigThumbs){
+            if (bigThumbs) {
                 thumbView = viewHolder.thumbview_top;
                 viewHolder.thumbview.setVisibility(View.GONE);
             } else {
@@ -385,12 +387,12 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             // check for preview images & thumbnails
             String imageUrl = null;
             int imageLoadFlag = 0; // 1 for thumbnail, 2 for preview, 3 for default thumbnail
-            if (loadPreviews && !nsfw && previewUrl!=null){
+            if (loadPreviews && !nsfw && previewUrl != null) {
                 imageUrl = previewUrl;
                 imageLoadFlag = 2;
                 thumbView.setVisibility(View.GONE);
                 viewHolder.thumbview_expand.setVisibility(View.GONE);
-            } else if (loadThumbnails && thumbnail!=null && !thumbnail.equals("")) {
+            } else if (loadThumbnails && thumbnail != null && !thumbnail.equals("")) {
                 // hide preview view
                 viewHolder.preview.setVisibility(View.GONE);
                 // check for default thumbnails
@@ -427,13 +429,13 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 viewHolder.preview.setVisibility(View.GONE);
             }
             // load external images into view
-            if (imageLoadFlag>0){
+            if (imageLoadFlag > 0) {
                 ImageView imageView = imageLoadFlag == 2 ? viewHolder.preview : thumbView;
                 // set id so loadImage callback knows if it should update the view
                 // this is done instead of calling notifyDataSetChanged for each image
                 imageView.setTag(id);
                 // skip if default thumbnail, just check for image
-                if (imageLoadFlag!=3) {
+                if (imageLoadFlag != 3) {
                     // check if the image is in cache
                     String fileurl = context.getCacheDir() + Reddinator.IMAGE_CACHE_DIR + id + (imageLoadFlag == 2 ? "-preview" : "") + ".png";
                     if (new File(fileurl).exists()) {
@@ -455,7 +457,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                     }
                 }
                 // check if url is image, if so, add ViewImageDialog intent and show indicator
-                if (Utilities.isImageUrl(url)){
+                if (Utilities.isImageUrl(url)) {
                     imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -493,17 +495,17 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
     }
 
     private void loadImage(final ImageView view, final ImageView expandView, final String urlstr, final String redditid, final String type) {
-        new LoadImageBitmapTask(urlstr, new LoadImageBitmapTask.ImageCallback(){
+        new LoadImageBitmapTask(urlstr, new LoadImageBitmapTask.ImageCallback() {
             @Override
             public void run() {
-                if (image!=null){
+                if (image != null) {
                     // save bitmap to cache, the item name will be the reddit id
-                    global.saveThumbnailToCache(image, redditid+type);
+                    global.saveThumbnailToCache(image, redditid + type);
                     // only update view if the tag is still the same, as we can be sure the view hasn't been recycled
-                    if (view.getTag()==redditid){
+                    if (view.getTag() == redditid) {
                         view.setImageBitmap(image);
                     }
-                } else if (view.getTag()==redditid) {
+                } else if (view.getTag() == redditid) {
                     view.setVisibility(View.GONE);
                     if (expandView != null)
                         expandView.setVisibility(View.GONE);

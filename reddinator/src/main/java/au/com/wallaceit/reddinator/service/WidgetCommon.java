@@ -55,9 +55,9 @@ public class WidgetCommon {
     static final Class WIDGET_CLASS_LIST = WidgetProvider.class;
     static final Class WIDGET_CLASS_STACK = StackWidgetProvider.class;
 
-    static Class getWidgetProviderClass(Context context, int appWidgetId){
+    static Class getWidgetProviderClass(Context context, int appWidgetId) {
         AppWidgetProviderInfo widgetInfo = AppWidgetManager.getInstance(context).getAppWidgetInfo(appWidgetId);
-        if (widgetInfo!=null) {
+        if (widgetInfo != null) {
             String className = widgetInfo.provider.getClassName();
             className = className.substring(className.lastIndexOf(".") + 1);
             if (className.equals(WIDGET_CLASS_LIST.getSimpleName())) {
@@ -69,7 +69,7 @@ public class WidgetCommon {
         return WidgetCommon.class;
     }
 
-    static int getWidgetLayoutId(Class providerClass){
+    static int getWidgetLayoutId(Class providerClass) {
         if (providerClass.getSimpleName().equals(WIDGET_CLASS_STACK.getSimpleName()))
             return R.layout.widget_stack;
 
@@ -113,7 +113,7 @@ public class WidgetCommon {
         mgr.notifyAppWidgetViewDataChanged(widgetId, R.id.adapterview);
     }
 
-    public static void refreshAllWidgetViews(Reddinator global){
+    public static void refreshAllWidgetViews(Reddinator global) {
         global.setRefreshView();
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(global);
         // update stack widgets
@@ -126,7 +126,7 @@ public class WidgetCommon {
         appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.adapterview);
     }
 
-    public static void showLoaderAndRefreshViews(Context context, int widgetId){
+    public static void showLoaderAndRefreshViews(Context context, int widgetId) {
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
         Class providerClass = getWidgetProviderClass(context, widgetId);
         // show loader
@@ -138,7 +138,7 @@ public class WidgetCommon {
         mgr.partiallyUpdateAppWidget(widgetId, views);
     }
 
-    public static void hideLoaderAndRefreshViews(Context context, int widgetId, boolean showerror){
+    public static void hideLoaderAndRefreshViews(Context context, int widgetId, boolean showerror) {
         Reddinator global = ((Reddinator) context.getApplicationContext());
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
         Class providerClass = getWidgetProviderClass(context, widgetId);
@@ -153,14 +153,14 @@ public class WidgetCommon {
         mgr.partiallyUpdateAppWidget(widgetId, views);
     }
 
-    private static int[] getAllAppWidgetIds(Context context){
+    private static int[] getAllAppWidgetIds(Context context) {
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
         int listIds[] = mgr.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
         int stackIds[] = mgr.getAppWidgetIds(new ComponentName(context, StackWidgetProvider.class));
         return ArrayUtils.addAll(listIds, stackIds);
     }
 
-    public static void setUpdateSchedule(Context context){
+    public static void setUpdateSchedule(Context context) {
 
         Intent intent = new Intent(context, WidgetProvider.class);
         intent.setAction(WidgetCommon.ACTION_AUTO_UPDATE);

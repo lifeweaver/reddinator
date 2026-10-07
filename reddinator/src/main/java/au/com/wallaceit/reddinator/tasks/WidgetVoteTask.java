@@ -77,14 +77,14 @@ public class WidgetVoteTask extends AsyncTask<String, Integer, Boolean> {
             if (curVote.equals("true")) { // if already upvoted, neutralize.
                 direction = 0;
                 netvote = -1;
-            } else if (curVote.equals("false")){
+            } else if (curVote.equals("false")) {
                 netvote = 2;
             }
         } else { // downvote
             if (curVote.equals("false")) {
                 direction = 0;
                 netvote = 1;
-            } else if (curVote.equals("true")){
+            } else if (curVote.equals("true")) {
                 netvote = -2;
             }
         }

@@ -20,9 +20,7 @@ package au.com.wallaceit.reddinator.activity;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -40,7 +38,6 @@ import com.joanzapata.android.iconify.Iconify;
 
 import java.lang.reflect.Method;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.ui.ActionbarActivity;
@@ -57,7 +54,7 @@ public class WebViewActivity extends ActionbarActivity {
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
         getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
         super.onCreate(savedInstanceState);
-        
+
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -94,7 +91,7 @@ public class WebViewActivity extends ActionbarActivity {
         CookieManager.getInstance().setAcceptCookie(true);
         // get url from extra
         String url = getIntent().getStringExtra("url");
-        if (url==null){
+        if (url == null) {
             url = "https://m.reddit.com/";
         }
         registerForContextMenu(wv);
@@ -112,7 +109,7 @@ public class WebViewActivity extends ActionbarActivity {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         if (wv != null) {
             wv.removeAllViews();
@@ -134,20 +131,17 @@ public class WebViewActivity extends ActionbarActivity {
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu)
-    {
-        if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
-            if(menu.getClass().getSimpleName().equals("MenuBuilder")){
-                try{
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
                     Method m = menu.getClass().getDeclaredMethod(
                             "setOptionalIconsVisible", Boolean.TYPE);
                     m.setAccessible(true);
                     m.invoke(menu, true);
-                }
-                catch(NoSuchMethodException e){
+                } catch (NoSuchMethodException e) {
                     System.out.println("Could not display action icons in menu");
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }

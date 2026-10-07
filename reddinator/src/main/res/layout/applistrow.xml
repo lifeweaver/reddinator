@@ -160,7 +160,7 @@
             android:text="@string/reddit_domain"
             android:textColor="#336699"
             android:singleLine="true"
-            android:ellipsize="marquee"/>
+            android:ellipsize="marquee" />
 
         <TextView
             android:id="@+id/nsfwflag"
@@ -208,7 +208,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/commentstxt"
             android:layout_toStartOf="@+id/commentstxt"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/commentstxt"

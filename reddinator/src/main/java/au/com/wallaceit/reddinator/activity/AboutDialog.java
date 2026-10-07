@@ -18,6 +18,7 @@ package au.com.wallaceit.reddinator.activity;
  *
  * Created by michael on 23/08/16.
  */
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -47,8 +48,8 @@ public class AboutDialog extends Dialog {
     private Context context;
     private boolean isUserInitiated = true;
 
-    public static Dialog show(Context context, boolean isUserInitiated){
-        Dialog dialog =  new AboutDialog(context, isUserInitiated);
+    public static Dialog show(Context context, boolean isUserInitiated) {
+        Dialog dialog = new AboutDialog(context, isUserInitiated);
         dialog.show();
         return dialog;
     }
@@ -91,7 +92,7 @@ public class AboutDialog extends Dialog {
         // do install/upgrade dialog specific stuff
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (!isUserInitiated) {
-            if (prefs.getBoolean("welcomeDialogShown", false)){
+            if (prefs.getBoolean("welcomeDialogShown", false)) {
                 pager.setCurrentItem(2); // show changelog view on upgrade
             } else {
                 prefs.edit().putBoolean("welcomeDialogShown", true).apply(); // show details view on first run

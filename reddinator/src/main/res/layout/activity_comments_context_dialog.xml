@@ -24,6 +24,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <au.com.wallaceit.reddinator.ui.RWebView
                 android:id="@+id/commentswebview"
                 android:layout_height="match_parent"
@@ -37,11 +38,13 @@
             android:layout_height="wrap_content"
             android:paddingLeft="6dp"
             android:paddingRight="6dp">
+
             <RelativeLayout
                 android:id="@+id/title_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp">
+
                 <TextView
                     android:id="@+id/source_txt"
                     android:layout_width="wrap_content"
@@ -53,11 +56,13 @@
                     android:textColor="#336699"
                     android:maxLines="1"
                     android:ellipsize="marquee"
-                    android:paddingTop="3dp"/>
+                    android:paddingTop="3dp" />
             </RelativeLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <TextView
                     android:id="@+id/post_title"
                     style="@android:style/TextAppearance.Medium"
@@ -67,7 +72,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginBottom="2dp"/>
+                    android:layout_marginBottom="2dp" />
 
                 <IconTextView
                     android:id="@+id/info_txt"
@@ -82,7 +87,7 @@
                     android:padding="0dp"
                     android:includeFontPadding="false"
                     android:clickable="true"
-                    android:linksClickable="true"/>
+                    android:linksClickable="true" />
 
                 <IconTextView
                     android:id="@+id/votes_icon"
@@ -109,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="2dp"
                     android:layout_marginStart="2dp"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <IconTextView
                     android:id="@+id/comments_icon"
@@ -126,7 +131,7 @@
                     android:shadowDy="4"
                     android:shadowRadius="3"
                     android:padding="2dp"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/comments_txt"
@@ -157,13 +162,15 @@
                     android:paddingTop="2dp"
                     android:textSize="24sp"
                     android:textColor="#DBDBDB"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
             </RelativeLayout>
+
             <LinearLayout
                 android:id="@+id/buttons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <IconButton
                     android:id="@+id/commentsbutton"
                     android:layout_weight="1"
@@ -173,6 +180,7 @@
                     android:padding="8dp"
                     android:background="#5F99CF"
                     android:text="@string/view_all_comments" />
+
                 <IconButton
                     android:id="@+id/linkbutton"
                     android:layout_weight="1"

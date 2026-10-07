@@ -2,9 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
     <title>Reddinator Comments</title>
-    <base href="https://www.reddit.com/" />
+    <base href="https://www.reddit.com/"/>
     <link href="file:///android_asset/css/font-awesome.min.css" rel="stylesheet">
     <link href="file:///android_asset/css/reddit-markdown.css" rel="stylesheet">
     <link href="file:///android_asset/css/core.css" rel="stylesheet">
@@ -41,10 +42,13 @@
     <div class="option_container">
         <div class="clearfix"></div>
         <div class="comment_options">
-            <i class="user_option fa fa-pencil" onclick="startEdit($(this).parent().parent().parent().attr('id'));"></i>
-            <i class="user_option fa fa-trash" onclick="deleteComment($(this).parent().parent().parent().attr('id'));"></i>
+            <i class="user_option fa fa-pencil"
+               onclick="startEdit($(this).parent().parent().parent().attr('id'));"></i>
+            <i class="user_option fa fa-trash"
+               onclick="deleteComment($(this).parent().parent().parent().attr('id'));"></i>
             <i class="post_toggle fa fa-reply"></i>
-            <i class="fa fa-globe" onclick="Reddinator.openCommentLink($(this).parent().parent().parent().attr('id'));"></i>
+            <i class="fa fa-globe"
+               onclick="Reddinator.openCommentLink($(this).parent().parent().parent().attr('id'));"></i>
         </div>
         <div class="reply_expand sub-border" onclick="toggleReplies(this);">
             <h5>-</h5>
@@ -53,7 +57,9 @@
     </div>
     <div class="post_reply post_box" style="display:none;">
         <textarea class="comment_textarea"></textarea>
-        <button onclick="$(this).prop('disabled', true); comment($(this).parent().parent().attr('id'), $(this).siblings('.comment_textarea').val());">Reply</button>
+        <button onclick="$(this).prop('disabled', true); comment($(this).parent().parent().attr('id'), $(this).siblings('.comment_textarea').val());">
+            Reply
+        </button>
     </div>
     <div class="comment_replies">
 
@@ -64,7 +70,9 @@
 </div>
 <div id="edit_template" class="post_box" style="display:none;">
     <textarea class="edit_textarea" rows="5" style=""></textarea>
-    <button onclick="$(this).prop('disabled', true).next('button').prop('disabled', true); edit($(this).parent().parent().attr('id'), $(this).siblings('.edit_textarea').val());">Save</button>
+    <button onclick="$(this).prop('disabled', true).next('button').prop('disabled', true); edit($(this).parent().parent().attr('id'), $(this).siblings('.edit_textarea').val());">
+        Save
+    </button>
     <button onclick="cancelEdit($(this).parent().parent().attr('id'));">Cancel</button>
 </div>
 <div id="header" class="comments_header">
@@ -85,9 +93,13 @@
     <div id="post_comment" class="post_box">
         <div id="post_comment_box" style="margin:0;display:none;">
             <textarea id="post_comment_textarea" rows="5"></textarea>
-            <button onclick="$(this).prop('disabled', true); comment(articleId, $('#post_comment_textarea').val());">Comment</button>
+            <button onclick="$(this).prop('disabled', true); comment(articleId, $('#post_comment_textarea').val());">
+                Comment
+            </button>
         </div>
-        <button id="post_comment_button" onclick="showPostCommentBox();" style="width:100%; margin-top:5px;">Add Comment</button>
+        <button id="post_comment_button" onclick="showPostCommentBox();"
+                style="width:100%; margin-top:5px;">Add Comment
+        </button>
     </div>
     <div id="base">
 

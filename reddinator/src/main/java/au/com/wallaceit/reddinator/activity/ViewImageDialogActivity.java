@@ -24,13 +24,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.IconButton;
@@ -60,7 +56,7 @@ public class ViewImageDialogActivity extends Activity {
         } else if (Utilities.isGfycatUrl(imageUrl)) {
             imageUrl = imageUrl.replace("gfycat.com", "gfycat.com/ifr");
             iframeContent = "<div style='position:relative; padding-bottom:calc(70.80% + 44px)'>" +
-                    "<iframe src='"+imageUrl+"' frameborder='0' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen></iframe></div>";
+                    "<iframe src='" + imageUrl + "' frameborder='0' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen></iframe></div>";
         }
         // setup image view
         WebView webView = (WebView) findViewById(R.id.imagewebview);
@@ -100,8 +96,8 @@ public class ViewImageDialogActivity extends Activity {
                 Bundle extras = getIntent().getExtras();
                 extras.putBoolean("view_comments", true);
                 Intent commentsIntent = new Intent(ViewImageDialogActivity.this, ViewRedditActivity.class);
-                commentsIntent .putExtras(extras);
-                startActivity(commentsIntent );
+                commentsIntent.putExtras(extras);
+                startActivity(commentsIntent);
                 finish();
             }
         });

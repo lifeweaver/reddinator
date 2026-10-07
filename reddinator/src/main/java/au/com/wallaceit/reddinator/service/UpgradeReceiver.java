@@ -65,10 +65,10 @@ public class UpgradeReceiver extends BroadcastReceiver {
         fileOrDirectory.delete();
     }
 
-    private void migrateFeedData(int feedId){
+    private void migrateFeedData(int feedId) {
         String prefKey = "feeddata-" + (feedId == 0 ? "app" : feedId);
         String feedData = global.mSharedPreferences.getString(prefKey, null);
-        if (feedData==null)
+        if (feedData == null)
             return;
         JSONArray data;
         try {

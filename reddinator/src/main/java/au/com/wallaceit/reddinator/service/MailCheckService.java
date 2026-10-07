@@ -33,8 +33,8 @@ import android.util.Log;
 
 import org.json.JSONArray;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.activity.MessagesActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
@@ -46,19 +46,19 @@ public class MailCheckService extends JobIntentService {
     private Reddinator global;
     public static final int JOB_ID = 1;
 
-    public static void checkMail(Context context, String action){
+    public static void checkMail(Context context, String action) {
         Intent intent = new Intent(context, MailCheckService.class);
         intent.setAction(action);
 
         try {
             MailCheckService.enqueueWork(context, MailCheckService.class, JOB_ID, intent);
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e("reddinator", e.getMessage());
         }
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         global = ((Reddinator) getApplicationContext());
     }
 
@@ -81,7 +81,7 @@ public class MailCheckService extends JobIntentService {
         Reddinator global;
         String action;
 
-        MailCheckTask(Reddinator global, String action){
+        MailCheckTask(Reddinator global, String action) {
             super();
 
             this.global = global;
@@ -99,7 +99,7 @@ public class MailCheckService extends JobIntentService {
             }
             // update stored unread messages if the count has changed
             int newCount = global.mRedditData.getInboxCount();
-            if (newCount>0 && newCount!=oldCount){
+            if (newCount > 0 && newCount != oldCount) {
                 try {
                     JSONArray messages = global.mRedditData.getMessageFeed("unread", 25, null);
                     global.setUnreadMessages(messages);
@@ -108,25 +108,25 @@ public class MailCheckService extends JobIntentService {
                     e.printStackTrace();
                 }
             } else {
-                if (oldCount>0) global.clearUnreadMessages();
+                if (oldCount > 0) global.clearUnreadMessages();
             }
             return true;
         }
 
         @Override
-        protected void onPostExecute(Boolean result){
+        protected void onPostExecute(Boolean result) {
             if (result)
-            if (action.equals(ACTIVITY_CHECK_ACTION)) {
-                // notify activity
-                Intent bIntent = new Intent(MAIL_CHECK_COMPLETE);
-                global.sendBroadcast(bIntent);
-            } else {
-                // show notification
-                if (global.mRedditData.getInboxCount()>0) setNotification();
-            }
+                if (action.equals(ACTIVITY_CHECK_ACTION)) {
+                    // notify activity
+                    Intent bIntent = new Intent(MAIL_CHECK_COMPLETE);
+                    global.sendBroadcast(bIntent);
+                } else {
+                    // show notification
+                    if (global.mRedditData.getInboxCount() > 0) setNotification();
+                }
         }
 
-        private void setNotification(){
+        private void setNotification() {
             int nummessages = global.mRedditData.getInboxCount();
             Intent notifyIntent = new Intent(global, MessagesActivity.class);
             notifyIntent.setAction(MessagesActivity.ACTION_UNREAD);
@@ -135,7 +135,7 @@ public class MailCheckService extends JobIntentService {
                     .setContentText(global.getResources().getString(R.string.new_messages_text))
                     .setLargeIcon(BitmapFactory.decodeResource(global.getResources(), R.drawable.reddinator_logo))
                     .setSmallIcon(R.drawable.ic_notify)
-                    .setContentIntent(PendingIntent.getActivity(global, 0 ,notifyIntent, Utilities.pendingFlags(false)))
+                    .setContentIntent(PendingIntent.getActivity(global, 0, notifyIntent, Utilities.pendingFlags(false)))
                     .build();
 
             NotificationManager notificationManager = (NotificationManager) global.getSystemService(NOTIFICATION_SERVICE);

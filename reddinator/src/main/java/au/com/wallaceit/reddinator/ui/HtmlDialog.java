@@ -31,7 +31,7 @@ import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 
 public class HtmlDialog extends AlertDialog {
-    public static HtmlDialog init(Activity context, String title, String html){
+    public static HtmlDialog init(Activity context, String title, String html) {
         HtmlDialog dialog = new HtmlDialog(context, title, html);
         dialog.show();
         return dialog;

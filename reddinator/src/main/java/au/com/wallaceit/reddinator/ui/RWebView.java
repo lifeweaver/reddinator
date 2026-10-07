@@ -84,7 +84,7 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
 
                 Intent intent;
 
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case ID_COPYLINK:
                         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                         ClipData clip = ClipData.newPlainText(result.getExtra(), result.getExtra());
@@ -144,7 +144,7 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
     private void downloadFile(String url) {
         // Check permissions for android M
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED) {
+            if (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 callbackUrl = url;
                 ((Activity) getContext()).requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 Toast.makeText(getContext(), "Storage permission is required to download files.", Toast.LENGTH_LONG).show();
@@ -154,7 +154,7 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         String downloadLocation = prefs.getString("download_location", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
 
-        if (prefs.getBoolean("download_ask_pref", false)){
+        if (prefs.getBoolean("download_ask_pref", false)) {
             try {
                 callbackUrl = url;
                 final Activity activity = (Activity) getContext();
@@ -167,7 +167,7 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
                 mDialog.setDirectoryChooserListener(this);
                 mDialog.show(activity.getFragmentManager(), null);
                 return;
-            } catch (ClassCastException ex){
+            } catch (ClassCastException ex) {
                 ex.printStackTrace();
             }
         }
@@ -188,7 +188,7 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
         mDialog.dismiss();
     }
 
-    private void doFileDownload(String url, String downloadLocation){
+    private void doFileDownload(String url, String downloadLocation) {
         DownloadManager mgr = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
         Uri downloadUri = Uri.parse(url);
         String filename = appendImageExtensionIfNeeded(downloadUri.getLastPathSegment());
@@ -196,11 +196,11 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
 
         DownloadManager.Request request = new DownloadManager.Request(downloadUri);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
-            .setAllowedOverRoaming(false)
-            .setTitle(filename)
-            .setDescription("Reddinator download")
-            .setVisibleInDownloadsUi(prefs.getBoolean("download_nativeui", true))
-            .setDestinationInExternalPublicDir(downloadLocation.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), filename);
+                .setAllowedOverRoaming(false)
+                .setTitle(filename)
+                .setDescription("Reddinator download")
+                .setVisibleInDownloadsUi(prefs.getBoolean("download_nativeui", true))
+                .setDestinationInExternalPublicDir(downloadLocation.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), filename);
 
         if (prefs.getBoolean("download_notify_complete", true))
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -215,15 +215,15 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
         }
     }*/
 
-    private void shareImage(final String url){
+    private void shareImage(final String url) {
         final ProgressDialog dialog = ProgressDialog.show(getContext(), "Downloading", "Please wait...", true);
         new LoadImageBitmapTask(url, new LoadImageBitmapTask.ImageCallback() {
             @Override
             public void run() {
                 dialog.dismiss();
-                if (image!=null){
+                if (image != null) {
                     // save file
-                    String filename = "share-"+appendImageExtensionIfNeeded(Uri.parse(url).getLastPathSegment());
+                    String filename = "share-" + appendImageExtensionIfNeeded(Uri.parse(url).getLastPathSegment());
                     File file = new File(getContext().getCacheDir().getPath() + Reddinator.IMAGE_CACHE_DIR + filename);
                     FileOutputStream fos = null;
                     try {
@@ -247,9 +247,9 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
         }).execute();
     }
 
-    private String appendImageExtensionIfNeeded(String filename){
-        if (!filename.contains(".")){
-            return filename+".jpg";
+    private String appendImageExtensionIfNeeded(String filename) {
+        if (!filename.contains(".")) {
+            return filename + ".jpg";
         }
         return filename;
     }

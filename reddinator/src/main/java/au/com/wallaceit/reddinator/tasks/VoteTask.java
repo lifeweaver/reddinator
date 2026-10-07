@@ -20,6 +20,7 @@ package au.com.wallaceit.reddinator.tasks;
  */
 
 import android.os.AsyncTask;
+
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
@@ -54,17 +55,17 @@ public class VoteTask extends AsyncTask<String, Integer, Boolean> {
     @Override
     protected Boolean doInBackground(String... strings) {
         if (direction == 1) {
-            if (currentVote==1) { // if already upvoted, neutralize.
+            if (currentVote == 1) { // if already upvoted, neutralize.
                 direction = 0;
                 netVote = -1;
-            } else if (currentVote==-1){
+            } else if (currentVote == -1) {
                 netVote = 2;
             }
         } else { // downvote
-            if (currentVote==-1) {
+            if (currentVote == -1) {
                 direction = 0;
                 netVote = 1;
-            } else if (currentVote==1){
+            } else if (currentVote == 1) {
                 netVote = -2;
             }
         }
@@ -80,7 +81,7 @@ public class VoteTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (voteCallback!=null)
+        if (voteCallback != null)
             voteCallback.onVoteComplete(result, exception, redditId, direction, netVote, listPosition);
     }
 }

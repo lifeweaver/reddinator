@@ -54,7 +54,7 @@ public class WidgetProviderBase extends AppWidgetProvider {
     public void onDeleted(Context context, int[] appWidgetIds) {
         // Cleaup widget data
         Reddinator global = (Reddinator) context.getApplicationContext();
-        for (int widgetId : appWidgetIds){
+        for (int widgetId : appWidgetIds) {
             global.clearFeedDataAndPreferences(widgetId);
         }
         super.onDeleted(context, appWidgetIds);

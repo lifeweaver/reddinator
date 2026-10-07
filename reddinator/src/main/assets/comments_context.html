@@ -2,9 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
     <title>Reddinator Comments</title>
-    <base href="https://www.reddit.com/" />
+    <base href="https://www.reddit.com/"/>
     <link href="file:///android_asset/css/font-awesome.min.css" rel="stylesheet">
     <link href="file:///android_asset/css/reddit-markdown.css" rel="stylesheet">
     <link href="file:///android_asset/css/core.css" rel="stylesheet">
@@ -34,10 +35,13 @@
     <div class="option_container">
         <div class="clearfix"></div>
         <div class="comment_options">
-            <i class="user_option fa fa-pencil" onclick="startEdit($(this).parent().parent().parent().attr('id'));"></i>
-            <i class="user_option fa fa-trash" onclick="deleteComment($(this).parent().parent().parent().attr('id'));"></i>
+            <i class="user_option fa fa-pencil"
+               onclick="startEdit($(this).parent().parent().parent().attr('id'));"></i>
+            <i class="user_option fa fa-trash"
+               onclick="deleteComment($(this).parent().parent().parent().attr('id'));"></i>
             <i class="post_toggle fa fa-reply"></i>
-            <i class="fa fa-globe" onclick="Reddinator.openCommentLink($(this).parent().parent().parent().attr('id'));"></i>
+            <i class="fa fa-globe"
+               onclick="Reddinator.openCommentLink($(this).parent().parent().parent().attr('id'));"></i>
         </div>
         <div class="reply_expand sub-border" onclick="toggleReplies(this);">
             <h5>-</h5>
@@ -46,7 +50,9 @@
     </div>
     <div class="post_reply post_box" style="display:none;">
         <textarea class="comment_textarea"></textarea>
-        <button onclick="$(this).prop('disabled', true); comment($(this).parent().parent().attr('id'), $(this).siblings('.comment_textarea').val());">Reply</button>
+        <button onclick="$(this).prop('disabled', true); comment($(this).parent().parent().attr('id'), $(this).siblings('.comment_textarea').val());">
+            Reply
+        </button>
     </div>
     <div class="comment_replies">
 
@@ -57,28 +63,30 @@
 </div>
 <div id="edit_template" class="post_box" style="display:none;">
     <textarea class="edit_textarea" rows="5" style=""></textarea>
-    <button onclick="$(this).prop('disabled', true).next('button').prop('disabled', true); edit($(this).parent().parent().attr('id'), $(this).siblings('.edit_textarea').val());">Save</button>
+    <button onclick="$(this).prop('disabled', true).next('button').prop('disabled', true); edit($(this).parent().parent().attr('id'), $(this).siblings('.edit_textarea').val());">
+        Save
+    </button>
     <button onclick="cancelEdit($(this).parent().parent().attr('id'));">Cancel</button>
 </div>
 <div id="header" style="position:fixed;top:0;z-index:1000;">
     <i onclick="reloadCommentsContext();" class="fa fa-refresh"></i>
     <label style="display:inline-block;">Sort:</label>
     <select id="context_sort_select" onchange="reloadCommentsContext();" style="margin-right: 4px;">
-            <option value="best">Best</option>
-            <option value="top">Top</option>
-            <option value="new">New</option>
-            <option value="hot">Hot</option>
-            <option value="controversial">Controversial</option>
-            <option value="old">Old</option>
+        <option value="best">Best</option>
+        <option value="top">Top</option>
+        <option value="new">New</option>
+        <option value="hot">Hot</option>
+        <option value="controversial">Controversial</option>
+        <option value="old">Old</option>
     </select>
     <label style="display:inline-block;">Context:</label>
     <select id="context_select" onchange="reloadCommentsContext();">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">1</option>
-            <option value="3">3</option>
-            <option value="10">10</option>
-            <option value="100">All</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">1</option>
+        <option value="3">3</option>
+        <option value="10">10</option>
+        <option value="100">All</option>
     </select>
 </div>
 <div id="container">

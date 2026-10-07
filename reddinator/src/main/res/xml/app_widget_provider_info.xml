@@ -10,5 +10,4 @@
     android:minResizeWidth="200dp"
     android:updatePeriodMillis="0"
     android:configure="au.com.wallaceit.reddinator.activity.SubredditSelectActivity"
-    tools:ignore="UnusedAttribute">
-</appwidget-provider>
+    tools:ignore="UnusedAttribute"></appwidget-provider>

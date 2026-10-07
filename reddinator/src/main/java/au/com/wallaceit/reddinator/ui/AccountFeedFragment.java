@@ -50,14 +50,12 @@ import java.util.ArrayList;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
-import au.com.wallaceit.reddinator.activity.AccountActivity;
 import au.com.wallaceit.reddinator.activity.CommentsContextDialogActivity;
 import au.com.wallaceit.reddinator.activity.MessagesActivity;
 import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-import au.com.wallaceit.reddinator.service.WidgetProvider;
 import au.com.wallaceit.reddinator.tasks.CommentTask;
 import au.com.wallaceit.reddinator.tasks.ComposeMessageTask;
 import au.com.wallaceit.reddinator.tasks.HidePostTask;
@@ -88,14 +86,15 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     }
 
     private boolean loaded = false;
-    public void load(){
+
+    public void load() {
         if (!loaded) {
             loadComments("new");
             loaded = true;
         }
     }
 
-    public void reload(){
+    public void reload() {
         mWebView.loadUrl("javascript:loadFeedStart();");
         loadComments(null);
     }
@@ -144,7 +143,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
             }
 
             public void onPageFinished(WebView view, String url) {
-                mWebView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \"" + global.mRedditData.getUsername() + "\", \""+type+"\")");
+                mWebView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \"" + global.mRedditData.getUsername() + "\", \"" + type + "\")");
                 if (load) load();
             }
         });
@@ -158,7 +157,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         if (type.equals("unread") || type.equals("inbox") || type.equals("sent"))
             isMessages = true;
 
-        mWebView.loadUrl("file:///android_asset/"+(isMessages?"messages":"account")+".html");
+        mWebView.loadUrl("file:///android_asset/" + (isMessages ? "messages" : "account") + ".html");
     }
 
     public void updateTheme() {
@@ -191,13 +190,13 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if (feedLoader !=null)
+        if (feedLoader != null)
             feedLoader.cancel(true);
-        if (commentsVoteTask!=null)
+        if (commentsVoteTask != null)
             commentsVoteTask.cancel(false);
-        if (commentTask!=null)
+        if (commentTask != null)
             commentTask.cancel(false);
     }
 
@@ -205,7 +204,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     public void onVoteComplete(boolean result, RedditData.RedditApiException exception, String redditId, int direction, int netVote, int listPosition) {
         ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
         if (result) {
-            mWebView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", "+netVote+")");
+            mWebView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", " + netVote + ")");
         } else {
             // check login required
             if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
@@ -217,8 +216,8 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     @Override
     public void onCommentComplete(JSONObject result, RedditData.RedditApiException exception, int action, String redditId) {
         ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-        if (result!=null){
-            switch (action){
+        if (result != null) {
+            switch (action) {
                 case -1:
                     mWebView.loadUrl("javascript:deleteCallback(\"" + redditId + "\")");
                     break;
@@ -241,7 +240,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     @Override
     public void onMessageSent(boolean result, RedditData.RedditApiException exception, String[] args) {
         ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-        if (result){
+        if (result) {
             mWebView.loadUrl("javascript:messageCallback(\"" + args[4] + "\", true);");
             // reload sent feed
             if (isMessages)
@@ -315,7 +314,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
                 @Override
                 public void run() {
                     ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-                    mWebView.loadUrl("javascript:deleteCallback('"+thingId+"')");
+                    mWebView.loadUrl("javascript:deleteCallback('" + thingId + "')");
                 }
             });
             savePostTask.execute("unsave", thingId);
@@ -328,7 +327,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
                 @Override
                 public void run() {
                     ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-                    mWebView.loadUrl("javascript:deleteCallback('"+thingId+"')");
+                    mWebView.loadUrl("javascript:deleteCallback('" + thingId + "')");
                 }
             });
             hidePostTask.execute("unhide", thingId);
@@ -359,6 +358,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
 
     public interface ActivityInterface {
         void setTitleText(String titleText);
+
         ThemeManager.Theme getCurrentTheme();
     }
 
@@ -377,7 +377,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         private ArrayList<String> unreadIds = null;
         private RedditData.RedditApiException exception;
 
-        FeedLoader(String sort){
+        FeedLoader(String sort) {
             mSort = sort;
         }
 
@@ -395,15 +395,15 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
             try {
                 if (isMessages) {
                     JSONArray cached = global.getUnreadMessages();
-                    if (type.equals("unread") && cached.length()>0){
+                    if (type.equals("unread") && cached.length() > 0) {
                         data = cached;
                     } else {
                         data = global.mRedditData.getMessageFeed(type, 25, mMoreId);
                     }
                     // collect ids of unread messages to mark them read below
-                    if (type.equals("unread") && data.length()>0){
+                    if (type.equals("unread") && data.length() > 0) {
                         unreadIds = new ArrayList<>();
-                        for (int i=0; i<data.length(); i++){
+                        for (int i = 0; i < data.length(); i++) {
                             try {
                                 unreadIds.add(data.getJSONObject(i).getJSONObject("data").getString("name"));
                             } catch (JSONException e) {
@@ -420,7 +420,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
                 return "-1"; // Indicate error
             }
 
-            if (data.length()>0) {
+            if (data.length() > 0) {
                 return data.toString();
             }
 
@@ -432,7 +432,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
             switch (result) {
                 case "":
                     if (!loadMore) {
-                        executeJavascript("showLoadingView(\""+StringEscapeUtils.escapeEcmaScript(resources.getString(R.string.nothing_more_here))+"\");");
+                        executeJavascript("showLoadingView(\"" + StringEscapeUtils.escapeEcmaScript(resources.getString(R.string.nothing_more_here)) + "\");");
                     } else {
                         executeJavascript("noMoreCallback('" + mMoreId + "');");
                     }
@@ -450,14 +450,15 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
                         return;
 
                     // check login required
-                    if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
+                    if (exception.isAuthError())
+                        global.mRedditData.initiateLogin(getActivity(), false);
 
                     Utilities.showApiErrorToastOrDialog(getActivity(), exception);
                     break;
                 default:
-                    executeJavascript("populateFeed('" + StringEscapeUtils.escapeEcmaScript(result) + "', "+loadMore+");");
+                    executeJavascript("populateFeed('" + StringEscapeUtils.escapeEcmaScript(result) + "', " + loadMore + ");");
                     // Mark messages read; this clears cached messages and count once completed
-                    if (unreadIds!=null && unreadIds.size()>0){
+                    if (unreadIds != null && unreadIds.size() > 0) {
                         new MarkMessageTask(global, unreadIds).execute();
                     }
                     break;
@@ -465,11 +466,11 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         }
     }
 
-    private void executeJavascript(String javascript){
+    private void executeJavascript(String javascript) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mWebView.evaluateJavascript(javascript, null);
         } else {
-            mWebView.loadUrl("javascript:"+javascript);
+            mWebView.loadUrl("javascript:" + javascript);
         }
     }
 }

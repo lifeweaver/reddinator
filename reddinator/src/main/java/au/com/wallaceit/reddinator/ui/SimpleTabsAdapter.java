@@ -32,7 +32,7 @@ public class SimpleTabsAdapter extends PagerAdapter {
     private int[] layoutIds;
     private Activity context;
 
-    public SimpleTabsAdapter(String[] labels, int[] layoutIds, Context context, View layout){
+    public SimpleTabsAdapter(String[] labels, int[] layoutIds, Context context, View layout) {
         this.context = (Activity) context;
         this.layout = layout;
         this.labels = labels;
@@ -40,9 +40,9 @@ public class SimpleTabsAdapter extends PagerAdapter {
     }
 
     public Object instantiateItem(ViewGroup collection, int position) {
-        if (position>labels.length)
+        if (position > labels.length)
             return null;
-        if (layout==null)
+        if (layout == null)
             return context.findViewById(layoutIds[position]);
         return layout.findViewById(layoutIds[position]);
     }
@@ -58,7 +58,7 @@ public class SimpleTabsAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        if (position>labels.length)
+        if (position > labels.length)
             return null;
         return labels[position];
     }

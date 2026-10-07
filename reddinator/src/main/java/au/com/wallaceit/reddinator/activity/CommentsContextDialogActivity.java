@@ -37,7 +37,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -104,15 +103,15 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         // get context url, extract permalink, id and comment id
         url = getIntent().getDataString();
-        if (url!=null) {
+        if (url != null) {
             Pattern pattern = Pattern.compile(".*reddit.com(/r/[^/]*/comments/([^/]*)/[^/]*/)([^/?]*)?(\\?context=([0-9]))?");
             Matcher matcher = pattern.matcher(url);
-            if (matcher.find()){
+            if (matcher.find()) {
                 //System.out.println(url + " " + matcher.group(1)+" "+matcher.group(2) + " " + matcher.group(3));
                 permalink = matcher.group(1);
-                articleId = "t3_"+matcher.group(2);
+                articleId = "t3_" + matcher.group(2);
                 commentId = matcher.group(3);
-                contextLevels = matcher.group(5)!=null ? Integer.parseInt(matcher.group(5)) : 3;
+                contextLevels = matcher.group(5) != null ? Integer.parseInt(matcher.group(5)) : 3;
             } else {
                 Toast.makeText(this, "Could not decode post URL", Toast.LENGTH_LONG).show();
                 this.finish();
@@ -151,7 +150,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         WebInterface webInterface = new WebInterface(this);
         webView.addJavascriptInterface(webInterface, "Reddinator");
         registerForContextMenu(webView);
-        webView.loadUrl("file:///android_asset/comments_context.html#"+articleId);
+        webView.loadUrl("file:///android_asset/comments_context.html#" + articleId);
         // setup open comments button
         IconButton button = (IconButton) findViewById(R.id.commentsbutton);
         button.setOnClickListener(new View.OnClickListener() {
@@ -212,7 +211,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
             if (usableHeightNow != usableHeightPrevious) {
                 int usableHeightSansKeyboard = mChildOfContent.getRootView().getHeight();
                 int heightDifference = usableHeightSansKeyboard - usableHeightNow;
-                if (heightDifference > (usableHeightSansKeyboard/4)) {
+                if (heightDifference > (usableHeightSansKeyboard / 4)) {
                     // keyboard probably just became visible
                     frameLayoutParams.height = usableHeightSansKeyboard - heightDifference - 60;
                 } else {
@@ -232,7 +231,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
 
     }
 
-    private void setTheme(){
+    private void setTheme() {
         ThemeManager.Theme theme = global.mThemeManager.getActiveTheme("appthemepref");
         int headerBg = Color.parseColor(theme.getValue("header_color"));
         int headerText = Color.parseColor(theme.getValue("header_text"));
@@ -255,14 +254,14 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
 
     }
 
-    private void showErrorAndFinish(){
+    private void showErrorAndFinish() {
         Toast.makeText(this, "Could not decode post URL", Toast.LENGTH_LONG).show();
         this.finish();
     }
 
-    private void populateInfoPanel(){
+    private void populateInfoPanel() {
         try {
-            String source = postInfo.getString("subreddit")+" - "+postInfo.getString("domain");
+            String source = postInfo.getString("subreddit") + " - " + postInfo.getString("domain");
             sourceText.setText(source);
             titleText.setText(Utilities.fromHtml(postInfo.getString("title")));
 
@@ -277,7 +276,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
             commentsText.setText(getResources().getQuantityString(R.plurals.num_comments, comments, comments));
 
             final String selftext = postInfo.getString("selftext_html");
-            if (!selftext.equals("null")){
+            if (!selftext.equals("null")) {
                 IconTextView textButton = (IconTextView) findViewById(R.id.selftext_button);
                 textButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -307,7 +306,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
 
         public void onPageFinished(WebView view, String url) {
             String themeStr = global.mThemeManager.getActiveTheme("appthemepref").getValuesString(true);
-            webView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \""+global.mRedditData.getUsername()+"\")");
+            webView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \"" + global.mRedditData.getUsername() + "\")");
 
             loadComments();
         }
@@ -389,7 +388,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
     public void onVoteComplete(boolean result, RedditData.RedditApiException exception, String redditId, int direction, int netVote, int listPosition) {
         //setTitleText(resources.getString(R.string.app_name)); // reset title
         if (result) {
-            webView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", "+netVote+")");
+            webView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", " + netVote + ")");
         } else {
             // check login required
             if (exception.isAuthError()) global.mRedditData.initiateLogin(this, false);
@@ -401,8 +400,8 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
     @Override
     public void onCommentComplete(JSONObject result, RedditData.RedditApiException exception, int action, String redditId) {
         //setTitleText(resources.getString(R.string.app_name)); // reset title
-        if (result!=null){
-            switch (action){
+        if (result != null) {
+            switch (action) {
                 case -1:
                     webView.loadUrl("javascript:deleteCallback(\"" + redditId + "\")");
                     break;
@@ -428,13 +427,14 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
     }
 
     private JSONObject postInfo;
+
     class CommentsContextLoader extends AsyncTask<Void, Integer, String> {
 
         private boolean loadMore = false;
         private String mMoreId;
         private String mChildren;
 
-        CommentsContextLoader(){
+        CommentsContextLoader() {
         }
 
         CommentsContextLoader(String moreId, String children) {
@@ -446,6 +446,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         }
 
         private String lastError;
+
         @Override
         protected String doInBackground(Void... none) {
             JSONArray data;
@@ -465,7 +466,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
                 return "-1"; // Indicate error
             }
 
-            if (data.length()>0) {
+            if (data.length() > 0) {
                 return data.toString();
             }
 
@@ -479,7 +480,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
                     if (!loadMore) {
                         Utilities.executeJavascriptInWebview(webView, "showLoadingView('" + resources.getString(R.string.no_comments_here) + "');");
                     } else {
-                        Utilities.executeJavascriptInWebview(webView, "noChildrenCallback('"+mMoreId+"');");
+                        Utilities.executeJavascriptInWebview(webView, "noChildrenCallback('" + mMoreId + "');");
                     }
                     break;
                 case "-1":
@@ -504,17 +505,17 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         }
     }
 
-    private void populateCommentsFromData(String data){
+    private void populateCommentsFromData(String data) {
         String author = "";
         try {
             author = postInfo.getString("author");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if (data.equals("[]")){
+        if (data.equals("[]")) {
             Utilities.executeJavascriptInWebview(webView, "showLoadingView('" + resources.getString(R.string.no_comments_here) + "');");
         } else {
-            Utilities.executeJavascriptInWebview(webView, "setContextLevel("+contextLevels+"); populateComments(\"" + author + "\", false, \"" + StringEscapeUtils.escapeEcmaScript(data) + "\");");
+            Utilities.executeJavascriptInWebview(webView, "setContextLevel(" + contextLevels + "); populateComments(\"" + author + "\", false, \"" + StringEscapeUtils.escapeEcmaScript(data) + "\");");
         }
     }
 }

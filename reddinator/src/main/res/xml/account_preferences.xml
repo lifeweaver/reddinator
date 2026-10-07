@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Account" android:key="account">
+        android:title="Account"
+        android:key="account">
 
         <ListPreference
-        android:key="@string/mail_check_pref"
-        android:title="@string/mail_check_pref_title"
-        android:summary="@string/mail_check_pref_summary"
-        android:entries="@array/mail_check_list"
-        android:entryValues="@array/mail_check_values"
-        android:defaultValue="300000"
-        android:dialogTitle="@string/mail_check_pref_title" />
+            android:key="@string/mail_check_pref"
+            android:title="@string/mail_check_pref_title"
+            android:summary="@string/mail_check_pref_summary"
+            android:entries="@array/mail_check_list"
+            android:entryValues="@array/mail_check_values"
+            android:defaultValue="300000"
+            android:dialogTitle="@string/mail_check_pref_title" />
 
         <ListPreference
             android:key="@string/background_mail_pref"
@@ -21,13 +22,15 @@
             android:defaultValue="43200000"
             android:dialogTitle="@string/background_mail_pref_title" />
 
-        <Preference android:title="@string/sync_data"
+        <Preference
+            android:title="@string/sync_data"
             android:key="refresh_data"
-            android:summary="@string/sync_data_summary"/>
+            android:summary="@string/sync_data_summary" />
 
-        <Preference android:title="@string/logout_title"
+        <Preference
+            android:title="@string/logout_title"
             android:key="logout"
-            android:summary="@string/logout_summary"/>
+            android:summary="@string/logout_summary" />
 
     </PreferenceCategory>
 </PreferenceScreen>

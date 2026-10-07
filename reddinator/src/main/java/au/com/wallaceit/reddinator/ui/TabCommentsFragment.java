@@ -87,7 +87,8 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
     }
 
     private JSONArray initialData = null;
-    public void loadFromData(JSONObject postInfo, JSONArray comments){
+
+    public void loadFromData(JSONObject postInfo, JSONArray comments) {
         subData = postInfo;
         if (webviewInit) {
             populateCommentsFromData(comments.toString());
@@ -145,8 +146,8 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                 }
 
                 public void onPageFinished(WebView view, String url) {
-                    mWebView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \""+global.mRedditData.getUsername()+"\")");
-                    if (initialData!=null) {
+                    mWebView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \"" + global.mRedditData.getUsername() + "\")");
+                    if (initialData != null) {
                         populateCommentsFromData(initialData.toString());
                     }
                     webviewInit = true;
@@ -159,7 +160,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
             mWebView.addJavascriptInterface(webInterface, "Reddinator");
             getActivity().registerForContextMenu(mWebView);
 
-            mWebView.loadUrl("file:///android_asset/comments.html#"+articleId);
+            mWebView.loadUrl("file:///android_asset/comments.html#" + articleId);
 
             mFirstTime = false;
         } else {
@@ -182,13 +183,13 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if (commentsLoader!=null)
+        if (commentsLoader != null)
             commentsLoader.cancel(true);
-        if (commentsVoteTask!=null)
+        if (commentsVoteTask != null)
             commentsVoteTask.cancel(false);
-        if (commentTask!=null)
+        if (commentTask != null)
             commentTask.cancel(false);
         if (mWebView != null) {
             mWebView.removeAllViews();
@@ -203,7 +204,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
         ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
         if (result) {
-            mWebView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", "+netVote+")");
+            mWebView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", " + netVote + ")");
         } else {
             // check login required
             if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
@@ -218,8 +219,8 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
             return;
 
         ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-        if (result!=null){
-            switch (action){
+        if (result != null) {
+            switch (action) {
                 case -1:
                     mWebView.loadUrl("javascript:deleteCallback(\"" + redditId + "\")");
                     break;
@@ -335,6 +336,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
     }
 
     private JSONObject subData;
+
     class CommentsLoader extends AsyncTask<Void, Integer, String> {
 
         private boolean loadMore = false;
@@ -342,7 +344,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
         private String mMoreId;
         private String mChildren;
 
-        CommentsLoader(String sort){
+        CommentsLoader(String sort) {
             mSort = sort;
         }
 
@@ -356,6 +358,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
         }
 
         private String lastError;
+
         @Override
         protected String doInBackground(Void... none) {
             JSONArray data;
@@ -375,7 +378,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                 return "-1"; // Indicate error
             }
 
-            if (data.length()>0) {
+            if (data.length() > 0) {
                 return data.toString();
             }
 
@@ -389,7 +392,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                     if (!loadMore) {
                         Utilities.executeJavascriptInWebview(mWebView, "showLoadingView('" + resources.getString(R.string.no_comments_here) + "');");
                     } else {
-                        Utilities.executeJavascriptInWebview(mWebView, "noChildrenCallback('"+mMoreId+"');");
+                        Utilities.executeJavascriptInWebview(mWebView, "noChildrenCallback('" + mMoreId + "');");
                     }
                     break;
                 case "-1":
@@ -400,7 +403,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                         // reset load more button
                         Utilities.executeJavascriptInWebview(mWebView, "resetMoreClickEvent('" + mMoreId + "');");
                     }
-                    if (getActivity()!=null)
+                    if (getActivity() != null)
                         Toast.makeText(getActivity(), lastError, Toast.LENGTH_LONG).show();
                     break;
                 default:
@@ -414,7 +417,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
         }
     }
 
-    private void populateCommentsFromData(String data){
+    private void populateCommentsFromData(String data) {
         String author = "";
         boolean archived = false;
         try {
@@ -423,7 +426,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if (data.equals("[]")){
+        if (data.equals("[]")) {
             Utilities.executeJavascriptInWebview(mWebView, "showLoadingView('" + resources.getString(R.string.no_comments_here) + "');");
         } else {
             Utilities.executeJavascriptInWebview(mWebView, "populateComments(\"" + author + "\", " + archived + ", \"" + StringEscapeUtils.escapeEcmaScript(data) + "\");");

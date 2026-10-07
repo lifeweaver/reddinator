@@ -65,10 +65,10 @@ public class PrefsActivity extends PreferenceActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             Toast.makeText(this, "Last widget refresh: " + new Date(PreferenceManager.getDefaultSharedPreferences(this).getLong("last_auto_refresh", 0)).toString(), Toast.LENGTH_LONG).show();
             return true;
-        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             Intent intent = new Intent(this, WidgetProvider.class);
             intent.setAction(WidgetCommon.ACTION_AUTO_UPDATE);
             intent.setPackage(this.getPackageName());

@@ -44,7 +44,7 @@ public class ComposeMessageTask extends AsyncTask<String, Integer, Boolean> {
     protected Boolean doInBackground(String... strings) {
         // Do the vote
         try {
-            global.mRedditData.composeMessage(args[0], args[1], args[2], args.length>3?args[3]:null);
+            global.mRedditData.composeMessage(args[0], args[1], args[2], args.length > 3 ? args[3] : null);
         } catch (RedditData.RedditApiException e) {
             e.printStackTrace();
             exception = e;
@@ -55,7 +55,7 @@ public class ComposeMessageTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (messageCallback !=null)
+        if (messageCallback != null)
             messageCallback.onMessageSent(result, exception, args);
     }
 }

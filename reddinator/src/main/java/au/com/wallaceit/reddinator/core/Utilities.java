@@ -28,7 +28,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.text.Html;
@@ -73,17 +80,17 @@ public class Utilities {
         return bitmap;
     }
 
-    public static int getActionbarIconColor(){
+    public static int getActionbarIconColor() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return Color.parseColor("#A5A5A5");
         }
         return Color.parseColor("#DBDBDB");
     }
 
-    public static String getScoreText(int score){
+    public static String getScoreText(int score) {
         // Since reddit changes their scoring system, we need to abbreviate high scores. eg. 17.3k
-        if (score>10000)
-            return new BigDecimal((score/1000)).setScale(1, BigDecimal.ROUND_HALF_UP).toString()+"k";
+        if (score > 10000)
+            return new BigDecimal((score / 1000)).setScale(1, BigDecimal.ROUND_HALF_UP).toString() + "k";
         return String.valueOf(score);
     }
 
@@ -91,7 +98,7 @@ public class Utilities {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, context.getResources().getDisplayMetrics());
     }
 
-    public static PackageInfo getPackageInfo(Context context){
+    public static PackageInfo getPackageInfo(Context context) {
         PackageInfo pInfo = null;
         try {
             pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -103,18 +110,18 @@ public class Utilities {
     }
 
     // compares a semantic version number without build
-    public static boolean compareVersionWithoutBuild(String version1, String version2){
+    public static boolean compareVersionWithoutBuild(String version1, String version2) {
         String[] parts1 = version1.split("\\.");
         String[] parts2 = version2.split("\\.");
         return parts1.length > 1 && parts2.length > 1 && parts1[0].equals(parts2[0]) && parts1[1].equals(parts2[1]);
     }
 
-    public static String getImageCacheSize(Context context){
+    public static String getImageCacheSize(Context context) {
         File cacheDir = new File(context.getCacheDir().getPath() + Reddinator.IMAGE_CACHE_DIR);
         return Formatter.formatShortFileSize(context, dirSize(cacheDir));
     }
 
-    public static String getFeedDataSize(Context context){
+    public static String getFeedDataSize(Context context) {
         File cacheDir = new File(context.getApplicationInfo().dataDir + Reddinator.FEED_DATA_DIR);
         return Formatter.formatShortFileSize(context, dirSize(cacheDir));
     }
@@ -140,11 +147,11 @@ public class Utilities {
         return 0;
     }
 
-    public static boolean isFeedPathMulti(String feedUrl){
+    public static boolean isFeedPathMulti(String feedUrl) {
         return feedUrl.matches("(.*reddit.com)?/user/[^/]*/m/[^/]*/?");
     }
 
-    public static boolean isFeedPathDomain(String feedUrl){
+    public static boolean isFeedPathDomain(String feedUrl) {
         return feedUrl.matches("(.*reddit.com)?/domain/[^/]*/?");
     }
 
@@ -158,39 +165,39 @@ public class Utilities {
         return url.toLowerCase().matches("(https?://(i.reddituploads.com/.*)$)") || isImgurUrl(url) || isGfycatUrl(url);
     }
 
-    public static boolean isImgurUrl(String url){
+    public static boolean isImgurUrl(String url) {
         if (url == null)
             return false;
         // Check for imgur url without file extension (should not be album)
         return url.toLowerCase().matches("(https?://.*(imgur.com/(?!gallery/|a/).*)$)");
     }
 
-    public static boolean isGfycatUrl(String url){
+    public static boolean isGfycatUrl(String url) {
         if (url == null)
             return false;
         // Check for imgur url without file extension (should not be album)
         return url.toLowerCase().matches("(https?://.*(gfycat.com/[^/]*)$)");
     }
 
-    public static boolean hasImageExtension(String url){
+    public static boolean hasImageExtension(String url) {
         if (url == null)
             return false;
         return url.toLowerCase().matches("([^\\s]+(\\.(?i)(jpe?g|png|gif?v|bmp))$)");
     }
 
-    public static void executeJavascriptInWebview(WebView webView, String javascript){
+    public static void executeJavascriptInWebview(WebView webView, String javascript) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             webView.evaluateJavascript(javascript, null);
         } else {
-            webView.loadUrl("javascript:"+javascript);
+            webView.loadUrl("javascript:" + javascript);
         }
     }
 
-    public static ColorMatrixColorFilter getColorFilterFromColor(int color, int darken){
-        float r = (Color.red(color)+darken) / 255f;
-        float g = (Color.green(color)+darken) / 255f;
-        float b = (Color.blue(color)+darken) / 255f;
-        ColorMatrix cm = new ColorMatrix(new float[] {
+    public static ColorMatrixColorFilter getColorFilterFromColor(int color, int darken) {
+        float r = (Color.red(color) + darken) / 255f;
+        float g = (Color.green(color) + darken) / 255f;
+        float b = (Color.blue(color) + darken) / 255f;
+        ColorMatrix cm = new ColorMatrix(new float[]{
                 // Change red channel
                 r, 0, 0, 0, 0,
                 // Change green channel
@@ -203,7 +210,7 @@ public class Utilities {
         return new ColorMatrixColorFilter(cm);
     }
 
-    public static Spanned fromHtml(String html){
+    public static Spanned fromHtml(String html) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
         } else {
@@ -212,7 +219,7 @@ public class Utilities {
         }
     }
 
-    public static void updateActionbarOverflowIcon(final Activity context, final int iconColor){
+    public static void updateActionbarOverflowIcon(final Activity context, final int iconColor) {
         final ViewGroup decorView = (ViewGroup) context.getWindow().getDecorView();
         decorView.postDelayed(new Runnable() {
             @Override
@@ -228,6 +235,7 @@ public class Utilities {
                 IconDrawable iconDrawable = new IconDrawable(context, Iconify.IconValue.fa_bars).color(iconColor).sizeDp(28);
                 overflow.setImageDrawable(iconDrawable);
             }
+
             private void findViewsWithText(ArrayList<View> outViews, ViewGroup parent, String targetDescription) {
                 if (parent == null || TextUtils.isEmpty(targetDescription)) {
                     return;
@@ -246,7 +254,7 @@ public class Utilities {
         }, 50);
     }
 
-    public static int voteDirectionToInt(String vote){
+    public static int voteDirectionToInt(String vote) {
         switch (vote) {
             case "null":
                 return 0;
@@ -259,7 +267,7 @@ public class Utilities {
         }
     }
 
-    public static String voteDirectionToString(int vote){
+    public static String voteDirectionToString(int vote) {
         switch (vote) {
             case 0:
                 return "null";
@@ -275,20 +283,20 @@ public class Utilities {
     public static AlertDialog showPostShareDialog(final Context context, final String postUrl, final String postPermalink) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getString(R.string.share_url))
-            .setNegativeButton(context.getString(R.string.content), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    intentActionShareText(context, postUrl);
-                }
-            }).setPositiveButton(context.getString(R.string.both), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    intentActionShareText(context, postUrl+"\nhttps://reddit.com" + postPermalink);
-                }
-            })
-            .setNeutralButton(context.getString(R.string.reddit_page), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    intentActionShareText(context, "https://reddit.com" + postPermalink);
-                }
-            });
+                .setNegativeButton(context.getString(R.string.content), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        intentActionShareText(context, postUrl);
+                    }
+                }).setPositiveButton(context.getString(R.string.both), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        intentActionShareText(context, postUrl + "\nhttps://reddit.com" + postPermalink);
+                    }
+                })
+                .setNeutralButton(context.getString(R.string.reddit_page), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        intentActionShareText(context, "https://reddit.com" + postPermalink);
+                    }
+                });
         AlertDialog dialog = builder.create();
         dialog.show();
         return dialog;
@@ -308,29 +316,29 @@ public class Utilities {
         context.startActivity(Intent.createChooser(sendintent, context.getString(R.string.share_with)));
     }
 
-    public static void showApiErrorToastOrDialog(final Context context, Exception ex){
+    public static void showApiErrorToastOrDialog(final Context context, Exception ex) {
         int errorCode = (ex instanceof RedditData.RedditApiException) ? ((RedditData.RedditApiException) ex).getHttpErrorCode() : 0;
-        if (errorCode >= 500 && errorCode < 600){
+        if (errorCode >= 500 && errorCode < 600) {
             new AlertDialog.Builder(context)
-                .setTitle(R.string.error)
-                .setMessage(ex.getMessage()+context.getString(R.string.reddit_server_error_message))
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse("http://www.redditstatus.com/"));
-                        context.startActivity(intent);
-                    }
-                }).show().setCanceledOnTouchOutside(true);
+                    .setTitle(R.string.error)
+                    .setMessage(ex.getMessage() + context.getString(R.string.reddit_server_error_message))
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse("http://www.redditstatus.com/"));
+                            context.startActivity(intent);
+                        }
+                    }).show().setCanceledOnTouchOutside(true);
             return;
         }
         Toast.makeText(context, ex.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     /*
-    * See https://developer.android.com/topic/performance/graphics/load-bitmap
-    * */
+     * See https://developer.android.com/topic/performance/graphics/load-bitmap
+     * */
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;

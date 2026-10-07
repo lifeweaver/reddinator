@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
-    <release version="3.22.3" versioncode="67">
+    <release
+        version="3.22.3"
+        versioncode="67">
         <change>Update out of date jQuery library.</change>
         <change>Added preference for resetting to default subreddit.</change>
-        <change>Changed mail check service to JobIntentService to comply with new background task restrictions in Android.</change>
+        <change>Changed mail check service to JobIntentService to comply with new background task
+            restrictions in Android.
+        </change>
         <change>Fixed "unknown activity" exception for unknown app urls.</change>
     </release>
-    <release version="3.22.2" versioncode="66">
+    <release
+        version="3.22.2"
+        versioncode="66">
         <change>Updated logo (snoo was removed because it is now a reddit trademark).</change>
         <change>Added subscribe/unsubscribe functionality to subreddit feed menus.</change>
         <change>Added contextual selection of subreddit on submit screen.</change>
@@ -15,40 +21,63 @@
         <change>Moved view all/search subreddits button to list view.</change>
         <change>Fixed gfycat preview url.</change>
     </release>
-    <release version="3.21.4" versioncode="64">
+    <release
+        version="3.21.4"
+        versioncode="64">
         <change>Fixed Android API >= 25 widget listview scrolling bug.</change>
     </release>
-    <release version="3.21.3" versioncode="63">
+    <release
+        version="3.21.3"
+        versioncode="63">
         <change>Enabled gfycat links in image preview.</change>
         <change>Hid Reddit app promo banner.</change>
     </release>
-    <release version="3.21.2" versioncode="62">
+    <release
+        version="3.21.2"
+        versioncode="62">
         <change>Fixed issue with comments not populating in context view.</change>
-        <change>Improved login &amp; logout functions. /r/all filters now cleared/synced on login/logout.</change>
-        <change>Subreddits list and login/refresh button now updated without restarting activity, when user returns from logging in or out.</change>
+        <change>Improved login &amp; logout functions. /r/all filters now cleared/synced on
+            login/logout.
+        </change>
+        <change>Subreddits list and login/refresh button now updated without restarting activity,
+            when user returns from logging in or out.
+        </change>
         <change>Utility; volume up on preference to test widget auto-refresh.</change>
     </release>
-    <release version="3.21.1" versioncode="61">
+    <release
+        version="3.21.1"
+        versioncode="61">
         <change>Added additional download preferences.</change>
         <change>Fixed issue with auto refresh alarm manager cancelling.</change>
-        <change>Utility; volume down on preference screen shows last widget auto-refresh time.</change>
+        <change>Utility; volume down on preference screen shows last widget auto-refresh time.
+        </change>
         <change>Fixed bug causing first comment posted in an empty thread not to show.</change>
     </release>
-    <release version="3.21.0" versioncode="60">
+    <release
+        version="3.21.0"
+        versioncode="60">
         <change>Added integration with reddits new /r/all filter.</change>
-        <change>Added background sync of subs, multis &amp; filters. Triggered daily when subreddit selection activity is opened.</change>
+        <change>Added background sync of subs, multis &amp; filters. Triggered daily when subreddit
+            selection activity is opened.
+        </change>
         <change>Added option to open a subreddit in a new activity via post options dialog.</change>
         <change>Added subscription status icon to view all subreddits activity.</change>
-        <change>Added score abbreviations to align with reddit scoring change (full score still visible in info panel).</change>
+        <change>Added score abbreviations to align with reddit scoring change (full score still
+            visible in info panel).
+        </change>
         <change>Various bug fixes.</change>
     </release>
-    <release version="3.20.2" versioncode="59">
+    <release
+        version="3.20.2"
+        versioncode="59">
         <change>Fixed issue loading and copying multi paths with proceeding slash.</change>
         <change>Fixed imgur regex detection to include sub domains.</change>
         <change>Added ime action to multi dialog EditText elements.</change>
         <change>Updated Android SDK and support libraries.</change>
     </release>
-    <release version="3.20" versioncode="57">
+    <release
+        version="3.20"
+        versioncode="57">
         <change>Added preview subreddit feature to subreddit search.</change>
         <change>Added open subreddit or domain option to search and temporary feeds.</change>
         <change>Added missing "image" default thumbnail.</change>
@@ -60,20 +89,26 @@
         <change>Added experimental stackview widget.</change>
         <change>Changed feed data to file based storage.</change>
         <change>Improved handling of Reddit API errors.</change>
-        <change>Fixed issue with comments context dialog height...for good now please (Android bug 5497).</change>
+        <change>Fixed issue with comments context dialog height...for good now please (Android bug
+            5497).
+        </change>
         <change>Fixed handling of "continue this thread" &amp; large comment stubs.</change>
         <change>Fixed issue causing default thumbnail images to have old click listener.</change>
         <change>Fixed NSFW posts displaying default thumbnail.</change>
         <change>Fixed thumbnails flickering in application feed during download.</change>
         <change>See git commit log for more details.</change>
     </release>
-    <release version="3.18" versioncode="53">
+    <release
+        version="3.18"
+        versioncode="53">
         <change>Added image sharing and download (long click on image views).</change>
         <change>Added share option to post options dialog.</change>
         <change>Updated library dependencies.</change>
         <change>Various tweaks &amp; fixes, see gitlog for details.</change>
     </release>
-    <release version="3.17" versioncode="52">
+    <release
+        version="3.17"
+        versioncode="52">
         <change>Fixed image preview dialog to wrap image height.</change>
         <change>Added new overflow menu icon.</change>
         <change>Added additional theme options and tweaked inbuilt themes.</change>
@@ -81,18 +116,26 @@
         <change>Updated markdown editor (beta: enable from preferences).</change>
         <change>Various bug fixes, see gitlog for details.</change>
     </release>
-    <release version="3.16" versioncode="48">
+    <release
+        version="3.16"
+        versioncode="48">
         <change>Added context menu for WebView links.</change>
         <change>Added random subreddits.</change>
-        <change>Added markdown editor for comments &amp; messages (experimental: enable from preferences).</change>
+        <change>Added markdown editor for comments &amp; messages (experimental: enable from
+            preferences).
+        </change>
         <change>Various bug fixes.</change>
     </release>
-    <release version="3.13" versioncode="45">
+    <release
+        version="3.13"
+        versioncode="45">
         <change>Share and apply custom themes at /r/reddinator</change>
         <change>View the default FrontPage when logged in.</change>
         <change>Default Subreddits are now loaded when the user is logged out.</change>
     </release>
-    <release version="3.11" versioncode="41">
+    <release
+        version="3.11"
+        versioncode="41">
         <change>Added menu to widget.</change>
         <change>Added comments border color and text color to theme options.</change>
         <change>Added comments layout and nested colour scheme preferences.</change>
@@ -102,33 +145,49 @@
         <change>Fixed bug causing wrong preview image to show for NSFW images.</change>
         <change>Fixed unauthorized error when viewing reddituploads.com URLs.</change>
     </release>
-    <release version="3.10" versioncode="38">
+    <release
+        version="3.10"
+        versioncode="38">
         <change>Added post info panel to view reddit activity.</change>
-        <change>Added viewpager gesture lock to info panel allowing horizontal scrolling when necessary.</change>
+        <change>Added viewpager gesture lock to info panel allowing horizontal scrolling when
+            necessary.
+        </change>
         <change>Added action menu to feed activity.</change>
         <change>Added sidebar dialog and feed/sort preferences to feed activity menu.</change>
         <change>Added native comments context dialog.</change>
         <change>Added option to display preview images in app &amp; widget feeds.</change>
         <change>View reddit activity and feed activity can now be opened via url.</change>
-        <change>Reddit URLs in comments and messages now open in native views when possible.</change>
+        <change>Reddit URLs in comments and messages now open in native views when possible.
+        </change>
         <change>Switched to app-only oauth for logged out api requests.</change>
     </release>
-    <release version="3.07" versioncode="37">
-        <change>Fixed bug causing failed login in oauth view by enabling DOM storage (possible Reddit change).</change>
-        <change>Added suppress changelog flag to suppress the changelog dialog for minor updates.</change>
+    <release
+        version="3.07"
+        versioncode="37">
+        <change>Fixed bug causing failed login in oauth view by enabling DOM storage (possible
+            Reddit change).
+        </change>
+        <change>Added suppress changelog flag to suppress the changelog dialog for minor updates.
+        </change>
     </release>
-    <release version="3.06" versioncode="36">
+    <release
+        version="3.06"
+        versioncode="36">
         <change>Added karma totals and breakdown dialog to account view</change>
         <change>Added username to account menu items and title</change>
         <change>Fixed .gifv malformed url bug in image dialog</change>
         <change>Fixed layout bug causing NPE</change>
     </release>
-    <release version="3.04" versioncode="35">
+    <release
+        version="3.04"
+        versioncode="35">
         <change>Added image preview dialog</change>
         <change>Updated about dialog with changelog and credits</change>
         <change>Various bug fixes and tweaks</change>
     </release>
-    <release version="3.03" versioncode="34">
+    <release
+        version="3.03"
+        versioncode="34">
         <change>Native account history and message views</change>
         <change>Compose messages</change>
         <change>Search for Reddit posts</change>
@@ -136,7 +195,9 @@
         <change>Pick theme colours using hex codes</change>
         <change>Huge project clean up (just for the developers sanity)</change>
     </release>
-    <release version="2.91" versioncode="28">
+    <release
+        version="2.91"
+        versioncode="28">
         <change>Voting on widget feed</change>
         <change>Post options dialogue (widget cogs icon, long press in app feed)</change>
         <change>Domain feeds (ie. view all imgur.com)</change>
@@ -147,12 +208,16 @@
         <change>Various other bug fixes and improvements</change>
         <change>Spanish translations</change>
     </release>
-    <release version="2.81" versioncode="25">
+    <release
+        version="2.81"
+        versioncode="25">
         <change>Addition of save post feature</change>
         <change>Updated this dialog with change-log and credits</change>
         <change>Various bug fixes and tweaks</change>
     </release>
-    <release version="2.7" versioncode="23">
+    <release
+        version="2.7"
+        versioncode="23">
         <change>User defined themes!</change>
         <change>Better account integration, loads subreddits &amp; multis on login.</change>
         <change>Subscribe &amp; unsubscribe from Subreddits when logged in.</change>

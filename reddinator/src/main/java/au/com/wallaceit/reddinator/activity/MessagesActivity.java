@@ -100,27 +100,31 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
         // theme
         updateTheme();
 
-        if (getIntent().getAction()==null || !getIntent().getAction().equals(ACTION_UNREAD)){
+        if (getIntent().getAction() == null || !getIntent().getAction().equals(ACTION_UNREAD)) {
             viewPager.setCurrentItem(1);
             tabsIndicator.setTab(1);
         }
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
             @Override
             public void onPageSelected(int position) {
                 Fragment fragment = pageAdapter.getRegisteredFragment(position);
-                if (fragment!=null)
+                if (fragment != null)
                     ((AccountFeedFragment) fragment).load();
             }
+
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode==0) {
+        if (requestCode == 0) {
             if (resultCode == 3) {
                 updateTheme();
                 Fragment fragment;
@@ -130,28 +134,28 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
                         ((AccountFeedFragment) fragment).updateTheme();
                 }
             }
-        } else if (requestCode==1){
-            if (resultCode==1)
+        } else if (requestCode == 1) {
+            if (resultCode == 1)
                 reloadSentMessages();
         }
     }
 
-    private void updateTheme(){
+    private void updateTheme() {
         ThemeManager.Theme theme = getCurrentTheme();
         tabsIndicator.setBackgroundColor(Color.parseColor(theme.getValue("header_color")));
         tabsIndicator.setInidicatorColor(Color.parseColor(theme.getValue("tab_indicator")));
         tabsIndicator.setTextColor(Color.parseColor(theme.getValue("header_text")));
     }
 
-    public ThemeManager.Theme getCurrentTheme(){
-        if (global==null) // TODO: Bug report in google play suggests this becomes null at some point, check back
+    public ThemeManager.Theme getCurrentTheme() {
+        if (global == null) // TODO: Bug report in google play suggests this becomes null at some point, check back
             global = (Reddinator) getApplication();
         return global.mThemeManager.getActiveTheme("appthemepref");
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        if (inboxReceiver!=null) {
+        if (inboxReceiver != null) {
             unregisterReceiver(inboxReceiver);
             inboxReceiver = null;
         }
@@ -183,20 +187,17 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu)
-    {
-        if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
-            if(menu.getClass().getSimpleName().equals("MenuBuilder")){
-                try{
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
                     Method m = menu.getClass().getDeclaredMethod(
                             "setOptionalIconsVisible", Boolean.TYPE);
                     m.setAccessible(true);
                     m.invoke(menu, true);
-                }
-                catch(NoSuchMethodException e){
+                } catch (NoSuchMethodException e) {
                     System.out.println("Could not display action icons in menu");
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -228,7 +229,7 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
 
             case R.id.menu_viewonreddit:
                 Intent inboxIntent = new Intent(MessagesActivity.this, WebViewActivity.class);
-                inboxIntent.putExtra("url", global.getDefaultMobileSite()+"/message/inbox/");
+                inboxIntent.putExtra("url", global.getDefaultMobileSite() + "/message/inbox/");
                 startActivity(inboxIntent);
                 break;
 
@@ -248,7 +249,7 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
         return true;
     }
 
-    public void setTitleText(final String title){
+    public void setTitleText(final String title) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -257,9 +258,9 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
         });
     }
 
-    public void reloadSentMessages(){
+    public void reloadSentMessages() {
         Fragment fragment = pageAdapter.getRegisteredFragment(2);
-        if (fragment!=null)
+        if (fragment != null)
             ((AccountFeedFragment) fragment).reload();
     }
 
@@ -277,16 +278,19 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
 
         SparseArray<Fragment> registeredFragments = new SparseArray<>();
 
-        RedditPageAdapter(FragmentManager fragmentManager){
+        RedditPageAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0: return resources.getString(R.string.unread);
-                case 1: return resources.getString(R.string.inbox);
-                case 2: return resources.getString(R.string.sent);
+            switch (position) {
+                case 0:
+                    return resources.getString(R.string.unread);
+                case 1:
+                    return resources.getString(R.string.inbox);
+                case 2:
+                    return resources.getString(R.string.sent);
             }
             return resources.getString(R.string.app_name);
         }

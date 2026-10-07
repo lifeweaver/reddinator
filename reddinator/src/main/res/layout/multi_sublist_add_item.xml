@@ -42,7 +42,7 @@
             android:layout_marginRight="6dp"
             android:layout_marginEnd="6dp"
             android:textSize="32sp"
-            android:textColor="#25C48F"/>
+            android:textColor="#25C48F" />
 
         <IconTextView
             android:id="@+id/multi_sub_search"

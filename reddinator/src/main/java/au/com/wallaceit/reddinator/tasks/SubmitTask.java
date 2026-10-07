@@ -18,8 +18,11 @@ package au.com.wallaceit.reddinator.tasks;
  *
  * Created by michael on 17/06/16.
  */
+
 import android.os.AsyncTask;
+
 import org.json.JSONObject;
+
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
@@ -37,7 +40,7 @@ public class SubmitTask extends AsyncTask<String, Integer, Boolean> {
         void onSubmitted(JSONObject result, RedditData.RedditApiException exception, boolean isLink);
     }
 
-    public SubmitTask(Reddinator global, String subreddit, String title, String data, boolean isLink, Callback callback){
+    public SubmitTask(Reddinator global, String subreddit, String title, String data, boolean isLink, Callback callback) {
         this.global = global;
         this.submitCallback = callback;
         this.isLink = isLink;
@@ -60,7 +63,7 @@ public class SubmitTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (submitCallback!=null)
+        if (submitCallback != null)
             submitCallback.onSubmitted(jsonResult, exception, isLink);
     }
 }

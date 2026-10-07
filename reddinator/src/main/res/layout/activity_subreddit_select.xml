@@ -40,7 +40,7 @@
         layout="@layout/tabs"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/srtoolbar"/>
+        android:layout_below="@id/srtoolbar" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
@@ -52,13 +52,13 @@
             android:id="@+id/sublist"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="#FFF"/>
+            android:background="#FFF" />
 
         <ListView
             android:id="@+id/multilist"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="#FFF"/>
+            android:background="#FFF" />
 
     </android.support.v4.view.ViewPager>
 

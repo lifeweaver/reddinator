@@ -114,7 +114,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
         });
 
         feedPath = getIntent().getStringExtra("feed_path");
-        if (feedPath==null) feedPath = ""; // default to front page
+        if (feedPath == null) feedPath = ""; // default to front page
 
         subredditLimitCb = (CheckBox) findViewById(R.id.limit_sr);
         final SubAutoCompleteAdapter subredditAdapter = new SubAutoCompleteAdapter(this, R.layout.autocomplete_list_item);
@@ -150,7 +150,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
             }
         });
 
-        if (!feedPath.equals("")){
+        if (!feedPath.equals("")) {
             restrictSub = true;
             subredditLimitCb.setChecked(true);
             subredditLimitText.setText(feedPath.replace("/r/", ""));
@@ -253,7 +253,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
             }
         });
 
-        if (Intent.ACTION_SEARCH.equals(getIntent().getAction())){
+        if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
             query = getIntent().getStringExtra("query");
             sort = getIntent().getStringExtra("sort");
             time = getIntent().getStringExtra("time");
@@ -263,10 +263,10 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
         }
     }
 
-    private void onSearchQueryEnter(){
+    private void onSearchQueryEnter() {
         restrictSub = subredditLimitCb.isChecked();
-        feedPath = (restrictSub  ? "/r/" + subredditLimitText.getText().toString() : "");
-        if (restrictSub && feedPath.equals("/r/")){
+        feedPath = (restrictSub ? "/r/" + subredditLimitText.getText().toString() : "");
+        if (restrictSub && feedPath.equals("/r/")) {
             subredditLimitCb.setChecked(false);
             feedPath = "";
             restrictSub = false;
@@ -292,6 +292,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
 
     private int headerText = Color.BLACK;
     private ColorMatrixColorFilter buttonfilter;
+
     private void setThemeColors() {
         theme = global.mThemeManager.getActiveTheme("appthemepref");
         appView.setBackgroundColor(Color.parseColor(theme.getValue("background_color")));
@@ -314,7 +315,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
         buttonfilter = Utilities.getColorFilterFromColor(iconColor, 250);
     }
 
-    private class SearchSpinnerAdapter extends ArrayAdapter<String>{
+    private class SearchSpinnerAdapter extends ArrayAdapter<String> {
 
         SearchSpinnerAdapter(Context context, int resource, int textViewResourceId, String[] objects) {
             super(context, resource, textViewResourceId, objects);
@@ -340,7 +341,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
             case 3:
             case 4:
                 int position = data.getIntExtra(Reddinator.ITEM_FEED_POSITION, -1);
-                listAdapter.initialiseVote(position, (resultcode==3?1:-1));
+                listAdapter.initialiseVote(position, (resultcode == 3 ? 1 : -1));
                 break;
             // reload feed data from cache
             case 5:
@@ -348,7 +349,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
                 //listView.invalidateViews();
                 break;
         }
-        if (resultcode==6 || data!=null && data.getBooleanExtra("themeupdate", true)){
+        if (resultcode == 6 || data != null && data.getBooleanExtra("themeupdate", true)) {
             setThemeColors();
             listAdapter.setTheme(theme);
             //listView.invalidateViews();
@@ -390,7 +391,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
         setProgressBarIndeterminateVisibility(true);
     }
 
-    public void loadMore(){
+    public void loadMore() {
         showLoader();
         new SearchFeedLoader(true).execute();
     }
@@ -447,7 +448,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
                 data = tempArray;
             }
             // save feed
-            if (endOfFeed){
+            if (endOfFeed) {
                 lastItemId = "0";
             } else {
                 try {

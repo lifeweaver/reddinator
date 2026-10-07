@@ -43,22 +43,22 @@ public class ThemeManager {
     private JSONArray themeOrder;
     private JSONObject customThemes;
     private JSONObject previewTheme = null;
-    public static final int LISTMODE_ALL= 0;
-    public static final int LISTMODE_CUSTOM= 1;
-    private static final int LISTMODE_DEFAULT= 2;
+    public static final int LISTMODE_ALL = 0;
+    public static final int LISTMODE_CUSTOM = 1;
+    private static final int LISTMODE_DEFAULT = 2;
     private Theme defaultValues;
 
-    public ThemeManager(Context context, SharedPreferences preferences){
+    public ThemeManager(Context context, SharedPreferences preferences) {
         this.prefs = preferences;
         this.context = context;
         loadThemes();
     }
 
-    public LinkedHashMap<String, String> getThemeList(int mode){
+    public LinkedHashMap<String, String> getThemeList(int mode) {
         LinkedHashMap<String, String> themeList = new LinkedHashMap<>();
         String key;
-        if (mode==LISTMODE_ALL || mode==LISTMODE_DEFAULT) {
-            for (int i=0; i<themeOrder.length(); i++) {
+        if (mode == LISTMODE_ALL || mode == LISTMODE_DEFAULT) {
+            for (int i = 0; i < themeOrder.length(); i++) {
                 try {
                     key = themeOrder.getString(i);
                     themeList.put(key, themes.getJSONObject(key).getString("name"));
@@ -67,7 +67,7 @@ public class ThemeManager {
                 }
             }
         }
-        if (mode==LISTMODE_ALL || mode==LISTMODE_CUSTOM) {
+        if (mode == LISTMODE_ALL || mode == LISTMODE_CUSTOM) {
             Iterator iterator = customThemes.keys();
             while (iterator.hasNext()) {
                 key = (String) iterator.next();
@@ -83,33 +83,33 @@ public class ThemeManager {
     }
 
     public String getThemePrefLabel(String key) {
-        int resId = context.getResources().getIdentifier("tl_"+key, "string", context.getPackageName());
+        int resId = context.getResources().getIdentifier("tl_" + key, "string", context.getPackageName());
         return context.getResources().getString(resId);
     }
 
-    public JSONArray getPreferenceOrder(){
+    public JSONArray getPreferenceOrder() {
         return valueOrder;
     }
 
-    public JSONObject getThemeJSON(String key){
+    public JSONObject getThemeJSON(String key) {
         JSONObject theme = null;
-        if (previewTheme!=null)
+        if (previewTheme != null)
             return previewTheme;
-        if (themes.has(key)){
+        if (themes.has(key)) {
             try {
-                theme =  themes.getJSONObject(key);
+                theme = themes.getJSONObject(key);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } else if (customThemes.has(key)){
+        } else if (customThemes.has(key)) {
             try {
-                theme =  customThemes.getJSONObject(key);
+                theme = customThemes.getJSONObject(key);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                theme =  themes.getJSONObject("reddit_classic");
+                theme = themes.getJSONObject("reddit_classic");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -119,7 +119,7 @@ public class ThemeManager {
     }
 
     // below 5 functions are used for previewing custom themes from /r/reddinator
-    public boolean setPreviewTheme(JSONObject theme){
+    public boolean setPreviewTheme(JSONObject theme) {
         if (!validateThemeJson(theme))
             return false;
 
@@ -127,8 +127,8 @@ public class ThemeManager {
         return true;
     }
 
-    public String getPreviewName(){
-        if (previewTheme==null)
+    public String getPreviewName() {
+        if (previewTheme == null)
             return null;
         try {
             return previewTheme.getString("name");
@@ -138,28 +138,28 @@ public class ThemeManager {
         return "unknown";
     }
 
-    public void clearPreviewTheme(){
+    public void clearPreviewTheme() {
         previewTheme = null;
     }
 
-    public boolean savePreviewTheme(){
-        if (previewTheme==null)
+    public boolean savePreviewTheme() {
+        if (previewTheme == null)
             return false;
 
-        saveCustomTheme("theme-"+ UUID.randomUUID(), new Theme(previewTheme));
+        saveCustomTheme("theme-" + UUID.randomUUID(), new Theme(previewTheme));
         previewTheme = null;
         return true;
     }
 
-    public boolean importTheme(JSONObject theme){
+    public boolean importTheme(JSONObject theme) {
         if (!validateThemeJson(theme))
             return false;
 
-        saveCustomTheme("theme-"+ UUID.randomUUID(), new Theme(theme));
+        saveCustomTheme("theme-" + UUID.randomUUID(), new Theme(theme));
         return true;
     }
 
-    private boolean validateThemeJson(JSONObject theme){
+    private boolean validateThemeJson(JSONObject theme) {
         // check name
         try {
             if (!theme.has("name") || "".equals(theme.get("name")))
@@ -172,16 +172,16 @@ public class ThemeManager {
             JSONObject defaults = defaultValues.getTheme().getJSONObject("values");
 
             Iterator<String> keys = impValues.keys();
-            while (keys.hasNext()){
+            while (keys.hasNext()) {
                 String key = keys.next();
-                if (defaults.has(key)){
+                if (defaults.has(key)) {
                     // check if value has the right format
-                    if (impValues.getString(key).length()==defaults.getString(key).length()){
+                    if (impValues.getString(key).length() == defaults.getString(key).length()) {
                         // try to parse color value
                         try {
                             Color.parseColor(impValues.getString(key));
                             continue;
-                        } catch (IllegalArgumentException ignored){
+                        } catch (IllegalArgumentException ignored) {
                         }
                     }
                     // validation failed, use default value
@@ -198,7 +198,7 @@ public class ThemeManager {
         return true;
     }
 
-    public Theme cloneTheme(String key){
+    public Theme cloneTheme(String key) {
         JSONObject theme = getThemeJSON(key);
         try {
             theme = new JSONObject(theme.toString()); // so fucking ridiculous, only way to clone json
@@ -208,13 +208,13 @@ public class ThemeManager {
         return new Theme(theme);
     }
 
-    public Theme getTheme(String key){
+    public Theme getTheme(String key) {
         JSONObject theme = getThemeJSON(key);
         return new Theme(theme);
     }
 
-    public Theme getActiveTheme(String themePrefKey){
-        if (themePrefKey==null)
+    public Theme getActiveTheme(String themePrefKey) {
+        if (themePrefKey == null)
             return getTheme(prefs.getString("appthemepref", "reddit_classic"));
 
         String themeKey = prefs.getString(themePrefKey, "app_select");
@@ -226,11 +226,11 @@ public class ThemeManager {
         return getTheme(themeKey);
     }
 
-    public boolean isThemeEditable(String key){
+    public boolean isThemeEditable(String key) {
         return customThemes.has(key);
     }
 
-    private void loadThemes(){
+    private void loadThemes() {
         String json;
         // load static themes
         try {
@@ -258,7 +258,7 @@ public class ThemeManager {
         defaultValues = new Theme(getThemeJSON("reddit_classic"));
     }
 
-    public void saveCustomTheme(String themeId, Theme theme){
+    public void saveCustomTheme(String themeId, Theme theme) {
         try {
             customThemes.put(themeId, theme.getTheme());
         } catch (JSONException e) {
@@ -267,13 +267,13 @@ public class ThemeManager {
         prefs.edit().putString("userThemes", customThemes.toString()).apply();
     }
 
-    public void deleteCustomTheme(String themeId){
+    public void deleteCustomTheme(String themeId) {
         customThemes.remove(themeId);
         prefs.edit().putString("userThemes", customThemes.toString()).apply();
     }
 
     // Bundles all custom themes into a single JSON string for backup/transfer. Returns null if there are none.
-    public String exportCustomThemes(){
+    public String exportCustomThemes() {
         try {
             JSONArray list = new JSONArray();
             Iterator<String> it = customThemes.keys();
@@ -294,7 +294,7 @@ public class ThemeManager {
 
     // Imports themes produced by exportCustomThemes(). A theme with the same name as an existing custom
     // theme replaces it; otherwise it is added. Returns the number imported, or -1 if the text isn't valid.
-    public int importThemes(String text){
+    public int importThemes(String text) {
         if (text == null)
             return -1;
         try {
@@ -341,19 +341,19 @@ public class ThemeManager {
             // backward compatibility fix for old value
             if (!jsonValues.has("comments_count"))
                 try {
-                    jsonValues.put("comments_count", (jsonValues.has("comments_text")?jsonValues.get("comments_text"):"#000000"));
+                    jsonValues.put("comments_count", (jsonValues.has("comments_text") ? jsonValues.get("comments_text") : "#000000"));
                     jsonValues.remove("comments_text");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
         }
 
-        public JSONObject getTheme(){
+        public JSONObject getTheme() {
             return mTheme;
         }
 
-        JSONObject cloneJsonValues(){
-            if (values==null)
+        JSONObject cloneJsonValues() {
+            if (values == null)
                 loadValues();
             try {
                 return new JSONObject(jsonValues, values.keySet().toArray(new String[values.size()]));
@@ -363,8 +363,8 @@ public class ThemeManager {
             return new JSONObject();
         }
 
-        public String getValuesString(boolean includeLayoutOptions){
-            if (includeLayoutOptions){
+        public String getValuesString(boolean includeLayoutOptions) {
+            if (includeLayoutOptions) {
                 JSONObject valuesObject = cloneJsonValues();
                 try {
                     valuesObject.put("comments_layout", prefs.getString("commentslayoutpref", "1"));
@@ -379,7 +379,7 @@ public class ThemeManager {
             }
         }
 
-        public String getName(){
+        public String getName() {
             try {
                 return mTheme.getString("name");
             } catch (JSONException e) {
@@ -388,7 +388,7 @@ public class ThemeManager {
             return "";
         }
 
-        public void setName(String name){
+        public void setName(String name) {
             try {
                 mTheme.put("name", name);
             } catch (JSONException e) {
@@ -396,11 +396,11 @@ public class ThemeManager {
             }
         }
 
-        private void loadValues(){
+        private void loadValues() {
             values = new LinkedHashMap<>();
             Iterator iterator = jsonValues.keys();
             String key;
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 key = (String) iterator.next();
                 try {
                     values.put(key, jsonValues.getString(key));
@@ -410,15 +410,15 @@ public class ThemeManager {
             }
         }
 
-        public HashMap<String, String> getValues(){
-            if (values==null)
+        public HashMap<String, String> getValues() {
+            if (values == null)
                 loadValues();
 
             return values;
         }
 
-        public String getValue(String key){
-            if (values==null)
+        public String getValue(String key) {
+            if (values == null)
                 loadValues();
 
             if (values.containsKey(key))
@@ -430,9 +430,9 @@ public class ThemeManager {
             return "#DBDBDB";
         }
 
-        public void setValue(String key, String newValue){
+        public void setValue(String key, String newValue) {
             // update in index if loaded
-            if (values!=null)
+            if (values != null)
                 values.put(key, newValue);
             // update in json source
             try {
@@ -443,19 +443,19 @@ public class ThemeManager {
             }
         }
 
-        public HashMap<String, Integer> getIntColors(){
+        public HashMap<String, Integer> getIntColors() {
             HashMap<String, String> srcColors = getValues();
-            HashMap<String, Integer>  themeColors = new HashMap<>();
+            HashMap<String, Integer> themeColors = new HashMap<>();
             Iterator iterator = srcColors.keySet().iterator();
             String key;
             int colorVal;
             Exception colorException;
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 key = (String) iterator.next();
                 try {
                     colorVal = Color.parseColor(srcColors.get(key));
-                } catch (IllegalArgumentException e){
-                    colorException = new Exception("Color value invalid: "+srcColors.get(key), e); // This will give us more info in g.play console.
+                } catch (IllegalArgumentException e) {
+                    colorException = new Exception("Color value invalid: " + srcColors.get(key), e); // This will give us more info in g.play console.
                     colorException.printStackTrace();
                     colorVal = Color.GRAY;
                 }

@@ -1,21 +1,23 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="au.com.wallaceit.reddinator.activity.SubmitActivity">
+
     <include
         android:id="@+id/tab_widget"
         layout="@layout/tabs"
         android:layout_alignParentTop="true"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/submit_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="@string/submit"/>
+        android:text="@string/submit" />
+
     <LinearLayout
         android:id="@+id/submit_container"
         android:layout_width="match_parent"
@@ -32,13 +34,13 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/subreddit"
-            android:hint="@string/subreddit"/>
+            android:hint="@string/subreddit" />
 
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/title"
-            android:hint="@string/title"/>
+            android:hint="@string/title" />
 
         <TextView
             android:id="@+id/title_chars_left"
@@ -53,6 +55,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1">
+
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -65,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:id="@+id/link"
-                android:hint="@string/link"/>
+                android:hint="@string/link" />
         </android.support.v4.view.ViewPager>
 
         <ScrollView
@@ -73,7 +76,7 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:minHeight="100dp"
-            android:id="@+id/scrollView" >
+            android:id="@+id/scrollView">
 
             <TextView
                 android:layout_width="fill_parent"

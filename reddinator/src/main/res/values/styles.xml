@@ -20,22 +20,27 @@
         <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
         <item name="android:actionOverflowButtonStyle">@style/ActionOverflowButtonStyle</item>
     </style>
+
     <style name="ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:actionOverflowButtonStyle">@style/ActionOverflowButtonStyle</item>
     </style>
+
     <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
         <item name="android:minWidth">32dp</item>
         <item name="android:paddingLeft">2dp</item>
         <item name="android:paddingRight">2dp</item>
     </style>
+
     <style name="ActionOverflowButtonStyle" parent="@android:style/Widget.Holo.ActionButton.Overflow">
         <item name="android:minWidth">42dip</item>
         <item name="android:paddingLeft">0dip</item>
         <item name="android:paddingRight">0dip</item>
     </style>
+
     <style name="HtmlDialog" parent="@android:style/Theme.Holo.Light.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+
     <style name="TransparentActivity" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -49,16 +54,20 @@
         <item name="android:fitsSystemWindows">false</item>
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds" tools:targetApi="lollipop">true</item>
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@android:color/transparent</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">@android:color/transparent
+        </item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
     </style>
+
     <style name="TransparentActivityUndimmed" parent="TransparentActivity">
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+
     <style name="PopupMenuStyle" parent="@android:style/Widget.Holo.Light.PopupMenu">
         <!-- Causes issues with some devices. Can't seem to reliably set icon padding accross all devices!
         <item name="android:layout_marginLeft">3dp</item>-->
     </style>
+
     <style name="ButtonStyle" parent="Base.Widget.AppCompat.Button">
         <item name="android:minHeight">0dp</item>
     </style>

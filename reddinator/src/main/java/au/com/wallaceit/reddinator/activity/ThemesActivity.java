@@ -3,6 +3,9 @@ package au.com.wallaceit.reddinator.activity;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -30,12 +33,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
@@ -80,27 +80,27 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
 
         // check if preview theme is applied
         String previewName = global.mThemeManager.getPreviewName();
-        if (previewName!=null){
+        if (previewName != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.theme_preview)
-                .setMessage(getString(R.string.theme_preview_clear_message, previewName))
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        global.mThemeManager.clearPreviewTheme();
-                        setResult(6); // indicate theme edit
-                        WidgetCommon.refreshAllWidgetViews(global);
-                    }
-                })
-                .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        global.mThemeManager.savePreviewTheme();
-                        refreshList();
-                        setResult(6); // indicate theme edit
-                        WidgetCommon.refreshAllWidgetViews(global);
-                    }
-                });
+                    .setMessage(getString(R.string.theme_preview_clear_message, previewName))
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            global.mThemeManager.clearPreviewTheme();
+                            setResult(6); // indicate theme edit
+                            WidgetCommon.refreshAllWidgetViews(global);
+                        }
+                    })
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            global.mThemeManager.savePreviewTheme();
+                            refreshList();
+                            setResult(6); // indicate theme edit
+                            WidgetCommon.refreshAllWidgetViews(global);
+                        }
+                    });
             builder.show().setCanceledOnTouchOutside(true);
         }
     }
@@ -112,23 +112,23 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (resultCode==RESULT_CODE_THEME_UPDATED) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_CODE_THEME_UPDATED) {
             themesEdited = true;
             setResult(RESULT_CODE_THEME_UPDATED);
         }
     }
 
     @Override
-    public void onBackPressed(){
-        if (themesEdited && (getIntent().hasExtra("requestCode") && getIntent().getExtras().getInt("requestCode")!=REQUEST_CODE_NO_WIDGET_UPDATES)){
+    public void onBackPressed() {
+        if (themesEdited && (getIntent().hasExtra("requestCode") && getIntent().getExtras().getInt("requestCode") != REQUEST_CODE_NO_WIDGET_UPDATES)) {
             // update widgets straight away if the requesting activity does not process the result
             WidgetCommon.refreshAllWidgetViews(global);
         }
         super.onBackPressed();
     }
 
-    private void refreshList(){
+    private void refreshList() {
         themesList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_CUSTOM);
         adapter.notifyDataSetChanged();
     }
@@ -149,13 +149,13 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
 
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
             case R.id.action_add:
                 // open template picker dialog
-                final HashMap<String,String> themesList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_ALL);
+                final HashMap<String, String> themesList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_ALL);
                 AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
                 builder.setTitle(resources.getString(R.string.choose_template))
                         .setItems(themesList.values().toArray(new CharSequence[themesList.values().size()]), new DialogInterface.OnClickListener() {
@@ -216,11 +216,11 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
     @Override
     public void onSubmitted(JSONObject result, RedditData.RedditApiException exception, boolean isLink) {
         progressDialog.cancel();
-        if (result!=null){
+        if (result != null) {
             try {
                 if (result.has("errors")) {
                     JSONArray errors = result.getJSONArray("errors");
-                    if (errors.length()>0) {
+                    if (errors.length() > 0) {
                         Toast.makeText(ThemesActivity.this, errors.getJSONArray(0).getString(1), Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -235,7 +235,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                 JSONObject data = result.getJSONObject("data");
                 id = data.getString("name");
                 permalink = StringEscapeUtils.unescapeJava(data.getString("url").replace(".json", ""));
-                String url = permalink+".compact";
+                String url = permalink + ".compact";
 
                 if (permalink != null)
                     permalink = permalink.substring(permalink.indexOf("/r/")); // trim domain to get real permalink
@@ -250,7 +250,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
             } catch (JSONException e) {
                 e.printStackTrace();
                 // show api error
-                Toast.makeText(ThemesActivity.this, resources.getString(R.string.cannot_open_post_error)+" "+e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ThemesActivity.this, resources.getString(R.string.cannot_open_post_error) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
                 finish();
             }
         } else {
@@ -280,7 +280,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
-            if (convertView==null || convertView.getTag()==null) {
+            if (convertView == null || convertView.getTag() == null) {
                 convertView = getLayoutInflater().inflate(R.layout.themes_list_item, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.name = (TextView) convertView.findViewById(R.id.theme_name);
@@ -295,9 +295,9 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
-                intent.putExtra("themeId", themeId);
-                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+                    Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
+                    intent.putExtra("themeId", themeId);
+                    startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
                 }
             });
             viewHolder.delete.setOnClickListener(new View.OnClickListener() {
@@ -312,46 +312,46 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                                     refreshList();
                                 }
                             }).setNegativeButton(resources.getString(R.string.no), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).show();
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
                 }
             });
             viewHolder.share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!global.mRedditData.isLoggedIn()){
+                    if (!global.mRedditData.isLoggedIn()) {
                         Toast.makeText(ThemesActivity.this, "Reddit Login Required", Toast.LENGTH_SHORT).show();
                     }
                     final EditText input = new EditText(ThemesActivity.this);
                     input.setHint(R.string.title);
                     AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
                     builder.setTitle(resources.getString(R.string.share_theme)).setMessage(resources.getString(R.string.share_theme_message))
-                        .setView(input)
-                        .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String title = input.getText().toString();
-                                if (title.length()>292){
-                                    Toast.makeText(ThemesActivity.this, getText(R.string.title_too_long_error), Toast.LENGTH_SHORT).show();
-                                    return;
+                            .setView(input)
+                            .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String title = input.getText().toString();
+                                    if (title.length() > 292) {
+                                        Toast.makeText(ThemesActivity.this, getText(R.string.title_too_long_error), Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    if (title.length() == 0) {
+                                        Toast.makeText(ThemesActivity.this, getText(R.string.no_title_error), Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    String theme = global.mThemeManager.getThemeJSON(themeId).toString();
+                                    progressDialog = ProgressDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting), true);
+                                    new SubmitTask(global, "reddinator", "[Theme] " + title, "This theme was shared through Reddinator\n\r    reddinator_theme=" + theme, false, ThemesActivity.this).execute();
                                 }
-                                if (title.length()==0){
-                                    Toast.makeText(ThemesActivity.this, getText(R.string.no_title_error), Toast.LENGTH_SHORT).show();
-                                    return;
+                            }).setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
                                 }
-                                String theme = global.mThemeManager.getThemeJSON(themeId).toString();
-                                progressDialog = ProgressDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting), true);
-                                new SubmitTask(global, "reddinator", "[Theme] "+title, "This theme was shared through Reddinator\n\r    reddinator_theme="+theme, false, ThemesActivity.this).execute();
-                            }
-                        }).setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                    }).show();
+                            }).show();
                 }
             });
             return convertView;
@@ -364,7 +364,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
 
         @Override
         public boolean isEmpty() {
-            return themesList.size()==0;
+            return themesList.size() == 0;
         }
     }
 

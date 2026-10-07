@@ -24,7 +24,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -80,14 +79,15 @@ public class TabWebFragment extends Fragment {
     }
 
     private boolean loaded = false;
-    public void load(){
+
+    public void load() {
         if (!loaded) {
             mWebView.loadUrl(url);
             loaded = true;
         }
     }
 
-    public void load(String url){
+    public void load(String url) {
         this.url = url;
         load();
     }
@@ -167,7 +167,7 @@ public class TabWebFragment extends Fragment {
                                         "	}\n" +
                                         "}\n" +
                                         "setTimeout(clickRedditButton, 100)"
-                                );
+                        );
 
                     super.onPageFinished(view, url);
                 }
@@ -175,7 +175,7 @@ public class TabWebFragment extends Fragment {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
-                    if (url.contains("file://") || url.contains("https://") || url.contains("http://")){
+                    if (url.contains("file://") || url.contains("https://") || url.contains("http://")) {
                         return false;
                     }
 
@@ -183,7 +183,7 @@ public class TabWebFragment extends Fragment {
                     // catch activity not found exceptions
                     try {
                         view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                    } catch (Exception ignored){
+                    } catch (Exception ignored) {
                         // no op
                     }
 
@@ -214,7 +214,7 @@ public class TabWebFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         if (mWebView != null) {
             mWebView.removeAllViews();
@@ -230,7 +230,7 @@ public class TabWebFragment extends Fragment {
         private LinearLayout rootLayout;
 
         public void onProgressChanged(WebView view, int progress) {
-            if(isAdded()) {
+            if (isAdded()) {
                 boolean voteinprogress = ((ViewRedditActivity) mActivity).voteInProgress();
                 //Make the bar disappear after URL is loaded, and changes string to Loading...
                 if (!voteinprogress)

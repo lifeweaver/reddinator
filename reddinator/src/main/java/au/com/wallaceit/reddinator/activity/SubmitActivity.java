@@ -34,15 +34,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
+import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.tasks.SubmitTask;
 import au.com.wallaceit.reddinator.ui.SimpleTabsAdapter;
 import au.com.wallaceit.reddinator.ui.SimpleTabsWidget;
 import au.com.wallaceit.reddinator.ui.SubAutoCompleteAdapter;
-import au.com.wallaceit.reddinator.core.ThemeManager;
 
 
 public class SubmitActivity extends Activity implements SubmitTask.Callback {
@@ -89,7 +89,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
 
         submitText = (TextView) findViewById(R.id.submission_text);
         submitText.setMovementMethod(new SafeLinkMethod());
-        charsLeft= (TextView) findViewById(R.id.title_chars_left);
+        charsLeft = (TextView) findViewById(R.id.title_chars_left);
         title = (EditText) findViewById(R.id.title);
         link = (EditText) findViewById(R.id.link);
         text = (EditText) findViewById(R.id.text);
@@ -110,7 +110,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         });
 
         String action = getIntent().getAction();
-        if (action!=null && (action.equals(Intent.ACTION_SEND) && getIntent().getType().equals("text/plain"))) {
+        if (action != null && (action.equals(Intent.ACTION_SEND) && getIntent().getType().equals("text/plain"))) {
             link.setText(getIntent().getStringExtra(Intent.EXTRA_TEXT));
         }
 
@@ -143,11 +143,11 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!global.mRedditData.isLoggedIn()){
+                if (!global.mRedditData.isLoggedIn()) {
                     global.mRedditData.initiateLogin(SubmitActivity.this, false);
                 } else {
                     if (validateInput()) {
-                        boolean isLink = pager.getCurrentItem()==0;
+                        boolean isLink = pager.getCurrentItem() == 0;
                         String data = isLink ? link.getText().toString() : text.getText().toString();
                         progressDialog = ProgressDialog.show(SubmitActivity.this, "", resources.getString(R.string.submitting), true);
                         new SubmitTask(global, subreddit.getText().toString(), title.getText().toString(), data, isLink, SubmitActivity.this).execute();
@@ -160,11 +160,11 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
     @Override
     public void onSubmitted(JSONObject result, RedditData.RedditApiException exception, boolean isLink) {
         progressDialog.cancel();
-        if (result!=null){
+        if (result != null) {
             try {
                 if (result.has("errors")) {
                     JSONArray errors = result.getJSONArray("errors");
-                    if (errors.length()>0) {
+                    if (errors.length() > 0) {
                         submitText.setText(Utilities.fromHtml("<strong><font color=\"red\">" + errors.getJSONArray(0).getString(1) + "</font></strong>"));
                         return;
                     }
@@ -179,7 +179,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
                 JSONObject data = result.getJSONObject("data");
                 id = data.getString("name");
                 permalink = StringEscapeUtils.unescapeJava(data.getString("url").replace(".json", ""));
-                String url = isLink?link.getText().toString():permalink+".compact";
+                String url = isLink ? link.getText().toString() : permalink + ".compact";
 
                 if (permalink != null)
                     permalink = permalink.substring(permalink.indexOf("/r/")); // trim domain to get real permalink
@@ -194,7 +194,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
             } catch (JSONException e) {
                 e.printStackTrace();
                 // show api error
-                Toast.makeText(SubmitActivity.this, resources.getString(R.string.cannot_open_post_error)+" "+e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(SubmitActivity.this, resources.getString(R.string.cannot_open_post_error) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
                 finish();
             }
         } else {
@@ -206,38 +206,38 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
     private class SafeLinkMethod extends LinkMovementMethod {
 
         @Override
-        public boolean onTouchEvent( @NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event ) {
+        public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
             try {
-                return super.onTouchEvent( widget, buffer, event ) ;
-            } catch( Exception ex ) {
-                Toast.makeText( SubmitActivity.this, resources.getString(R.string.load_link_error), Toast.LENGTH_LONG ).show();
+                return super.onTouchEvent(widget, buffer, event);
+            } catch (Exception ex) {
+                Toast.makeText(SubmitActivity.this, resources.getString(R.string.load_link_error), Toast.LENGTH_LONG).show();
                 return true;
             }
         }
 
     }
 
-    private boolean validateInput(){
+    private boolean validateInput() {
         String subText = title.getText().toString();
-        if (subText.equals("")){
+        if (subText.equals("")) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_subreddit_error));
             return false;
         }
         String titleText = title.getText().toString();
-        if (titleText.equals("")){
+        if (titleText.equals("")) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_title_error));
             return false;
-        } else if (titleText.length()>300){
+        } else if (titleText.length() > 300) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.title_too_long_error));
             return false;
         }
         String content;
-        if (pager.getCurrentItem()==0){
+        if (pager.getCurrentItem() == 0) {
             content = link.getText().toString();
         } else {
             content = text.getText().toString();
         }
-        if (content.equals("")){
+        if (content.equals("")) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_content_error));
             return false;
         }
@@ -275,7 +275,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            submitText.setText(Utilities.fromHtml(result?Utilities.fromHtml(submitHtml).toString():"<strong><font color=\"red\">"+resources.getString(R.string.sub_doesnt_look_valid)+"</font></strong>"));
+            submitText.setText(Utilities.fromHtml(result ? Utilities.fromHtml(submitHtml).toString() : "<strong><font color=\"red\">" + resources.getString(R.string.sub_doesnt_look_valid) + "</font></strong>"));
         }
     }
 

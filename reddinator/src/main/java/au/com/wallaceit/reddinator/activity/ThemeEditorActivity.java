@@ -30,8 +30,8 @@ import org.json.JSONException;
 
 import java.util.UUID;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.service.WidgetCommon;
 
@@ -54,11 +54,11 @@ public class ThemeEditorActivity extends ListActivity {
             // edit existing theme
             themeId = getIntent().getStringExtra("themeId");
             theme = global.mThemeManager.getTheme(themeId);
-        } else if (getIntent().hasExtra("templateId")){
+        } else if (getIntent().hasExtra("templateId")) {
             // creating new theme from template
             theme = global.mThemeManager.cloneTheme(getIntent().getStringExtra("templateId"));
             // set a unique id & default name for the theme
-            themeId = "theme-"+ UUID.randomUUID();
+            themeId = "theme-" + UUID.randomUUID();
             theme.setName(resources.getString(R.string.my_awesome_theme));
             themeChanged = true;
         }
@@ -78,15 +78,15 @@ public class ThemeEditorActivity extends ListActivity {
         }
     }
 
-    private void refreshList(){
+    private void refreshList() {
         ((BaseAdapter) getListView().getAdapter()).notifyDataSetChanged();
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         if (themeChanged) {
             global.mThemeManager.saveCustomTheme(themeId, theme);
-            if (getIntent().getExtras().getInt("requestCode")!=ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) // update widgets straight away if the requesting activity does not process the result
+            if (getIntent().getExtras().getInt("requestCode") != ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) // update widgets straight away if the requesting activity does not process the result
                 WidgetCommon.refreshAllWidgetViews(global);
 
             setResult(ThemesActivity.RESULT_CODE_THEME_UPDATED);
@@ -111,13 +111,13 @@ public class ThemeEditorActivity extends ListActivity {
 
         @Override
         public int getCount() {
-            return global.mThemeManager.getPreferenceOrder().length()+1; // +1 for theme name
+            return global.mThemeManager.getPreferenceOrder().length() + 1; // +1 for theme name
         }
 
         @Override
         public Object getItem(int position) {
             String key;
-            if (position==0){
+            if (position == 0) {
                 return theme.getName();
             }
             try {
@@ -151,7 +151,7 @@ public class ThemeEditorActivity extends ListActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            if (position==0){
+            if (position == 0) {
                 viewHolder.settingName.setText(resources.getString(R.string.name));
                 viewHolder.settingValue.setText(theme.getName());
                 viewHolder.colorPreview.setVisibility(View.GONE);
@@ -165,27 +165,27 @@ public class ThemeEditorActivity extends ListActivity {
                         input.setText(theme.getName());
                         input.selectAll();
                         builder.setTitle(resources.getString(R.string.theme_name))
-                        .setView(input)
-                        .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                theme.setName(input.getText().toString());
-                                themeChanged = true;
-                                refreshList();
-                            }
-                        })
-                        .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
+                                .setView(input)
+                                .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        theme.setName(input.getText().toString());
+                                        themeChanged = true;
+                                        refreshList();
+                                    }
+                                })
+                                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
                     }
                 });
             } else {
                 String key;
                 try {
-                    key = (String) global.mThemeManager.getPreferenceOrder().get(position-1);
+                    key = (String) global.mThemeManager.getPreferenceOrder().get(position - 1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     return convertView;
@@ -196,7 +196,7 @@ public class ThemeEditorActivity extends ListActivity {
                 int color;
                 try {
                     color = Color.parseColor(value);
-                } catch (IllegalArgumentException e){
+                } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                     color = Color.WHITE;
                 }
@@ -219,7 +219,7 @@ public class ThemeEditorActivity extends ListActivity {
                         picker.addSaturationBar(sBar);
                         picker.addValueBar(vBar);
                         // is opacity needed?
-                        final boolean useAlpha = theme.getValue(finalKey).length()>7;
+                        final boolean useAlpha = theme.getValue(finalKey).length() > 7;
                         if (useAlpha) {
                             picker.addOpacityBar(opacityBar);
                         } else {
@@ -239,7 +239,7 @@ public class ThemeEditorActivity extends ListActivity {
                         okButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                String hexColor = useAlpha?("#"+Integer.toHexString(picker.getColor())):String.format("#%06X", (0xFFFFFF & picker.getColor()));
+                                String hexColor = useAlpha ? ("#" + Integer.toHexString(picker.getColor())) : String.format("#%06X", (0xFFFFFF & picker.getColor()));
                                 theme.setValue(finalKey, hexColor.toUpperCase());
                                 themeChanged = true;
                                 refreshList();
@@ -264,26 +264,26 @@ public class ThemeEditorActivity extends ListActivity {
                     public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
                         builder.setTitle(resources.getString(R.string.pick_basic_color))
-                        .setItems(R.array.fontcolor_names, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                String hexColor = getResources().getStringArray(R.array.fontcolor_values)[i];
-                                if (theme.getValue(finalKey).length()>7){
-                                    // Add alpha values if needed
-                                    hexColor = "#FF"+hexColor.substring(1);
-                                }
-                                theme.setValue(finalKey, hexColor);
-                                themeChanged = true;
-                                refreshList();
-                                dialogInterface.dismiss();
-                            }
-                        })
-                        .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).show();
+                                .setItems(R.array.fontcolor_names, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        String hexColor = getResources().getStringArray(R.array.fontcolor_values)[i];
+                                        if (theme.getValue(finalKey).length() > 7) {
+                                            // Add alpha values if needed
+                                            hexColor = "#FF" + hexColor.substring(1);
+                                        }
+                                        theme.setValue(finalKey, hexColor);
+                                        themeChanged = true;
+                                        refreshList();
+                                        dialogInterface.dismiss();
+                                    }
+                                })
+                                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                }).show();
                     }
                 });
                 viewHolder.customPickBtn.setOnClickListener(new View.OnClickListener() {
@@ -294,30 +294,30 @@ public class ThemeEditorActivity extends ListActivity {
                         input.setText(value);
                         builder.setView(input);
                         builder.setTitle(resources.getString(R.string.custom_hex_color))
-                        .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // validate input
-                                String hexCode = input.getText().toString();
-                                dialogInterface.dismiss();
-                                try {
-                                    Color.parseColor(hexCode);
-                                } catch (IllegalArgumentException iae) {
-                                    // This color string is not valid
-                                    Toast.makeText(ThemeEditorActivity.this, "Please enter a valid hex color code", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                theme.setValue(finalKey, hexCode);
-                                themeChanged = true;
-                                refreshList();
-                            }
-                        })
-                        .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).show();
+                                .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        // validate input
+                                        String hexCode = input.getText().toString();
+                                        dialogInterface.dismiss();
+                                        try {
+                                            Color.parseColor(hexCode);
+                                        } catch (IllegalArgumentException iae) {
+                                            // This color string is not valid
+                                            Toast.makeText(ThemeEditorActivity.this, "Please enter a valid hex color code", Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
+                                        theme.setValue(finalKey, hexCode);
+                                        themeChanged = true;
+                                        refreshList();
+                                    }
+                                })
+                                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                }).show();
                     }
                 });
             }
@@ -334,7 +334,7 @@ public class ThemeEditorActivity extends ListActivity {
 
         @Override
         public boolean isEmpty() {
-            return theme.getValues().size()==0;
+            return theme.getValues().size() == 0;
         }
 
         class ViewHolder {

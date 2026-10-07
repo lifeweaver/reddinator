@@ -1,73 +1,75 @@
-<PreferenceScreen
-        xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="Widgets">
 
-			<ListPreference
-                android:key="@string/on_click_pref"
-                android:title="@string/on_click_pref_title"
-                android:defaultValue="1"
-                android:summary="@string/on_click_pref_summary"
-                android:entries="@array/onclick_list_preference"
-                android:entryValues="@array/onclick_values_list_preference"
-                android:dialogTitle="@string/on_click_pref_summary" />
-            <ListPreference
-                android:key="@string/refresh_rate_pref"
-                android:title="@string/refresh_rate_pref_title"
-                android:defaultValue="43200000"
-                android:summary="@string/refresh_rate_pref_summary"
-                android:entries="@array/widget_refresh_list"
-                android:entryValues="@array/widget_refresh_values"
-                android:dialogTitle="@string/refresh_rate_pref_summary" />
-            <CheckBoxPreference
-                android:key="@string/logo_open_pref"
-                android:title="@string/logo_open_pref_title"
-                android:defaultValue="true"
-                android:summary="@string/logo_open_pref_summary" />
+        <ListPreference
+            android:key="@string/on_click_pref"
+            android:title="@string/on_click_pref_title"
+            android:defaultValue="1"
+            android:summary="@string/on_click_pref_summary"
+            android:entries="@array/onclick_list_preference"
+            android:entryValues="@array/onclick_values_list_preference"
+            android:dialogTitle="@string/on_click_pref_summary" />
+        <ListPreference
+            android:key="@string/refresh_rate_pref"
+            android:title="@string/refresh_rate_pref_title"
+            android:defaultValue="43200000"
+            android:summary="@string/refresh_rate_pref_summary"
+            android:entries="@array/widget_refresh_list"
+            android:entryValues="@array/widget_refresh_values"
+            android:dialogTitle="@string/refresh_rate_pref_summary" />
+        <CheckBoxPreference
+            android:key="@string/logo_open_pref"
+            android:title="@string/logo_open_pref_title"
+            android:defaultValue="true"
+            android:summary="@string/logo_open_pref_summary" />
 
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Feeds &amp; Filters">
 
-            <CheckBoxPreference
-                android:key="@string/app_reload_pref"
-                android:title="@string/app_reload_pref_title"
-                android:defaultValue="false"
-                android:summary="@string/app_reload_pref_summary" />
+        <CheckBoxPreference
+            android:key="@string/app_reload_pref"
+            android:title="@string/app_reload_pref_title"
+            android:defaultValue="false"
+            android:summary="@string/app_reload_pref_summary" />
 
-			<ListPreference
-                android:key="@string/num_item_load_pref"
-                android:title="@string/num_item_load_pref_title"
-                android:defaultValue="25"
-                android:summary="@string/num_item_load_pref_summary"
-                android:entries="@array/reddit_item_load"
-                android:entryValues="@array/reddit_item_load"
-                android:dialogTitle="@string/num_item_load_pref_summary" />
+        <ListPreference
+            android:key="@string/num_item_load_pref"
+            android:title="@string/num_item_load_pref_title"
+            android:defaultValue="25"
+            android:summary="@string/num_item_load_pref_summary"
+            android:entries="@array/reddit_item_load"
+            android:entryValues="@array/reddit_item_load"
+            android:dialogTitle="@string/num_item_load_pref_summary" />
 
-            <CheckBoxPreference
-                android:key="@string/reset_sort_pref"
-                android:title="@string/reset_sort_title"
-                android:defaultValue="false"
-                android:summary="@string/reset_sort_summary" />
+        <CheckBoxPreference
+            android:key="@string/reset_sort_pref"
+            android:title="@string/reset_sort_title"
+            android:defaultValue="false"
+            android:summary="@string/reset_sort_summary" />
 
-            <CheckBoxPreference
-                android:key="@string/filter_duplicates_pref"
-                android:title="@string/feed_filter_duplicates_title"
-                android:defaultValue="true"
-                android:summary="@string/feed_filter_duplicates_summary" />
+        <CheckBoxPreference
+            android:key="@string/filter_duplicates_pref"
+            android:title="@string/feed_filter_duplicates_title"
+            android:defaultValue="true"
+            android:summary="@string/feed_filter_duplicates_summary" />
 
-            <CheckBoxPreference
-                android:key="@string/hide_seen_pref"
-                android:title="@string/hide_seen_title"
-                android:defaultValue="false"
-                android:summary="@string/hide_seen_summary" />
+        <CheckBoxPreference
+            android:key="@string/hide_seen_pref"
+            android:title="@string/hide_seen_title"
+            android:defaultValue="false"
+            android:summary="@string/hide_seen_summary" />
 
-            <Preference android:title="@string/clear_post_filter_title"
-                android:key="clear_post_filter"
-                android:summary="@string/clear_post_filter_summary"/>
+        <Preference
+            android:title="@string/clear_post_filter_title"
+            android:key="clear_post_filter"
+            android:summary="@string/clear_post_filter_summary" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:key="appearance" android:title="Appearance">
+    <PreferenceCategory
+        android:key="appearance"
+        android:title="Appearance">
 
         <ListPreference
             android:key="@string/app_theme_pref"
@@ -79,12 +81,12 @@
         <Preference
             android:title="@string/edit_theme_pref_title"
             android:key="theme_editor_button"
-            android:summary="@string/edit_theme_pref_summary"/>
+            android:summary="@string/edit_theme_pref_summary" />
 
         <Preference
             android:title="@string/theme_manager_pref_title"
             android:key="theme_manager_button"
-            android:summary="@string/theme_manager_pref_summary"/>
+            android:summary="@string/theme_manager_pref_summary" />
 
         <ListPreference
             android:key="@string/title_font_pref"
@@ -123,7 +125,7 @@
 
     <PreferenceCategory android:title="Reddinator View">
 
-		<CheckBoxPreference
+        <CheckBoxPreference
             android:key="@string/comments_first_pref"
             android:title="@string/comments_first_pref_title"
             android:defaultValue="false"
@@ -147,7 +149,7 @@
             android:title="@string/back_button_pref_title"
             android:defaultValue="false"
             android:summaryOn="@string/back_button_pref_summary_on"
-            android:summaryOff="@string/back_button_pref_summary_off"/>
+            android:summaryOff="@string/back_button_pref_summary_off" />
         <ListPreference
             android:key="@string/comment_font_pref"
             android:title="@string/comment_font_pref_title"
@@ -205,8 +207,9 @@
             android:title="@string/download_ask_pref_title"
             android:defaultValue="false"
             android:summary="@string/download_ask_pref_summary" />
-        <Preference android:title="@string/download_location_title"
-            android:key="download_location"/>
+        <Preference
+            android:title="@string/download_location_title"
+            android:key="download_location" />
     </PreferenceCategory>
 
 </PreferenceScreen>

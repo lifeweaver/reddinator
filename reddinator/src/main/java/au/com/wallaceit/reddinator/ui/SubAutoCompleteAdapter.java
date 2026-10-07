@@ -42,7 +42,7 @@ public class SubAutoCompleteAdapter extends ArrayAdapter<String> implements Filt
 
     @Override
     public int getCount() {
-        if (suggestions==null)
+        if (suggestions == null)
             return 0;
 
         return suggestions.length();
@@ -62,6 +62,7 @@ public class SubAutoCompleteAdapter extends ArrayAdapter<String> implements Filt
     public Filter getFilter() {
         return new Filter() {
             private Exception exception;
+
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
@@ -93,6 +94,7 @@ public class SubAutoCompleteAdapter extends ArrayAdapter<String> implements Filt
                     Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                 }
                 notifyDataSetInvalidated();
-            }};
+            }
+        };
     }
 }

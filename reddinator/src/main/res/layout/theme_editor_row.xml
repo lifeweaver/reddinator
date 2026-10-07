@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:padding="10dip">
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1">
+
         <TextView
             android:id="@+id/theme_value_name"
             android:layout_width="wrap_content"
@@ -27,6 +28,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/color_options"
         android:orientation="vertical"
@@ -34,6 +36,7 @@
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:visibility="gone">
+
         <IconTextView
             android:id="@+id/simple_color_btn"
             android:layout_width="wrap_content"
@@ -48,8 +51,8 @@
             android:layout_marginRight="12dp"
             android:layout_marginEnd="12dp"
             android:textSize="22sp"
-            android:textColor="#ff696969"
-            />
+            android:textColor="#ff696969" />
+
         <IconTextView
             android:id="@+id/custom_color_btn"
             android:layout_width="wrap_content"
@@ -63,13 +66,14 @@
             android:layout_marginRight="12dp"
             android:layout_marginEnd="12dp"
             android:textSize="22sp"
-            android:textColor="#ff696969"/>
+            android:textColor="#ff696969" />
     </LinearLayout>
+
     <ImageView
         android:contentDescription="@string/color_preview"
         android:id="@+id/color_preview"
         android:src="@drawable/border"
         android:layout_width="50dip"
         android:layout_height="50dip"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 </LinearLayout>

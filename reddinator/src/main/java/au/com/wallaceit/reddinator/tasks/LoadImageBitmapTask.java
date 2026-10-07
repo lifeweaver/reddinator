@@ -24,8 +24,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -40,8 +38,9 @@ public class LoadImageBitmapTask extends AsyncTask<Void, Integer, Bitmap> {
 
     public static abstract class ImageCallback implements Runnable {
         public Bitmap image = null;
+
         @Override
-        public void run(){
+        public void run() {
         }
     }
 
@@ -55,14 +54,14 @@ public class LoadImageBitmapTask extends AsyncTask<Void, Integer, Bitmap> {
             con.setReadTimeout(8000);
             return BitmapFactory.decodeStream(con.getInputStream());
         } catch (Exception e) {
-            Log.d("Reddinator", "Count not load image with URL: "+this.url, e);
+            Log.d("Reddinator", "Count not load image with URL: " + this.url, e);
             return null;
         }
     }
 
     @Override
     protected void onPostExecute(Bitmap result) {
-        if (callback!=null){
+        if (callback != null) {
             callback.image = result;
             callback.run();
         }

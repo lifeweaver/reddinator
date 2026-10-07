@@ -33,8 +33,8 @@ import com.joanzapata.android.iconify.Iconify;
 
 import java.util.HashMap;
 
-import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.R;
+import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.activity.MainActivity;
 import au.com.wallaceit.reddinator.activity.SubredditSelectActivity;
 import au.com.wallaceit.reddinator.activity.WidgetMenuDialogActivity;
@@ -101,7 +101,7 @@ public class StackWidgetProvider extends WidgetProviderBase {
             views.setEmptyView(R.id.adapterview, R.id.empty_list_view);
 
             // setup app open intent
-            if (global.mSharedPreferences.getBoolean("logoopenpref", true)){
+            if (global.mSharedPreferences.getBoolean("logoopenpref", true)) {
                 Intent appIntent = new Intent(context, MainActivity.class);
                 appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 appIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -113,7 +113,7 @@ public class StackWidgetProvider extends WidgetProviderBase {
             }
 
             // setup theme
-            HashMap<String, Integer> themeColors = global.mThemeManager.getActiveTheme("widgettheme-"+appWidgetId).getIntColors();
+            HashMap<String, Integer> themeColors = global.mThemeManager.getActiveTheme("widgettheme-" + appWidgetId).getIntColors();
             views.setInt(R.id.widgetheader, "setBackgroundColor", themeColors.get("widget_header_color"));
             views.setInt(R.id.adapterview, "setBackgroundColor", themeColors.get("widget_background_color"));
 

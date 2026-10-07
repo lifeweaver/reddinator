@@ -50,7 +50,7 @@ public class SubredditManager {
         // load subreddits & multis
         try {
             subreddits = new JSONObject(prefs.getString("userSubreddits", "{}"));
-            if (subreddits.length()==0){
+            if (subreddits.length() == 0) {
                 loadDefaultSubreddits();
             }
         } catch (JSONException e) {
@@ -69,7 +69,7 @@ public class SubredditManager {
         }
     }
 
-    public void loadDefaultSubreddits(){
+    public void loadDefaultSubreddits() {
         try {
             subreddits = new JSONObject(defaultSubreddits); // start with front page and all
         } catch (JSONException e) {
@@ -78,12 +78,12 @@ public class SubredditManager {
         new LoadDefaultSubredditsTask().execute();
     }
 
-    public void clearMultis(){
+    public void clearMultis() {
         multis = new JSONObject();
         saveMultis();
     }
 
-    private class LoadDefaultSubredditsTask extends AsyncTask<Void, Void, JSONArray>{
+    private class LoadDefaultSubredditsTask extends AsyncTask<Void, Void, JSONArray> {
 
         @Override
         protected JSONArray doInBackground(Void... params) {
@@ -97,8 +97,8 @@ public class SubredditManager {
 
         @Override
         protected void onPostExecute(JSONArray result) {
-            if (result!=null){
-                for (int i=0; i<result.length(); i++){
+            if (result != null) {
+                for (int i = 0; i < result.length(); i++) {
                     try {
                         JSONObject subSrc = result.getJSONObject(i).getJSONObject("data");
                         JSONObject sub = new JSONObject();
@@ -116,7 +116,7 @@ public class SubredditManager {
     }
 
     // CURRENT FEEDS
-    public String getCurrentFeedName(int feedId){
+    public String getCurrentFeedName(int feedId) {
         try {
             return getCurrentFeed(feedId).getString("name");
         } catch (JSONException e) {
@@ -125,7 +125,7 @@ public class SubredditManager {
         }
     }
 
-    public String getCurrentFeedPath(int feedId){
+    public String getCurrentFeedPath(int feedId) {
         try {
             return getCurrentFeed(feedId).getString("path");
         } catch (JSONException e) {
@@ -134,7 +134,7 @@ public class SubredditManager {
         }
     }
 
-    public boolean isFeedSystemSubreddit(int feedId){
+    public boolean isFeedSystemSubreddit(int feedId) {
         try {
             String name = getCurrentFeed(feedId).getString("name");
             return ("Front Page".equals(name) || "all".equals(name) || "Popular".equals(name));
@@ -144,7 +144,7 @@ public class SubredditManager {
         }
     }
 
-    public boolean isFeedMulti(int feedId){
+    public boolean isFeedMulti(int feedId) {
         try {
             return getCurrentFeed(feedId).getBoolean("is_multi");
         } catch (JSONException e) {
@@ -152,11 +152,12 @@ public class SubredditManager {
             return false;
         }
     }
+
     // this sets the current feed using the supplied name, reddit url path and isMulti value.
     // isMulti is used to determine whether the items are from a different subreddit, in order to show that value to the user
-    public void setFeed(int feedId, String name, String path, boolean isMulti){
-        if (path.length()>1 && '/' == (path.charAt(path.length()-1)))
-            path = path.substring(0, path.length()-1);
+    public void setFeed(int feedId, String name, String path, boolean isMulti) {
+        if (path.length() > 1 && '/' == (path.charAt(path.length() - 1)))
+            path = path.substring(0, path.length() - 1);
 
         JSONObject data = new JSONObject();
         try {
@@ -167,23 +168,25 @@ public class SubredditManager {
             e.printStackTrace();
         }
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("currentfeed-"+String.valueOf(feedId), data.toString());
+        editor.putString("currentfeed-" + String.valueOf(feedId), data.toString());
         editor.apply();
     }
+
     // shortcut method for setting the feed to a subreddit
-    public void setFeedSubreddit(int feedId, String subreddit, String path){
+    public void setFeedSubreddit(int feedId, String subreddit, String path) {
         boolean isMulti = (subreddit.equals("Front Page") || subreddit.equals("all"));
         // backwards compatibility; using name in url causes issues on subreddits with non-url-compatible characters
-        if (path==null) {
+        if (path == null) {
             path = subreddit.equals("Front Page") ? "" : "/r/" + subreddit;
             // Strip last / from url if present
-        } else if (path.length()>0 && path.charAt(path.length()-1)=='/')
-            path = path.substring(0, path.length()-1);
+        } else if (path.length() > 0 && path.charAt(path.length() - 1) == '/')
+            path = path.substring(0, path.length() - 1);
 
         setFeed(feedId, subreddit, path, isMulti);
     }
+
     // shortcut method for setting the feed to a domain
-    public void setFeedDomain(int feedId, String domain){
+    public void setFeedDomain(int feedId, String domain) {
         setFeed(feedId, domain, "/domain/" + domain, true);
     }
 
@@ -192,23 +195,25 @@ public class SubredditManager {
     }
 
     // /r/all filtering
-    public ArrayList<String> getAllFilter(){
+    public ArrayList<String> getAllFilter() {
         return new ArrayList<>(Arrays.asList(StringUtils.split(prefs.getString("allFilter", ""), ",")));
     }
 
-    public void setAllFilter(ArrayList<String> filter){
+    public void setAllFilter(ArrayList<String> filter) {
         prefs.edit().putString("allFilter", StringUtils.join(filter.toArray(new String[filter.size()]), ",")).apply();
     }
-    public void clearAllFilter(){
+
+    public void clearAllFilter() {
         prefs.edit().putString("allFilter", "").apply();
     }
+
     // TODO: per subreddit domain filtering
     // hidden post filters
-    public void addPostFilter(int feedId, String redditId){
+    public void addPostFilter(int feedId, String redditId) {
         String feedPath = getCurrentFeedPath(feedId);
         JSONObject arr;
         try {
-            if (postFilters.has(feedPath)){
+            if (postFilters.has(feedPath)) {
                 arr = postFilters.getJSONObject(feedPath);
             } else {
                 arr = new JSONObject();
@@ -221,16 +226,16 @@ public class SubredditManager {
         }
     }
 
-    private JSONObject getPostFilters(String feedPath){
+    private JSONObject getPostFilters(String feedPath) {
         // return all for front page and all otherwise just return the path specific filters
         JSONObject finalarr = new JSONObject();
-        if (feedPath.equals("") || feedPath.equals("/r/all")){
+        if (feedPath.equals("") || feedPath.equals("/r/all")) {
             Iterator it = postFilters.keys();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 try {
                     JSONObject arr = postFilters.getJSONObject((String) it.next());
                     Iterator it2 = arr.keys();
-                    while (it2.hasNext()){
+                    while (it2.hasNext()) {
                         String id = arr.getString((String) it2.next());
                         finalarr.put(id, id);
                     }
@@ -252,10 +257,10 @@ public class SubredditManager {
         return new JSONObject();
     }
 
-    public int getPostFilterCount(){
+    public int getPostFilterCount() {
         int count = 0;
         Iterator it = postFilters.keys();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             try {
                 count += postFilters.getJSONObject((String) it.next()).length();
             } catch (JSONException e) {
@@ -265,20 +270,21 @@ public class SubredditManager {
         return count;
     }
 
-    public void clearPostFilters(){
+    public void clearPostFilters() {
         postFilters = new JSONObject();
         savePostFilters();
     }
 
-    private void savePostFilters(){
+    private void savePostFilters() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("postFilters", postFilters.toString());
         editor.apply();
     }
+
     // apply filters to the new feed data
-    public JSONArray filterFeed(int feedId, JSONArray feedArray, JSONArray currentFeed, boolean filterAll, boolean filterPosts){
+    public JSONArray filterFeed(int feedId, JSONArray feedArray, JSONArray currentFeed, boolean filterAll, boolean filterPosts) {
         // determine filter requirements
-        boolean filterDuplicates = prefs.getBoolean("filterduplicatespref", true) && currentFeed!=null;
+        boolean filterDuplicates = prefs.getBoolean("filterduplicatespref", true) && currentFeed != null;
         boolean filterSeen = prefs.getBoolean("hideseenpref", false);
         JSONObject postFilters = null;
         if (filterPosts) {
@@ -292,8 +298,8 @@ public class SubredditManager {
             return feedArray; // no filters applied
         // collect current ids
         ArrayList<String> ids = new ArrayList<>();
-        if (filterDuplicates){
-            for (int i=0; i<currentFeed.length(); i++){
+        if (filterDuplicates) {
+            for (int i = 0; i < currentFeed.length(); i++) {
                 try {
                     ids.add(currentFeed.getJSONObject(i).getJSONObject("data").getString("name"));
                 } catch (JSONException e) {
@@ -308,7 +314,7 @@ public class SubredditManager {
             filter = getAllFilter();
         JSONObject feedObj;
         String subreddit;
-        for (int i=0; i<feedArray.length(); i++){
+        for (int i = 0; i < feedArray.length(); i++) {
             try {
                 feedObj = feedArray.getJSONObject(i);
                 if (filterDuplicates || filterPosts) {
@@ -343,7 +349,7 @@ public class SubredditManager {
     }
 
     // SUBREDDIT STORAGE
-    private void saveSubs(){
+    private void saveSubs() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("userSubreddits", subreddits.toString());
         editor.apply();
@@ -352,13 +358,13 @@ public class SubredditManager {
     public ArrayList<String> getSubredditNames() {
         ArrayList<String> subList = new ArrayList<>();
         Iterator iterator = subreddits.keys();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             subList.add(iterator.next().toString());
         }
         return subList;
     }
 
-    public JSONObject getSubredditData(String name){
+    public JSONObject getSubredditData(String name) {
         try {
             return subreddits.getJSONObject(name);
         } catch (JSONException e) {
@@ -367,7 +373,7 @@ public class SubredditManager {
         return null;
     }
 
-    public void addSubreddit(JSONObject subObj){
+    public void addSubreddit(JSONObject subObj) {
         try {
             subreddits.put(subObj.getString("display_name"), subObj);
         } catch (JSONException e) {
@@ -376,13 +382,13 @@ public class SubredditManager {
         saveSubs();
     }
 
-    public void setSubreddits(JSONArray subsArray){
+    public void setSubreddits(JSONArray subsArray) {
         try {
             subreddits = new JSONObject(defaultSubreddits); // start with front page and all
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i<subsArray.length(); i++){
+        for (int i = 0; i < subsArray.length(); i++) {
             try {
                 addSubredditData(subsArray.getJSONObject(i));
             } catch (JSONException e) {
@@ -392,9 +398,9 @@ public class SubredditManager {
         saveSubs();
     }
 
-    private void addSubredditData(JSONObject subObj){
+    private void addSubredditData(JSONObject subObj) {
         try {
-            JSONObject data =  subObj.getJSONObject("data");
+            JSONObject data = subObj.getJSONObject("data");
             String name = data.getString("display_name");
             subreddits.put(name, data);
         } catch (JSONException e) {
@@ -402,12 +408,12 @@ public class SubredditManager {
         }
     }
 
-    public void removeSubreddit(String subredditName){
+    public void removeSubreddit(String subredditName) {
         subreddits.remove(subredditName);
         saveSubs();
     }
 
-    public int getSubredditSubscribeCapability(String key){
+    public int getSubredditSubscribeCapability(String key) {
 
         if ("Front Page".equals(key) || "all".equals(key) || "Popular".equals(key))
             return 0;
@@ -419,11 +425,11 @@ public class SubredditManager {
     }
 
     // MULTI STORAGE
-    public ArrayList<JSONObject> getMultiList(){
+    public ArrayList<JSONObject> getMultiList() {
         ArrayList<JSONObject> multiList = new ArrayList<>();
         Iterator iterator = multis.keys();
         JSONObject multiObj;
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             try {
                 multiObj = multis.getJSONObject(iterator.next().toString());
                 multiList.add(multiObj);
@@ -434,12 +440,12 @@ public class SubredditManager {
         return multiList;
     }
 
-    public ArrayList<String> getMultiSubreddits(String multiPath){
+    public ArrayList<String> getMultiSubreddits(String multiPath) {
 
         ArrayList<String> multiList = new ArrayList<>();
         try {
             JSONArray multiSubs = multis.getJSONObject(multiPath).getJSONArray("subreddits");
-            for (int i=0; i<multiSubs.length(); i++){
+            for (int i = 0; i < multiSubs.length(); i++) {
                 multiList.add(multiSubs.getJSONObject(i).getString("name"));
             }
         } catch (JSONException e) {
@@ -448,10 +454,10 @@ public class SubredditManager {
         return multiList;
     }
 
-    public void setMultiSubs(String multiPath, ArrayList<String> multiSubList){
+    public void setMultiSubs(String multiPath, ArrayList<String> multiSubList) {
         JSONArray multiSubs = new JSONArray();
         JSONObject subObj;
-        for (int i=0; i<multiSubList.size(); i++){
+        for (int i = 0; i < multiSubList.size(); i++) {
             subObj = new JSONObject();
             try {
                 subObj.put("name", multiSubList.get(i));
@@ -470,7 +476,7 @@ public class SubredditManager {
         saveMultis();
     }
 
-    public JSONObject getMultiData(String multiPath){
+    public JSONObject getMultiData(String multiPath) {
         try {
             return multis.getJSONObject(multiPath);
         } catch (JSONException e) {
@@ -479,7 +485,7 @@ public class SubredditManager {
         }
     }
 
-    public void setMultiData(String multiPath, JSONObject multiObj){
+    public void setMultiData(String multiPath, JSONObject multiObj) {
 
         try {
             multis.put(multiPath, multiObj);
@@ -490,11 +496,11 @@ public class SubredditManager {
         saveMultis();
     }
 
-    public void addMultis(JSONArray subsArray, boolean clearCurrent){
+    public void addMultis(JSONArray subsArray, boolean clearCurrent) {
         if (clearCurrent)
             multis = new JSONObject();
 
-        for (int i = 0; i<subsArray.length(); i++){
+        for (int i = 0; i < subsArray.length(); i++) {
             try {
                 addMultiData(subsArray.getJSONObject(i));
             } catch (JSONException e) {
@@ -505,14 +511,14 @@ public class SubredditManager {
         saveMultis();
     }
 
-    public void removeMulti(String key){
+    public void removeMulti(String key) {
         multis.remove(key);
         saveMultis();
     }
 
-    private void addMultiData(JSONObject multiObj){
+    private void addMultiData(JSONObject multiObj) {
         try {
-            JSONObject data =  multiObj.getJSONObject("data");
+            JSONObject data = multiObj.getJSONObject("data");
             String name = data.getString("path");
             multis.put(name, data);
         } catch (JSONException e) {
@@ -520,7 +526,7 @@ public class SubredditManager {
         }
     }
 
-    private void saveMultis(){
+    private void saveMultis() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("userMultis", multis.toString());
         editor.apply();

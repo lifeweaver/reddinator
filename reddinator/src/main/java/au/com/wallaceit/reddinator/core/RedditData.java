@@ -28,14 +28,6 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import okhttp3.FormBody;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +44,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import au.com.wallaceit.reddinator.activity.OAuthView;
+import okhttp3.FormBody;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class RedditData {
     private SharedPreferences sharedPrefs;
@@ -91,7 +90,7 @@ public class RedditData {
         username = sharedPrefs.getString("username", "");
         inboxCount = sharedPrefs.getInt("inbox_count", 0);
         lastUpdateTime = sharedPrefs.getLong("last_info_update", 0);
-        if (tokenStr!=null) {
+        if (tokenStr != null) {
             try {
                 oauthToken = new JSONObject(tokenStr);
             } catch (JSONException e) {
@@ -101,7 +100,7 @@ public class RedditData {
         }
         // load app only oauth token
         String appTokenStr = sharedPrefs.getString("oauthAppToken", null);
-        if (appTokenStr!=null) {
+        if (appTokenStr != null) {
             try {
                 oauthAppToken = new JSONObject(appTokenStr);
             } catch (JSONException e) {
@@ -111,7 +110,7 @@ public class RedditData {
         }
     }
 
-    private Intent getLoginIntent(Context context, boolean newTask){
+    private Intent getLoginIntent(Context context, boolean newTask) {
         Intent loginintent = new Intent(context, OAuthView.class);
         oauthstate = UUID.randomUUID().toString();
         loginintent.putExtra("oauthstate", oauthstate);
@@ -152,7 +151,7 @@ public class RedditData {
             subreddits = redditApiGet(url, false).getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return subreddits;
     }
@@ -164,7 +163,7 @@ public class RedditData {
             subreddits = redditApiGet(url, false).getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return subreddits;
     }
@@ -176,7 +175,7 @@ public class RedditData {
             subreddits = redditApiGet(url, true).getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return subreddits;
     }
@@ -188,32 +187,32 @@ public class RedditData {
             names = redditApiPost(url).getJSONArray("names");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return names;
     }
 
     public JSONObject getSubmitText(String subreddit) throws RedditApiException {
 
-        String url = OAUTH_ENDPOINT + "/r/"+subreddit+"/api/submit_text.json";
+        String url = OAUTH_ENDPOINT + "/r/" + subreddit + "/api/submit_text.json";
         return redditApiGet(url, false);
     }
 
     public JSONObject getSubredditInfo(String subreddit) throws RedditApiException {
 
-        String url = OAUTH_ENDPOINT + "/r/"+subreddit+"/about.json";
+        String url = OAUTH_ENDPOINT + "/r/" + subreddit + "/about.json";
         try {
             return redditApiGet(url, false).getJSONObject("data");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
     }
 
     public JSONArray getRedditFeed(String feedPath, String sort, int limit, String afterid) throws RedditApiException {
         // allows a logged in user to retrieve the default front page
         boolean authedFeed = true;
-        if (feedPath.equals("/default")){
+        if (feedPath.equals("/default")) {
             authedFeed = false;
             feedPath = "";
         }
@@ -227,7 +226,7 @@ public class RedditData {
             feed = result.getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return feed;
     }
@@ -241,7 +240,7 @@ public class RedditData {
             result = result.getJSONObject("data");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return result;
     }
@@ -253,7 +252,7 @@ public class RedditData {
             url = OAUTH_ENDPOINT + feedPath + "/search.json?q=" + URLEncoder.encode(query, "UTF-8") + "&t=" + time + "&sort=" + sort + "&restrict_sr=" + restrictSub + "&type=link&syntax=plain&limit=" + String.valueOf(limit) + (!afterid.equals("0") ? "&after=" + afterid : "");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
         JSONObject result;
         JSONArray feed;
@@ -263,7 +262,7 @@ public class RedditData {
             feed = result.getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return feed;
     }
@@ -295,21 +294,21 @@ public class RedditData {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return feed;
     }
 
     // AUTHED CALLS
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
-    public int getInboxCount(){
+    public int getInboxCount() {
         return inboxCount;
     }
 
-    public long getLinkKarma(){
+    public long getLinkKarma() {
         try {
             return userInfo.getLong("link_karma");
         } catch (JSONException e) {
@@ -318,7 +317,7 @@ public class RedditData {
         }
     }
 
-    public long getCommentKarma(){
+    public long getCommentKarma() {
         try {
             return userInfo.getLong("comment_karma");
         } catch (JSONException e) {
@@ -331,9 +330,11 @@ public class RedditData {
         return userInfo;
     }*/
 
-    public long getLastUserUpdateTime(){ return lastUpdateTime; }
+    public long getLastUserUpdateTime() {
+        return lastUpdateTime;
+    }
 
-    public void clearStoredInboxCount(){
+    public void clearStoredInboxCount() {
         inboxCount = 0;
         SharedPreferences.Editor edit = sharedPrefs.edit();
         edit.putInt("inbox_count", inboxCount);
@@ -362,12 +363,12 @@ public class RedditData {
         try {
             resultjson = redditApiGet(url, true);
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
-                throw new RedditApiException("API error: "+resultjson.getJSONArray("errors").getJSONArray(0).getString(1));
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
+                throw new RedditApiException("API error: " + resultjson.getJSONArray("errors").getJSONArray(0).getString(1));
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
 
         return resultjson;
@@ -381,12 +382,12 @@ public class RedditData {
         try {
             resultjson = redditApiGet(url, true);
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
-                throw new RedditApiException("API error: "+resultjson.getJSONArray("errors").getJSONArray(0).getString(1));
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
+                throw new RedditApiException("API error: " + resultjson.getJSONArray("errors").getJSONArray(0).getString(1));
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
 
         return resultjson;
@@ -400,12 +401,12 @@ public class RedditData {
         try {
             resultjson = redditApiGet(url, true);
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
-                throw new RedditApiException("API error: "+resultjson.getJSONArray("errors").getJSONArray(0).getString(1));
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
+                throw new RedditApiException("API error: " + resultjson.getJSONArray("errors").getJSONArray(0).getString(1));
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
 
         return resultjson;
@@ -419,7 +420,7 @@ public class RedditData {
         try {
             resultjson = redditApiPost(url);
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
                 JSONArray errors = resultjson.getJSONArray("errors");
                 JSONArray firsterror = (JSONArray) errors.get(0);
                 if (firsterror.get(0).equals("USER_REQUIRED")) {
@@ -432,14 +433,14 @@ public class RedditData {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
     }
 
     public JSONArray getAccountFeed(String type, String sort, int limit, String afterid) throws RedditApiException {
         checkLogin();
 
-        String url = OAUTH_ENDPOINT + "/user/" + username + "/" + type + "/.json?sort=" + sort + "&limit=" + String.valueOf(limit) + (afterid!=null ? "&after=" + afterid : "");
+        String url = OAUTH_ENDPOINT + "/user/" + username + "/" + type + "/.json?sort=" + sort + "&limit=" + String.valueOf(limit) + (afterid != null ? "&after=" + afterid : "");
         JSONObject result;
         JSONArray feed;
 
@@ -448,7 +449,7 @@ public class RedditData {
             feed = result.getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return feed;
     }
@@ -456,7 +457,7 @@ public class RedditData {
     public JSONArray getMessageFeed(String type, int limit, String afterid) throws RedditApiException {
         checkLogin();
 
-        String url = OAUTH_ENDPOINT + "/message/" + type + ".json?limit=" + String.valueOf(limit) + (afterid!=null ? "&after=" + afterid : "");
+        String url = OAUTH_ENDPOINT + "/message/" + type + ".json?limit=" + String.valueOf(limit) + (afterid != null ? "&after=" + afterid : "");
         JSONObject result;
         JSONArray feed;
 
@@ -465,14 +466,14 @@ public class RedditData {
             feed = result.getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return feed;
     }
 
     public void markMessagesRead(ArrayList<String> redditIds) throws RedditApiException {
         checkLogin();
-        redditApiPost(OAUTH_ENDPOINT + "/api/read_message?id="+ TextUtils.join(",", redditIds));
+        redditApiPost(OAUTH_ENDPOINT + "/api/read_message?id=" + TextUtils.join(",", redditIds));
     }
 
     /*public void markAllMessagesRead() throws RedditApiException {
@@ -484,9 +485,9 @@ public class RedditData {
         checkLogin();
         String url;
         try {
-            url = OAUTH_ENDPOINT + "/api/compose?api_type=json&to=" + to + "&subject=" + URLEncoder.encode(subject, "UTF-8") + "&text=" + URLEncoder.encode(text, "UTF-8") + (fromSubreddit!=null ? "&from_sr=" + fromSubreddit : "");
+            url = OAUTH_ENDPOINT + "/api/compose?api_type=json&to=" + to + "&subject=" + URLEncoder.encode(subject, "UTF-8") + "&text=" + URLEncoder.encode(text, "UTF-8") + (fromSubreddit != null ? "&from_sr=" + fromSubreddit : "");
         } catch (UnsupportedEncodingException e) {
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
         redditApiPost(url);
     }
@@ -502,23 +503,23 @@ public class RedditData {
 
             resultjson = redditApiPost(url).getJSONObject("json");
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
                 JSONArray errors = resultjson.getJSONArray("errors");
                 JSONArray firsterror = (JSONArray) errors.get(0);
                 if (firsterror.get(0).equals("USER_REQUIRED")) {
                     oauthToken = null; // bearer token invalid, nullify
                     throw new RedditApiException("Authentication Error, Reddit Login Required", true); // creds invalid re-authenticate.
                 }
-                throw new RedditApiException("API Error: "+firsterror.get(1), false);
+                throw new RedditApiException("API Error: " + firsterror.get(1), false);
             } else {
                 return resultjson.getJSONObject("data").getJSONArray("things").getJSONObject(0).getJSONObject("data");
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
     }
 
@@ -533,23 +534,23 @@ public class RedditData {
 
             resultjson = redditApiPost(url).getJSONObject("json");
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
                 JSONArray errors = resultjson.getJSONArray("errors");
                 JSONArray firsterror = (JSONArray) errors.get(0);
                 if (firsterror.get(0).equals("USER_REQUIRED")) {
                     oauthToken = null; // bearer token invalid, nullify
                     throw new RedditApiException("Authentication Error, Reddit Login Required", true); // creds invalid re-authenticate.
                 }
-                throw new RedditApiException("API Error: "+firsterror.get(1), true);
+                throw new RedditApiException("API Error: " + firsterror.get(1), true);
             } else {
                 return resultjson.getJSONObject("data").getJSONArray("things").getJSONObject(0).getJSONObject("data");
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
     }
 
@@ -563,18 +564,18 @@ public class RedditData {
 
             resultjson = redditApiPost(url);
 
-            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length()>0) {
+            if (resultjson.has("errors") && resultjson.getJSONArray("errors").length() > 0) {
                 JSONArray errors = resultjson.getJSONArray("errors");
                 JSONArray firsterror = (JSONArray) errors.get(0);
                 if (firsterror.get(0).equals("USER_REQUIRED")) {
                     oauthToken = null; // bearer token invalid, nullify
                     throw new RedditApiException("Authentication Error, Reddit Login Required", true); // creds invalid re-authenticate.
                 }
-                throw new RedditApiException("API Error: "+firsterror.get(1), true);
+                throw new RedditApiException("API Error: " + firsterror.get(1), true);
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
     }
 
@@ -587,7 +588,7 @@ public class RedditData {
             resultjson = redditApiGet(url, true).getJSONObject("data").getJSONArray("children");
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Parsing error: "+e.getMessage());
+            throw new RedditApiException("Parsing error: " + e.getMessage());
         }
         return resultjson;
     }
@@ -595,7 +596,7 @@ public class RedditData {
     public JSONObject subscribe(String subId, boolean subscribe) throws RedditApiException {
         checkLogin();
 
-        String url = OAUTH_ENDPOINT + "/api/subscribe?sr="+ subId +"&action="+(subscribe?"sub":"unsub");
+        String url = OAUTH_ENDPOINT + "/api/subscribe?sr=" + subId + "&action=" + (subscribe ? "sub" : "unsub");
 
         return redditApiPost(url);
     }
@@ -612,13 +613,13 @@ public class RedditData {
         checkLogin();
 
         String url;
-        String toPath = "user/"+username+"/m/"+name.toLowerCase().replaceAll("\\s+", "");
+        String toPath = "user/" + username + "/m/" + name.toLowerCase().replaceAll("\\s+", "");
         System.out.println(toPath);
         try {
-            url = OAUTH_ENDPOINT + "/api/multi/copy?display_name="+ URLEncoder.encode(name, "UTF-8")+"&from="+URLEncoder.encode(fromPath, "UTF-8")+"&to="+URLEncoder.encode(toPath, "UTF-8");
+            url = OAUTH_ENDPOINT + "/api/multi/copy?display_name=" + URLEncoder.encode(name, "UTF-8") + "&from=" + URLEncoder.encode(fromPath, "UTF-8") + "&to=" + URLEncoder.encode(toPath, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
 
         return redditApiPost(url);
@@ -629,10 +630,10 @@ public class RedditData {
 
         String url;
         try {
-            url = OAUTH_ENDPOINT + "/api/multi/user/"+username+"/m/"+name+"?model="+URLEncoder.encode(multiObj.toString(), "UTF-8");
+            url = OAUTH_ENDPOINT + "/api/multi/user/" + username + "/m/" + name + "?model=" + URLEncoder.encode(multiObj.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
 
         return redditApiPost(url);
@@ -643,10 +644,10 @@ public class RedditData {
 
         String url;
         try {
-            url = OAUTH_ENDPOINT + "/api/multi"+multiPath+"?model="+URLEncoder.encode(multiObj.toString(), "UTF-8");
+            url = OAUTH_ENDPOINT + "/api/multi" + multiPath + "?model=" + URLEncoder.encode(multiObj.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
 
         return redditApiPut(url);
@@ -655,7 +656,7 @@ public class RedditData {
     public void deleteMulti(String multiPath) throws RedditApiException {
         checkLogin();
 
-        String url = OAUTH_ENDPOINT + "/api/multi"+multiPath;
+        String url = OAUTH_ENDPOINT + "/api/multi" + multiPath;
 
         redditApiDelete(url);
     }
@@ -663,7 +664,7 @@ public class RedditData {
     public JSONObject renameMulti(String multiPath, String newName) throws RedditApiException {
         checkLogin();
 
-        String url = OAUTH_ENDPOINT + "/api/multi/rename/?from="+multiPath+"&to=/user/"+username+"/m/"+newName;
+        String url = OAUTH_ENDPOINT + "/api/multi/rename/?from=" + multiPath + "&to=/user/" + username + "/m/" + newName;
 
         return redditApiPost(url);
     }
@@ -673,10 +674,10 @@ public class RedditData {
 
         String url;
         try {
-            url = OAUTH_ENDPOINT + "/api/multi"+multiPath+"/r/"+subredditName+"?srname="+URLEncoder.encode(subredditName, "UTF-8")+"&model="+URLEncoder.encode("{\"name\":\""+subredditName+"\"}", "UTF-8");
+            url = OAUTH_ENDPOINT + "/api/multi" + multiPath + "/r/" + subredditName + "?srname=" + URLEncoder.encode(subredditName, "UTF-8") + "&model=" + URLEncoder.encode("{\"name\":\"" + subredditName + "\"}", "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
 
         return redditApiPut(url);
@@ -687,10 +688,10 @@ public class RedditData {
 
         String url;
         try {
-            url = OAUTH_ENDPOINT + "/api/multi"+multiPath+"/r/"+subredditName+"?srname="+URLEncoder.encode(subredditName, "UTF-8")+"&model="+URLEncoder.encode("{\"name\":\""+subredditName+"\"}", "UTF-8");
+            url = OAUTH_ENDPOINT + "/api/multi" + multiPath + "/r/" + subredditName + "?srname=" + URLEncoder.encode(subredditName, "UTF-8") + "&model=" + URLEncoder.encode("{\"name\":\"" + subredditName + "\"}", "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
 
         redditApiDelete(url);
@@ -701,7 +702,7 @@ public class RedditData {
 
         try {
             content = URLEncoder.encode(content, "UTF-8");
-            String url = OAUTH_ENDPOINT + "/api/submit?api_type=json&extension=json&then=comments&sr=" + URLEncoder.encode(subreddit, "UTF-8") + "&kind=" + (isLink?"link":"self") + "&title=" + URLEncoder.encode(title, "UTF-8") + "&" + (isLink?"url=":"text=")+content;
+            String url = OAUTH_ENDPOINT + "/api/submit?api_type=json&extension=json&then=comments&sr=" + URLEncoder.encode(subreddit, "UTF-8") + "&kind=" + (isLink ? "link" : "self") + "&title=" + URLEncoder.encode(title, "UTF-8") + "&" + (isLink ? "url=" : "text=") + content;
 
             return redditApiPost(url).getJSONObject("json");
 
@@ -712,49 +713,49 @@ public class RedditData {
 
     public void save(String category, String name) throws RedditApiException {
         checkLogin();
-        String url = OAUTH_ENDPOINT + "/api/save?category="+category+"&id="+name;
+        String url = OAUTH_ENDPOINT + "/api/save?category=" + category + "&id=" + name;
         redditApiPost(url);
     }
 
     public void unSave(String name) throws RedditApiException {
         checkLogin();
-        String url = OAUTH_ENDPOINT + "/api/unsave?id="+name;
+        String url = OAUTH_ENDPOINT + "/api/unsave?id=" + name;
         redditApiPost(url);
     }
 
     public void hide(String name) throws RedditApiException {
         checkLogin();
-        String url = OAUTH_ENDPOINT + "/api/hide?id="+name;
+        String url = OAUTH_ENDPOINT + "/api/hide?id=" + name;
         redditApiPost(url);
     }
 
     public void unHide(String name) throws RedditApiException {
         checkLogin();
-        String url = OAUTH_ENDPOINT + "/api/unhide?id="+name;
+        String url = OAUTH_ENDPOINT + "/api/unhide?id=" + name;
         redditApiPost(url);
     }
 
     public JSONObject getFilter(String filter) throws RedditApiException {
         checkLogin();
-        String url = OAUTH_ENDPOINT + "/api/filter/user/"+getUsername()+"/f/"+filter;
+        String url = OAUTH_ENDPOINT + "/api/filter/user/" + getUsername() + "/f/" + filter;
         return redditApiGet(url, true);
     }
 
     public JSONObject addFilterSubreddit(String filter, String subreddit) throws RedditApiException {
         checkLogin();
         try {
-            String url = OAUTH_ENDPOINT + "/api/filter/user/"+getUsername()+"/f/"+filter+"/r/"+subreddit+"?model="+ URLEncoder.encode("{\"name\":\""+subreddit+"\"}", "UTF-8");
+            String url = OAUTH_ENDPOINT + "/api/filter/user/" + getUsername() + "/f/" + filter + "/r/" + subreddit + "?model=" + URLEncoder.encode("{\"name\":\"" + subreddit + "\"}", "UTF-8");
 
             return redditApiPut(url);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new RedditApiException("Encoding error: "+e.getMessage());
+            throw new RedditApiException("Encoding error: " + e.getMessage());
         }
     }
 
     public void removeFilterSubreddit(String filter, String subreddit) throws RedditApiException {
         checkLogin();
-        String url = OAUTH_ENDPOINT + "/api/filter/user/"+getUsername()+"/f/"+filter+"/r/"+subreddit;
+        String url = OAUTH_ENDPOINT + "/api/filter/user/" + getUsername() + "/f/" + filter + "/r/" + subreddit;
         redditApiDelete(url);
     }
 
@@ -762,19 +763,19 @@ public class RedditData {
     // Create Http/s client
     private void createHttpClient() {
         httpClient = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request originalRequest = chain.request();
-                    Request requestWithUserAgent = originalRequest.newBuilder()
-                            .removeHeader("User-Agent")
-                            .addHeader("User-Agent", userAgent)
-                            .build();
-                    return chain.proceed(requestWithUserAgent);
-                }
-            }).build();
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request originalRequest = chain.request();
+                        Request requestWithUserAgent = originalRequest.newBuilder()
+                                .removeHeader("User-Agent")
+                                .addHeader("User-Agent", userAgent)
+                                .build();
+                        return chain.proceed(requestWithUserAgent);
+                    }
+                }).build();
     }
 
     private JSONArray redditApiGetArray(String url, boolean useAuth) throws RedditApiException {
@@ -784,7 +785,7 @@ public class RedditData {
             jArr = new JSONArray(json);
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Error: "+e.getMessage());
+            throw new RedditApiException("Error: " + e.getMessage());
         }
         return jArr;
     }
@@ -792,11 +793,11 @@ public class RedditData {
     private JSONObject redditApiGet(String url, boolean useAuth) throws RedditApiException {
         JSONObject jObj;
         try {
-            String json = redditApiRequest(url, "GET", useAuth?REQUEST_MODE_AUTHED:REQUEST_MODE_UNAUTHED, null);
+            String json = redditApiRequest(url, "GET", useAuth ? REQUEST_MODE_AUTHED : REQUEST_MODE_UNAUTHED, null);
             jObj = new JSONObject(json);
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Error: "+e.getMessage());
+            throw new RedditApiException("Error: " + e.getMessage());
         }
         return jObj;
     }
@@ -808,7 +809,7 @@ public class RedditData {
             jObj = new JSONObject(json);
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Error: "+e.getMessage());
+            throw new RedditApiException("Error: " + e.getMessage());
         }
         return jObj;
     }
@@ -820,7 +821,7 @@ public class RedditData {
             jObj = new JSONObject(json);
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Error: "+e.getMessage());
+            throw new RedditApiException("Error: " + e.getMessage());
         }
         return jObj;
     }
@@ -837,7 +838,7 @@ public class RedditData {
             jObj = new JSONObject(json);
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RedditApiException("Error: "+e.getMessage());
+            throw new RedditApiException("Error: " + e.getMessage());
         }
         return jObj;
     }
@@ -846,6 +847,7 @@ public class RedditData {
     private static final int REQUEST_MODE_AUTHED = 1;
     private static final int REQUEST_MODE_OAUTHREQ = 2;
     private static final MediaType POST_ENCODED = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+
     private String redditApiRequest(String urlStr, String method, int oauthMode, HashMap<String, String> formData) throws RedditApiException {
         String responseText;
         // create client if null
@@ -856,11 +858,11 @@ public class RedditData {
             Request.Builder httpRequest = new Request.Builder().url(urlStr);
             RequestBody httpRequestBody;
             String requestStr = "";
-            if (formData!=null) {
+            if (formData != null) {
                 FormBody.Builder formBuilder = new FormBody.Builder();
                 Iterator iterator = formData.keySet().iterator();
                 String key;
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
                     key = (String) iterator.next();
                     formBuilder.add(key, formData.get(key));
                 }
@@ -868,14 +870,14 @@ public class RedditData {
             } else {
                 if (!method.equals("GET")) {
                     int queryIndex = urlStr.indexOf("?");
-                    if (queryIndex!=-1) {
+                    if (queryIndex != -1) {
                         requestStr = URLEncoder.encode(urlStr.substring(queryIndex), "UTF-8");
                     }
                 }
                 httpRequestBody = RequestBody.create(POST_ENCODED, requestStr);
             }
 
-            switch (method){
+            switch (method) {
                 case "POST":
                     httpRequest.post(httpRequestBody);
                     break;
@@ -890,10 +892,10 @@ public class RedditData {
                     httpRequest.get();
                     break;
             }
-            if (oauthMode==REQUEST_MODE_OAUTHREQ) {
+            if (oauthMode == REQUEST_MODE_OAUTHREQ) {
                 // For oauth token retrieval and refresh
                 httpRequest.addHeader("Authorization", "Basic " + Base64.encodeToString((OAUTH_CLIENTID + ":").getBytes(), Base64.URL_SAFE | Base64.NO_WRAP));
-            } else if (isLoggedIn() && oauthMode==REQUEST_MODE_AUTHED) {
+            } else if (isLoggedIn() && oauthMode == REQUEST_MODE_AUTHED) {
                 if (isTokenExpired(true)) {
                     refreshToken();
                 }
@@ -911,25 +913,25 @@ public class RedditData {
             Response response = httpClient.newCall(httpRequest.build()).execute();
             responseText = response.body().string();
             int errorCode = response.code();
-            if (errorCode<200 || errorCode>202) {
+            if (errorCode < 200 || errorCode > 202) {
                 JSONObject errorJson = getErrorJson(responseText);
-                String errorMsg = errorJson!=null ? getJsonErrorText(errorJson) : getHtmlErrorText(responseText);
-                boolean isAuthError = errorCode==403 && isAuthenticationError(errorJson);
+                String errorMsg = errorJson != null ? getJsonErrorText(errorJson) : getHtmlErrorText(responseText);
+                boolean isAuthError = errorCode == 403 && isAuthenticationError(errorJson);
                 if (isAuthError)
                     errorMsg += "(Permission with Reddit required)";
-                throw new RedditApiException("Error "+String.valueOf(errorCode)+" "+(errorMsg.equals("")?response.message():errorMsg), isAuthError, errorCode);
+                throw new RedditApiException("Error " + String.valueOf(errorCode) + " " + (errorMsg.equals("") ? response.message() : errorMsg), isAuthError, errorCode);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RedditApiException("Error: "+e.getMessage());
+            throw new RedditApiException("Error: " + e.getMessage());
         }
 
         return responseText;
     }
 
-    private JSONObject getErrorJson(String response){
-        if (response!=null) {
-            if (response.indexOf("{")==0)
+    private JSONObject getErrorJson(String response) {
+        if (response != null) {
+            if (response.indexOf("{") == 0)
                 try {
                     return new JSONObject(response);
                 } catch (JSONException e) {
@@ -939,11 +941,11 @@ public class RedditData {
         return null;
     }
 
-    private boolean isAuthenticationError(JSONObject errorJson){
-        if (errorJson!=null && errorJson.has("reason")) {
+    private boolean isAuthenticationError(JSONObject errorJson) {
+        if (errorJson != null && errorJson.has("reason")) {
             try {
                 String reason = errorJson.getString("reason");
-                return reason.indexOf("OAUTH2_")==0;
+                return reason.indexOf("OAUTH2_") == 0;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -951,9 +953,9 @@ public class RedditData {
         return false;
     }
 
-    private String getJsonErrorText(JSONObject errorJson){
+    private String getJsonErrorText(JSONObject errorJson) {
         String errorMsg = "";
-        if (errorJson!=null) {
+        if (errorJson != null) {
             try {
                 if (errorJson.has("errors")) {
                     JSONArray errorArr = errorJson.getJSONArray("errors");
@@ -972,7 +974,7 @@ public class RedditData {
         return errorMsg;
     }
 
-    private String getHtmlErrorText(String html){
+    private String getHtmlErrorText(String html) {
         String errorMsg = "";
         // attempt to get html error message (often returned by 403/500)
         final Pattern patternh2 = Pattern.compile("<h2>(.+?)</h2>");
@@ -992,6 +994,7 @@ public class RedditData {
     public class RedditApiException extends Exception {
         private boolean isLoginError = false;
         private int httpErrorCode = 200;
+
         //Constructor that accepts a message
         public RedditApiException(String message) {
             super(message);
@@ -1009,9 +1012,11 @@ public class RedditData {
         }
 
         @SuppressWarnings("unused")
-        int getHttpErrorCode() { return httpErrorCode; }
+        int getHttpErrorCode() {
+            return httpErrorCode;
+        }
 
-        public boolean isAuthError(){
+        public boolean isAuthError() {
             return isLoginError;
         }
     }
@@ -1025,7 +1030,7 @@ public class RedditData {
         Long now = (System.currentTimeMillis() / 1000L);
         Long expiry = (long) 0;
         try {
-            expiry = userToken ?  oauthToken.getLong("expires_at") : oauthAppToken.getLong("expires_at");
+            expiry = userToken ? oauthToken.getLong("expires_at") : oauthAppToken.getLong("expires_at");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1062,7 +1067,7 @@ public class RedditData {
                 oauthToken.put("expires_at", expires_at);
             } catch (JSONException e) {
                 e.printStackTrace();
-                throw new RedditApiException("OAuth Error: "+e.getMessage());
+                throw new RedditApiException("OAuth Error: " + e.getMessage());
             }
             // try to retrieve user info & save, if exception thrown, just make sure we save token
             try {
@@ -1096,7 +1101,7 @@ public class RedditData {
                 oauthToken.put("expires_at", (epoch + expires_in));
             } catch (JSONException e) {
                 e.printStackTrace();
-                throw new RedditApiException("OAuth Error: "+e.getMessage());
+                throw new RedditApiException("OAuth Error: " + e.getMessage());
             }
             // save oauth token
             saveUserData();
@@ -1107,9 +1112,9 @@ public class RedditData {
         throwOAuthError(resultjson);
     }
 
-    private String getDeviceId(){
+    private String getDeviceId() {
         String uuid = sharedPrefs.getString("oauthUuid", "");
-        if (uuid.equals("")){
+        if (uuid.equals("")) {
             uuid = UUID.randomUUID().toString();
             sharedPrefs.edit().putString("oauthUuid", uuid).apply();
         }
@@ -1117,7 +1122,7 @@ public class RedditData {
     }
 
     private void checkAppToken() throws RedditApiException {
-        if (oauthAppToken==null)
+        if (oauthAppToken == null)
             retrieveAppToken();
 
         if (isTokenExpired(false))
@@ -1141,7 +1146,7 @@ public class RedditData {
                 oauthAppToken.put("expires_at", expires_at);
             } catch (JSONException e) {
                 e.printStackTrace();
-                throw new RedditApiException("OAuth Error: "+e.getMessage());
+                throw new RedditApiException("OAuth Error: " + e.getMessage());
             }
             saveAppToken();
             return;
@@ -1152,7 +1157,7 @@ public class RedditData {
 
     private void throwOAuthError(JSONObject resultjson) throws RedditApiException {
         String error;
-        if (resultjson.has("error")){
+        if (resultjson.has("error")) {
             try {
                 error = resultjson.getString("error");
             } catch (JSONException e) {
@@ -1162,10 +1167,10 @@ public class RedditData {
         } else {
             error = "Unknown Error D-:";
         }
-        throw new RedditApiException("OAuth Error: "+error);
+        throw new RedditApiException("OAuth Error: " + error);
     }
 
-    private void saveAppToken(){
+    private void saveAppToken() {
         String token = oauthAppToken == null ? "" : oauthAppToken.toString();
         sharedPrefs.edit().putString("oauthAppToken", token).apply();
     }

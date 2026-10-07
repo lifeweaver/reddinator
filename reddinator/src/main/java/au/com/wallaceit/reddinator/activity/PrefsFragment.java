@@ -47,9 +47,9 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     private String curDownloadPath;
     private Preference downloadLocationBtn;
     private DirectoryChooserFragment mDialog;
+
     @Override
-    public void onCreate(final Bundle savedInstanceState)
-    {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((PrefsActivity) getActivity()).getListView().setBackgroundColor(Color.WHITE);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -57,7 +57,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
-        if (global.mRedditData.isLoggedIn()){
+        if (global.mRedditData.isLoggedIn()) {
             // Load the account preferences when logged in
             addPreferencesFromResource(R.xml.account_preferences);
             Preference logoutbtn = findPreference("logout");
@@ -198,7 +198,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         mSharedPreferences.registerOnSharedPreferenceChangeListener(PrefsFragment.this);
     }
 
-    private void clearWebviewCookies(){
+    private void clearWebviewCookies() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().removeAllCookies(null);
         } else {
@@ -210,7 +210,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        switch(key){
+        switch (key) {
             case "appthemepref":
                 setupThemePrefs();
             case "logoopenpref":
@@ -222,7 +222,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(PrefsFragment.this);
     }
@@ -253,15 +253,15 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (resultCode==6) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 6) {
             themeChanged = true;
         }
     }
 
-    private void setupThemePrefs(){
+    private void setupThemePrefs() {
         mAppTheme = mSharedPreferences.getString(getString(R.string.app_theme_pref), "reddit_classic");
-        if (global.mThemeManager.isThemeEditable(mAppTheme)){
+        if (global.mThemeManager.isThemeEditable(mAppTheme)) {
             appearanceCat.addPreference(themeEditorButton);
         } else {
             appearanceCat.removePreference(themeEditorButton);
@@ -300,7 +300,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             Intent intent = new Intent();
             intent.putExtra("themeupdate", true);
             getActivity().setResult(6, intent);
-            if (getActivity().getIntent().getIntExtra("requestCode", 0)!=ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) {
+            if (getActivity().getIntent().getIntExtra("requestCode", 0) != ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) {
                 Reddinator global = ((Reddinator) getActivity().getApplicationContext());
                 if (global != null) {
                     WidgetCommon.refreshAllWidgetViews(global);

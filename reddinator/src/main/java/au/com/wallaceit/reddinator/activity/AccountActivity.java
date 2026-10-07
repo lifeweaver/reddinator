@@ -119,9 +119,9 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         updateTheme();
 
         String action = getIntent().getAction();
-        if (action!=null && (action.equals(ACTION_SAVED) || action.equals(ACTION_HIDDEN))){
+        if (action != null && (action.equals(ACTION_SAVED) || action.equals(ACTION_HIDDEN))) {
             section = action;
-            int index = action.equals(ACTION_HIDDEN)?5:6;
+            int index = action.equals(ACTION_HIDDEN) ? 5 : 6;
             viewPager.setCurrentItem(index);
             tabsIndicator.setTab(index);
             scrollView.post(new Runnable() {
@@ -134,15 +134,19 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
             @Override
             public void onPageSelected(int position) {
                 Fragment fragment = pageAdapter.getRegisteredFragment(position);
-                if (fragment!=null)
+                if (fragment != null)
                     ((AccountFeedFragment) fragment).load();
             }
+
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
     }
 
@@ -150,7 +154,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         if (resultCode == 3) {
             updateTheme();
             Fragment fragment;
-            for (int i =0; i<pageAdapter.registeredFragments.size(); i++) {
+            for (int i = 0; i < pageAdapter.registeredFragments.size(); i++) {
                 fragment = pageAdapter.getRegisteredFragment(i);
                 if (fragment != null && fragment.getClass().getSimpleName().equals("AccountFeedFragment"))
                     ((AccountFeedFragment) fragment).updateTheme();
@@ -158,7 +162,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         }
     }
 
-    private void updateTheme(){
+    private void updateTheme() {
         theme = getCurrentTheme();
         tabsIndicator.setBackgroundColor(Color.parseColor(theme.getValue("header_color")));
         tabsIndicator.setInidicatorColor(Color.parseColor(theme.getValue("tab_indicator")));
@@ -166,7 +170,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         updateSubtitle();
     }
 
-    private void updateSubtitle(){
+    private void updateSubtitle() {
         String linkKarma = NumberFormat.getInstance().format(global.mRedditData.getLinkKarma());
         String commentKarma = NumberFormat.getInstance().format(global.mRedditData.getCommentKarma());
         actionBar.setSubtitle(
@@ -174,22 +178,22 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
                         "<font color='" + theme.getValue("comments_icon") + "'>" + commentKarma + "</font>"));
     }
 
-    public ThemeManager.Theme getCurrentTheme(){
-        if (global==null) // TODO: Bug report in google play suggests this becomes null at some point, check back
+    public ThemeManager.Theme getCurrentTheme() {
+        if (global == null) // TODO: Bug report in google play suggests this becomes null at some point, check back
             global = (Reddinator) getApplication();
         return global.mThemeManager.getActiveTheme("appthemepref");
     }
 
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         // user info update refreshes both karma and message indicator
         triggerRefreshUserInfo();
         setInboxIcon();
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        if (inboxReceiver!=null) {
+        if (inboxReceiver != null) {
             unregisterReceiver(inboxReceiver);
             inboxReceiver = null;
         }
@@ -219,28 +223,25 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void setInboxIcon(){
-        if (messageIcon!=null){
-            int inboxColor = global.mRedditData.getInboxCount()>0?Color.parseColor("#E06B6C"): actionbarIconColor;
+    private void setInboxIcon() {
+        if (messageIcon != null) {
+            int inboxColor = global.mRedditData.getInboxCount() > 0 ? Color.parseColor("#E06B6C") : actionbarIconColor;
             messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
         }
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu)
-    {
-        if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
-            if(menu.getClass().getSimpleName().equals("MenuBuilder")){
-                try{
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
                     Method m = menu.getClass().getDeclaredMethod(
                             "setOptionalIconsVisible", Boolean.TYPE);
                     m.setAccessible(true);
                     m.invoke(menu, true);
-                }
-                catch(NoSuchMethodException e){
+                } catch (NoSuchMethodException e) {
                     System.out.println("Could not display action icons in menu");
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -258,7 +259,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
 
             case R.id.menu_inbox:
                 Intent inboxIntent = new Intent(AccountActivity.this, MessagesActivity.class);
-                if (global.mRedditData.getInboxCount()>0) {
+                if (global.mRedditData.getInboxCount() > 0) {
                     inboxIntent.setAction(MessagesActivity.ACTION_UNREAD);
                 }
                 startActivity(inboxIntent);
@@ -275,7 +276,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
 
             case R.id.menu_viewonreddit:
                 Intent accnIntent = new Intent(AccountActivity.this, WebViewActivity.class);
-                accnIntent.putExtra("url", global.getDefaultMobileSite()+"/user/"+global.mRedditData.getUsername()+"/");
+                accnIntent.putExtra("url", global.getDefaultMobileSite() + "/user/" + global.mRedditData.getUsername() + "/");
                 startActivity(accnIntent);
                 break;
 
@@ -295,7 +296,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         return true;
     }
 
-    private void showUserDetailsDialog(JSONObject[] data){
+    private void showUserDetailsDialog(JSONObject[] data) {
 
         JSONArray trophies, karma;
         try {
@@ -313,14 +314,14 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         String html = "";
         // build trophies
         html += "<h3>Trophies</h3><div style='text-align:center;'>";
-        for (int i = 0; i<trophies.length(); i++){
+        for (int i = 0; i < trophies.length(); i++) {
             try {
                 JSONObject trophy = trophies.getJSONObject(i).getJSONObject("data");
                 String icon = trophy.getString("icon_70");
                 String name = trophy.getString("name");
                 html += "<div style='display:inline-block; min-width:100px; text-align: center; padding: 6px;'>";
-                html += "<img src='"+icon+"' />";
-                html += "<p style='margin-top:4px;'>"+name+"</p>";
+                html += "<img src='" + icon + "' />";
+                html += "<p style='margin-top:4px;'>" + name + "</p>";
                 html += "</div>";
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -330,13 +331,13 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         // build karma table
         html += "<h3 style='margin-top:4px;'>Karma by Subreddit</h3>";
         html += "<table style='margin:0;width:100%;'><thead><tr><th style='text-align:left;'>Subreddit</th><th>Links</th><th>Comments</th></tr></thead><tbody>";
-        for (int i = 0; i<karma.length(); i++){
+        for (int i = 0; i < karma.length(); i++) {
             try {
                 JSONObject subKarma = karma.getJSONObject(i);
                 String subreddit = subKarma.getString("sr");
                 String link = subKarma.getString("link_karma");
                 String comment = subKarma.getString("comment_karma");
-                html += "<tr><td>"+subreddit+"</td><td style='text-align:right;'>"+link+"</td><td style='text-align:right;'>"+comment+"</td></tr>";
+                html += "<tr><td>" + subreddit + "</td><td style='text-align:right;'>" + link + "</td><td style='text-align:right;'>" + comment + "</td></tr>";
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -346,7 +347,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         HtmlDialog.init(this, global.mRedditData.getUsername(), html);
     }
 
-    private class LoadUserDetailsTask extends AsyncTask<Void, Void, JSONObject[]>{
+    private class LoadUserDetailsTask extends AsyncTask<Void, Void, JSONObject[]> {
         private RedditData.RedditApiException exception = null;
         ProgressDialog progressDialog;
 
@@ -370,7 +371,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         @Override
         protected void onPostExecute(JSONObject[] result) {
             progressDialog.dismiss();
-            if (result!=null) {
+            if (result != null) {
                 showUserDetailsDialog(result);
             } else {
                 // show error
@@ -380,15 +381,15 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
     }
 
     // don't update this more than once a minute
-    private void triggerRefreshUserInfo(){
+    private void triggerRefreshUserInfo() {
         long now = System.currentTimeMillis();
         long last = global.mRedditData.getLastUserUpdateTime();
-        if ((now-last)>60000){
+        if ((now - last) > 60000) {
             new RefreshUserInfoTask().execute();
         }
     }
 
-    private class RefreshUserInfoTask extends AsyncTask<Void, Void, Boolean>{
+    private class RefreshUserInfoTask extends AsyncTask<Void, Void, Boolean> {
         private RedditData.RedditApiException exception = null;
 
         @Override
@@ -415,7 +416,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         }
     }
 
-    public void setTitleText(final String title){
+    public void setTitleText(final String title) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -438,21 +439,29 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
 
         SparseArray<Fragment> registeredFragments = new SparseArray<>();
 
-        RedditPageAdapter(FragmentManager fragmentManager){
+        RedditPageAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0: return resources.getString(R.string.overview);
-                case 1: return resources.getString(R.string.submitted);
-                case 2: return resources.getString(R.string.comments);
-                case 3: return resources.getString(R.string.upvoted);
-                case 4: return resources.getString(R.string.downvoted);
-                case 5: return resources.getString(R.string.hidden);
-                case 6: return resources.getString(R.string.saved);
-                case 7: return resources.getString(R.string.gilded);
+            switch (position) {
+                case 0:
+                    return resources.getString(R.string.overview);
+                case 1:
+                    return resources.getString(R.string.submitted);
+                case 2:
+                    return resources.getString(R.string.comments);
+                case 3:
+                    return resources.getString(R.string.upvoted);
+                case 4:
+                    return resources.getString(R.string.downvoted);
+                case 5:
+                    return resources.getString(R.string.hidden);
+                case 6:
+                    return resources.getString(R.string.saved);
+                case 7:
+                    return resources.getString(R.string.gilded);
             }
             return resources.getString(R.string.app_name);
         }

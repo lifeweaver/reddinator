@@ -40,7 +40,6 @@ import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.SparseArray;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -67,11 +66,12 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
+import au.com.wallaceit.reddinator.core.RedditData;
+import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.service.MailCheckService;
-import au.com.wallaceit.reddinator.R;
-import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.service.WidgetCommon;
 import au.com.wallaceit.reddinator.tasks.LoadPostTask;
 import au.com.wallaceit.reddinator.tasks.SavePostTask;
@@ -82,7 +82,6 @@ import au.com.wallaceit.reddinator.ui.RedditViewPager;
 import au.com.wallaceit.reddinator.ui.SimpleTabsWidget;
 import au.com.wallaceit.reddinator.ui.TabCommentsFragment;
 import au.com.wallaceit.reddinator.ui.TabWebFragment;
-import au.com.wallaceit.reddinator.core.ThemeManager;
 
 public class ViewRedditActivity extends ActionbarFragmentActivity implements LoadPostTask.Callback, VoteTask.Callback {
 
@@ -147,14 +146,14 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             view.setPadding(5, 0, 5, 0);
         }
         // setup needed members
-        if (getIntent().getAction()!=null && getIntent().getAction().equals(Intent.ACTION_VIEW)){
+        if (getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
             // open post via url, extract permalink and postId
             Pattern pattern = Pattern.compile(".*reddit.com(/r/[^/]*/comments/([^/]*)/[^/]*/)");
             Matcher matcher = pattern.matcher(getIntent().getDataString());
-            if (matcher.find()){
+            if (matcher.find()) {
                 //System.out.println(matcher.group(2)+" "+matcher.group(1));
                 postPermalink = matcher.group(1);
-                redditItemId = "t3_"+matcher.group(2);
+                redditItemId = "t3_" + matcher.group(2);
             } else {
                 Toast.makeText(this, "Could not decode post URL", Toast.LENGTH_LONG).show();
                 this.finish();
@@ -170,7 +169,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             postPermalink = getIntent().getStringExtra(Reddinator.ITEM_PERMALINK);
             userLikes = getIntent().getStringExtra(Reddinator.ITEM_USERLIKES);
             // Get selected item from feed and user vote preference
-            if (getIntent().getBooleanExtra("submitted", false)){
+            if (getIntent().getBooleanExtra("submitted", false)) {
                 userLikes = "true";
             }
         }
@@ -185,16 +184,20 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         tabsIndicator.setViewPager(viewPager);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
             @Override
             public void onPageSelected(int position) {
                 Fragment fragment = pageAdapter.getRegisteredFragment(position);
-                if (postUrl!=null && fragment!=null && fragment instanceof TabWebFragment) {
+                if (postUrl != null && fragment != null && fragment instanceof TabWebFragment) {
                     ((TabWebFragment) fragment).load();
                 }
             }
+
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
         if (getIntent().getBooleanExtra("view_comments", false) || prefs.getBoolean("commentsfirstpref", false)) {
             viewPager.setCurrentItem(1);
@@ -244,13 +247,13 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == 6) {
             updateTheme();
-            if (pageAdapter.getRegisteredFragment(1)!=null && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment)
+            if (pageAdapter.getRegisteredFragment(1) != null && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment)
                 ((TabCommentsFragment) pageAdapter.getRegisteredFragment(1)).updateTheme();
             setResult(6);
         }
     }
 
-    private void updateTheme(){
+    private void updateTheme() {
         ThemeManager.Theme theme = getCurrentTheme();
         int headerBg = Color.parseColor(theme.getValue("header_color"));
         int headerText = Color.parseColor(theme.getValue("header_text"));
@@ -273,36 +276,36 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         commentsIcon.setTextColor(Color.parseColor(theme.getValue("comments_icon")));
     }
 
-    public ThemeManager.Theme getCurrentTheme(){
+    public ThemeManager.Theme getCurrentTheme() {
         return global.mThemeManager.getActiveTheme("appthemepref");
     }
 
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         // Register receiver & check for new messages if logged in, enabled and due
         int checkPref = Integer.parseInt(prefs.getString("mail_check_pref", "300000"));
-        if (global.mRedditData.isLoggedIn() || checkPref!=0)
-        if ((global.mRedditData.getLastUserUpdateTime()+checkPref)<(new Date()).getTime()) {
-            inboxReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    // update inbox indicator
-                    setInboxIcon();
-                }
-            };
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(MailCheckService.MAIL_CHECK_COMPLETE);
-            registerReceiver(inboxReceiver, filter);
+        if (global.mRedditData.isLoggedIn() || checkPref != 0)
+            if ((global.mRedditData.getLastUserUpdateTime() + checkPref) < (new Date()).getTime()) {
+                inboxReceiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        // update inbox indicator
+                        setInboxIcon();
+                    }
+                };
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(MailCheckService.MAIL_CHECK_COMPLETE);
+                registerReceiver(inboxReceiver, filter);
 
-            MailCheckService.checkMail(ViewRedditActivity.this, MailCheckService.ACTIVITY_CHECK_ACTION);
-        }
+                MailCheckService.checkMail(ViewRedditActivity.this, MailCheckService.ACTIVITY_CHECK_ACTION);
+            }
 
         setInboxIcon();
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        if (inboxReceiver!=null) {
+        if (inboxReceiver != null) {
             unregisterReceiver(inboxReceiver);
             inboxReceiver = null;
         }
@@ -311,12 +314,12 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     @Override
     public void finish() {
         // update widget voting icons if a vote has been placed
-        if (widgetId>0){
-            if (global.getItemUpdate()!=null){
+        if (widgetId > 0) {
+            if (global.getItemUpdate() != null) {
                 WidgetCommon.hideLoaderAndRefreshViews(this, widgetId, false);
             }
         }
-        if (loadPostTask!=null)
+        if (loadPostTask != null)
             loadPostTask.cancel(false);
         ViewGroup view = (ViewGroup) getWindow().getDecorView();
         view.removeAllViews();
@@ -326,17 +329,17 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     public void onBackPressed() {
         TabWebFragment webFragment = (TabWebFragment) pageAdapter.getRegisteredFragment(0);
         if (webFragment != null)
-        if (webFragment.mFullSView != null) {
-            webFragment.mChromeClient.onHideCustomView();
-        } else if (infoPanel.getPanelState()==SlidingUpPanelLayout.PanelState.EXPANDED) {
-            infoPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        } else if (webFragment.mWebView.canGoBack()) {
-            webFragment.mWebView.goBack();
-        } else {
-            webFragment.mWebView.stopLoading();
-            webFragment.mWebView.loadData("", "text/html", "utf-8");
-            this.finish();
-        }
+            if (webFragment.mFullSView != null) {
+                webFragment.mChromeClient.onHideCustomView();
+            } else if (infoPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                infoPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            } else if (webFragment.mWebView.canGoBack()) {
+                webFragment.mWebView.goBack();
+            } else {
+                webFragment.mWebView.stopLoading();
+                webFragment.mWebView.loadData("", "text/html", "utf-8");
+                this.finish();
+            }
     }
 
     @Override
@@ -365,9 +368,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void setVoteIcons(){
-        if (upvote!=null)
-            if (userLikes!=null && !userLikes.equals("null")){
+    private void setVoteIcons() {
+        if (upvote != null)
+            if (userLikes != null && !userLikes.equals("null")) {
                 if (userLikes.equals("true")) {
                     upvote.setIcon(new IconDrawable(this, Iconify.IconValue.fa_arrow_up).color(Color.parseColor(Reddinator.COLOR_UPVOTE_ACTIVE)).actionBarSize());
                     downvote.setIcon(new IconDrawable(this, Iconify.IconValue.fa_arrow_down).color(actionbarIconColor).actionBarSize());
@@ -384,28 +387,25 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             }
     }
 
-    private void setInboxIcon(){
-        if (messageIcon!=null){
-            int inboxColor = global.mRedditData.getInboxCount()>0?Color.parseColor("#E06B6C"): actionbarIconColor;
+    private void setInboxIcon() {
+        if (messageIcon != null) {
+            int inboxColor = global.mRedditData.getInboxCount() > 0 ? Color.parseColor("#E06B6C") : actionbarIconColor;
             messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
         }
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu)
-    {
-        if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
-            if(menu.getClass().getSimpleName().equals("MenuBuilder")){
-                try{
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
                     Method m = menu.getClass().getDeclaredMethod(
                             "setOptionalIconsVisible", Boolean.TYPE);
                     m.setAccessible(true);
                     m.invoke(menu, true);
-                }
-                catch(NoSuchMethodException e){
+                } catch (NoSuchMethodException e) {
                     System.out.println("Could not display action icons in menu");
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -437,7 +437,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 break;
 
             case R.id.menu_account:
-                if (!global.mRedditData.isLoggedIn()){
+                if (!global.mRedditData.isLoggedIn()) {
                     global.mRedditData.initiateLogin(ViewRedditActivity.this, false);
                     Toast.makeText(ViewRedditActivity.this, "Reddit login required", Toast.LENGTH_LONG).show();
                 } else {
@@ -447,7 +447,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 break;
 
             case R.id.menu_inbox:
-                if (!global.mRedditData.isLoggedIn()){
+                if (!global.mRedditData.isLoggedIn()) {
                     global.mRedditData.initiateLogin(ViewRedditActivity.this, false);
                     Toast.makeText(ViewRedditActivity.this, "Reddit login required", Toast.LENGTH_LONG).show();
                 } else {
@@ -516,7 +516,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         builder.create().show();
     }
 
-    public void setTitleText(final String title){
+    public void setTitleText(final String title) {
 
         runOnUiThread(new Runnable() {
             @Override
@@ -553,9 +553,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         task.execute();
     }
 
-    private boolean archivedPostCheck(){
+    private boolean archivedPostCheck() {
         try {
-            if (postInfo!=null && postInfo.getBoolean("archived")){
+            if (postInfo != null && postInfo.getBoolean("archived")) {
                 Toast.makeText(this, R.string.archived_post_error, Toast.LENGTH_LONG).show();
                 return true;
             }
@@ -591,14 +591,15 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             setVoteUpdateRecord(redditId, Utilities.voteDirectionToString(direction), netVote);
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(ViewRedditActivity.this, false);
+            if (exception.isAuthError())
+                global.mRedditData.initiateLogin(ViewRedditActivity.this, false);
             // show error
             Utilities.showApiErrorToastOrDialog(ViewRedditActivity.this, exception);
         }
     }
 
     private void setVoteUpdateRecord(String redditId, String val, int netVote) {
-        if (feedposition>=0) {
+        if (feedposition >= 0) {
             global.setItemUpdate(feedposition, redditId, val, netVote);
             // save in feed data
             global.setItemVote(widgetId, feedposition, redditId, val, netVote);
@@ -616,25 +617,26 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     }
 
     private boolean commentsLoaded = false; // don't pass comments to comments view on subsequent reloads
+
     @Override
     public void onPostLoaded(JSONArray result, RedditData.RedditApiException exception) {
-        if (result!=null){
+        if (result != null) {
             try {
                 postInfo = result.getJSONObject(0).getJSONObject("data").getJSONArray("children").getJSONObject(0).getJSONObject("data");
                 global.getSeenPostStore().markSeen(postInfo); // idempotent, so refreshes are harmless
                 JSONArray comments = result.getJSONObject(1).getJSONObject("data").getJSONArray("children");
                 // pass comments to fragment
-                if (!commentsLoaded && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment){
+                if (!commentsLoaded && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment) {
                     TabCommentsFragment fragment = (TabCommentsFragment) pageAdapter.getRegisteredFragment(1);
                     fragment.loadFromData(postInfo, comments);
                     commentsLoaded = true;
                 }
                 // load content view and set vote icons if url was not passed in extras
-                if (postUrl==null){
+                if (postUrl == null) {
                     userLikes = postInfo.getString("likes");
                     postUrl = postInfo.getString("url");
                     // use reddit mobile view
-                    if (postUrl.contains("//www.reddit.com/")){
+                    if (postUrl.contains("//www.reddit.com/")) {
                         postUrl = postUrl.replace("//www.reddit.com", global.getDefaultCommentsMobileSite().substring(6));
                     }
                     TabWebFragment webfragment = (TabWebFragment) pageAdapter.getRegisteredFragment(0);
@@ -653,9 +655,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         setTitle(R.string.app_name);
     }
 
-    private void populateInfoPanel(){
+    private void populateInfoPanel() {
         try {
-            String source = postInfo.getString("subreddit")+" - "+postInfo.getString("domain");
+            String source = postInfo.getString("subreddit") + " - " + postInfo.getString("domain");
             sourceText.setText(source);
             titleText.setText(Utilities.fromHtml(postInfo.getString("title")));
 
@@ -672,12 +674,12 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             SlidingUpPanelLayout.PanelState state = infoPanel.getPanelState();
             if (state == SlidingUpPanelLayout.PanelState.DRAGGING) {
                 infoPanel.addPanelSlideListener(slideListener);
-            } else if (state == SlidingUpPanelLayout.PanelState.EXPANDED){
+            } else if (state == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 infoPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
             }
 
             final String selftext = postInfo.getString("selftext_html");
-            if (!selftext.equals("null")){
+            if (!selftext.equals("null")) {
                 selfTextButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -698,7 +700,8 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
     SlidingUpPanelLayout.PanelSlideListener slideListener = new SlidingUpPanelLayout.PanelSlideListener() {
         @Override
-        public void onPanelSlide(View panel, float slideOffset) {}
+        public void onPanelSlide(View panel, float slideOffset) {
+        }
 
         @Override
         public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
@@ -711,22 +714,24 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
         SparseArray<Fragment> registeredFragments = new SparseArray<>();
 
-        RedditPageAdapter(FragmentManager fragmentManager){
+        RedditPageAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0: return resources.getString(R.string.content);
-                case 1: return resources.getString(R.string.comments);
+            switch (position) {
+                case 0:
+                    return resources.getString(R.string.content);
+                case 1:
+                    return resources.getString(R.string.comments);
             }
             return resources.getString(R.string.app_name);
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (registeredFragments.indexOfKey(position)>-1)
+            if (registeredFragments.indexOfKey(position) > -1)
                 return registeredFragments.get(position);
             String url;
             int fontsize;
@@ -737,18 +742,18 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 case 0: // content
                     // use reddit mobile view
                     //System.out.println(postUrl);
-                    if (postUrl !=null && postUrl.contains("//www.reddit.com/")){
+                    if (postUrl != null && postUrl.contains("//www.reddit.com/")) {
                         postUrl = postUrl.replace("//www.reddit.com", global.getDefaultCommentsMobileSite().substring(6));
                         //System.out.println(postUrl);
                     }
                     fontsize = Integer.parseInt(prefs.getString("contentfontpref", "18"));
-                    return TabWebFragment.init(postUrl, fontsize, (postUrl!=null && (!commentsPref || (preloadPref==3 || preloadPref==1))));
+                    return TabWebFragment.init(postUrl, fontsize, (postUrl != null && (!commentsPref || (preloadPref == 3 || preloadPref == 1))));
                 case 1: // comments
                     if (prefs.getBoolean("commentswebviewpref", false)) {
                         // reddit
                         url = global.getDefaultCommentsMobileSite() + postPermalink;
                         fontsize = Integer.parseInt(prefs.getString("reddit_content_font_pref", "21"));
-                        return TabWebFragment.init(url, fontsize, (commentsPref || preloadPref>1));
+                        return TabWebFragment.init(url, fontsize, (commentsPref || preloadPref > 1));
                     } else {
                         // native
                         return TabCommentsFragment.init(redditItemId, postPermalink); // don't load comments, initial data now populated via onPostLoaded

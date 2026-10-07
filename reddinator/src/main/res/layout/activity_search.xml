@@ -11,10 +11,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="#CEE3F8">
+
         <RelativeLayout
             android:id="@+id/topbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <IconTextView
                 android:id="@+id/searchbutton"
                 android:layout_width="wrap_content"
@@ -65,7 +67,7 @@
                 android:layout_weight="1"
                 android:singleLine="true"
                 android:imeOptions="actionSearch"
-                android:hint="@string/subreddit"/>
+                android:hint="@string/subreddit" />
         </LinearLayout>
 
         <LinearLayout
@@ -73,6 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <Spinner
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -81,6 +84,7 @@
                 android:layout_weight="1"
                 android:spinnerMode="dropdown"
                 android:id="@+id/sort" />
+
             <Spinner
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -96,7 +100,6 @@
     <ListView
         android:id="@+id/applistview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"></ListView>
 
 </LinearLayout>
