@@ -276,6 +276,8 @@ public class Reddinator extends Application {
             ArrayList<String> current = getSubredditManager().getAllFilter();
             ArrayList<String> remote = new ArrayList<>();
 
+            // Merge: anything on the server is added locally. Local-only entries are KEPT
+            // (they're the overflow beyond Reddit's server-side limit).
             for (int i=0; i<subreddits.length(); i++){
                 String name = subreddits.getJSONObject(i).getString("name");
                 if (!current.contains(name)){
@@ -284,12 +286,13 @@ public class Reddinator extends Application {
                 remote.add(name);
             }
 
-            for (int i=0; i<current.size(); i++){
-                if (!remote.contains(current.get(i))){
-                    if (mSharedPreferences.getLong("last_sync_time", 0)==0) {
-                        mRedditData.addFilterSubreddit("all", current.get(i));
-                    } else {
-                        current.remove(current.get(i));
+            // On the very first sync, push local entries up to the server, up to the cap.
+            if (mSharedPreferences.getLong("last_sync_time", 0)==0) {
+                for (String name : current) {
+                    if (remote.size() >= 100) break;
+                    if (!remote.contains(name)) {
+                        mRedditData.addFilterSubreddit("all", name);
+                        remote.add(name);
                     }
                 }
             }
@@ -301,6 +304,7 @@ public class Reddinator extends Application {
         }
         return false;
     }
+
     // unread message storage
     public void setUnreadMessages(JSONArray messages){
         mSharedPreferences.edit().putString("unreadMail", messages.toString()).apply();
