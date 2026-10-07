@@ -93,6 +93,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
 
     private String lastItemId = "0";
     private boolean endOfFeed = false;
+    private int seenMarkedUpTo = 0; // feed positions below this have been marked seen
     private static final int MAX_FILL_PAGES = 5;
 
     @Override
@@ -188,6 +189,19 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         listView = findViewById(R.id.applistview);
         listAdapter = new SubredditFeedAdapter(this, this, global, theme, feedId, data, !endOfFeed, hasMultipleSubs);
         listView.setAdapter(listAdapter);
+
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    markScrolledPastAsSeen(view.getFirstVisiblePosition());
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            }
+        });
 
         listView.setOnItemClickListener((adapterView, view, position, l) -> {
             final Bundle extras = listAdapter.getItemExtras(position);
@@ -643,8 +657,26 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         loadReddits(!endOfFeed);
     }
 
+    // Everything above the first visible row has been scrolled past; record it so reposts can be hidden.
+    private void markScrolledPastAsSeen(int firstVisible) {
+        if (firstVisible <= seenMarkedUpTo) {
+            return;
+        }
+
+        ArrayList<JSONObject> passed = new ArrayList<>();
+        for (int i = seenMarkedUpTo; i < firstVisible; i++) {
+            JSONObject post = listAdapter.getItem(i);
+            if (post != null) {
+                passed.add(post);
+            }
+        }
+        seenMarkedUpTo = firstVisible;
+        global.getSeenPostStore().markSeenAll(passed);
+    }
+
     void reloadFeedData() {
         data = global.getFeed(feedId);
+        seenMarkedUpTo = 0;
         listAdapter.setFeed(data, !endOfFeed, (feedId == 0 && global.getSubredditManager().isFeedMulti(feedId)));
         //listAdapter.notifyDataSetChanged();
     }
@@ -801,6 +833,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
                 } else {
                     hideAppLoader(true, false); // go to top
                     data = result;
+                    seenMarkedUpTo = 0;
                 }
                 listAdapter.setFeed(data, !endOfFeed, hasMultipleSubs);
                 //listView.invalidateViews();

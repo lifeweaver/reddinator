@@ -12,8 +12,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,15 +57,27 @@ public class SeenPostStore {
     }
 
     public void markSeen(JSONObject post) {
-        String key = keyFor(post);
-        if (key == null) {
-            return;
-        }
+        markSeenAll(Collections.singletonList(post));
+    }
 
+    public void markSeenAll(List<JSONObject> posts) {
         final String snapshot;
         synchronized (this) {
-            seen.remove(key); // re-add to move to the newest position
-            seen.add(key);
+            boolean changed = false;
+            for (JSONObject post : posts) {
+                String key = keyFor(post);
+                if (key == null) {
+                    continue;
+                }
+
+                seen.remove(key); // re-add to move to the newest position
+                seen.add(key);
+                changed = true;
+            }
+            if (!changed) {
+                return;
+            }
+
             Iterator<String> it = seen.iterator();
             while (seen.size() > MAX_ENTRIES && it.hasNext()) {
                 it.next();
