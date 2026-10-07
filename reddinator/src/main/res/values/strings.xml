@@ -401,4 +401,7 @@
     <string name="reset_sort_pref" translatable="false">resetsortpref</string>
     <string name="reset_sort_title">Reset sorting</string>
     <string name="reset_sort_summary">Reset to default sorting when changing subreddit</string>
+    <string name="hide_seen_pref" translatable="false">hideseenpref</string>
+    <string name="hide_seen_title">Hide Seen Posts</string>
+    <string name="hide_seen_summary">Hide posts (and reposts) you have already opened</string>
 </resources>

@@ -56,6 +56,12 @@
                 android:defaultValue="true"
                 android:summary="@string/feed_filter_duplicates_summary" />
 
+            <CheckBoxPreference
+                android:key="@string/hide_seen_pref"
+                android:title="@string/hide_seen_title"
+                android:defaultValue="false"
+                android:summary="@string/hide_seen_summary" />
+
             <Preference android:title="@string/clear_post_filter_title"
                 android:key="clear_post_filter"
                 android:summary="@string/clear_post_filter_summary"/>

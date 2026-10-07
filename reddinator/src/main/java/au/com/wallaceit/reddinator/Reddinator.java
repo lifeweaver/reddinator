@@ -56,6 +56,7 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.SubredditManager;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.core.SeenPostStore;
 
 import static android.content.Intent.ACTION_VIEW;
 
@@ -89,6 +90,7 @@ public class Reddinator extends Application {
     public RedditData mRedditData;
     public ThemeManager mThemeManager;
     private SubredditManager mSubManager;
+    private SeenPostStore mSeenStore;
     public SharedPreferences mSharedPreferences;
     public final static int ALL_FILTER_SERVER_LIMIT = 100; // Reddit's cap on the /r/all filter
 
@@ -250,10 +252,19 @@ public class Reddinator extends Application {
 
     // subreddit list, settings & filter management
     public SubredditManager getSubredditManager(){
-        if (mSubManager==null)
-            mSubManager = new SubredditManager(mRedditData, mSharedPreferences);
+        if (mSubManager==null) {
+            mSubManager = new SubredditManager(mRedditData, mSharedPreferences, getSeenPostStore());
+        }
 
         return mSubManager;
+    }
+
+    public synchronized SeenPostStore getSeenPostStore() {
+        if (mSeenStore==null) {
+            mSeenStore = new SeenPostStore(new File(getApplicationInfo().dataDir, "seen_posts.txt"));
+        }
+
+        return mSeenStore;
     }
 
     public int loadAccountSubreddits() throws RedditData.RedditApiException {

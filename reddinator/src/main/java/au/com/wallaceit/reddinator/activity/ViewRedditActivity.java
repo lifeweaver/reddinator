@@ -621,6 +621,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         if (result!=null){
             try {
                 postInfo = result.getJSONObject(0).getJSONObject("data").getJSONArray("children").getJSONObject(0).getJSONObject("data");
+                global.getSeenPostStore().markSeen(postInfo); // idempotent, so refreshes are harmless
                 JSONArray comments = result.getJSONObject(1).getJSONObject("data").getJSONArray("children");
                 // pass comments to fragment
                 if (!commentsLoaded && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment){

@@ -39,12 +39,14 @@ public class SubredditManager {
     private JSONObject subreddits;
     private JSONObject multis;
     private JSONObject postFilters;
+    private SeenPostStore seenStore;
     public final static String defaultSubreddits = "{\"Front Page\":{\"display_name\"=\"Front Page\", \"public_description\"=\"Your reddit front page\",\"url\"=\"\"}, \"Popular\":{\"display_name\"=\"Popular\", \"public_description\"=\"Popular Post\",\"url\"=\"/r/popular\"}, \"all\":{\"display_name\"=\"all\", \"public_description\"=\"The best of reddit\",\"url\"=\"/r/all\"}}";
     private final static String defaultFeed = "{\"name\":\"Front Page\",\"path\":\"\",\"is_multi\":\"true\"}"; // default subs are also "multi"
 
-    public SubredditManager(RedditData redditData, SharedPreferences prefs){
+    public SubredditManager(RedditData redditData, SharedPreferences prefs, SeenPostStore seenStore) {
         this.prefs = prefs;
         this.redditData = redditData;
+        this.seenStore = seenStore;
         // load subreddits & multis
         try {
             subreddits = new JSONObject(prefs.getString("userSubreddits", "{}"));
@@ -277,6 +279,7 @@ public class SubredditManager {
     public JSONArray filterFeed(int feedId, JSONArray feedArray, JSONArray currentFeed, boolean filterAll, boolean filterPosts){
         // determine filter requirements
         boolean filterDuplicates = prefs.getBoolean("filterduplicatespref", true) && currentFeed!=null;
+        boolean filterSeen = prefs.getBoolean("hideseenpref", false);
         JSONObject postFilters = null;
         if (filterPosts) {
             postFilters = getPostFilters(getCurrentFeedPath(feedId));
@@ -285,7 +288,7 @@ public class SubredditManager {
         if (filterAll) {
             filterAll = !prefs.getString("allFilter", "").equals("");
         }
-        if (!filterAll && !filterDuplicates && !filterPosts)
+        if (!filterAll && !filterDuplicates && !filterPosts && !filterSeen)
             return feedArray; // no filters applied
         // collect current ids
         ArrayList<String> ids = new ArrayList<>();
@@ -320,6 +323,9 @@ public class SubredditManager {
                             continue;
                         }
                     }
+                }
+                if (filterSeen && seenStore.isSeen(feedObj.getJSONObject("data"))) {
+                    continue;
                 }
                 if (filterAll) {
                     subreddit = feedObj.getJSONObject("data").getString("subreddit");
