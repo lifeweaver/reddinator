@@ -50,8 +50,9 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        if (showUI)
+        if (showUI) {
             progressDialog = ProgressDialog.show(context, context.getString(R.string.loading), "", true);
+        }
     }
 
     @Override
@@ -61,12 +62,16 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
             if (mode != MODE_MULTIS) {
                 publishProgress(context.getString(R.string.loading_subreddits));
                 global.loadAccountSubreddits();
-                if (mode == MODE_SUBREDDITS) return true;
+                if (mode == MODE_SUBREDDITS) {
+                    return true;
+                }
             }
 
             publishProgress(context.getString(R.string.loading_multis));
             global.loadAccountMultis();
-            if (mode == MODE_MULTIS) return true;
+            if (mode == MODE_MULTIS) {
+                return true;
+            }
 
             publishProgress(context.getString(R.string.loading_filters));
             global.syncAllFilters();
@@ -80,26 +85,33 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
 
     @Override
     protected void onProgressUpdate(String... statusText) {
-        if (!showUI) return;
+        if (!showUI) {
+            return;
+        }
         progressDialog.setMessage(statusText[0]);
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
         if (showUI) {
-            if (progressDialog != null)
+            if (progressDialog != null) {
                 progressDialog.dismiss();
+            }
             if (!result) {
                 // check login required
-                if (exception.isAuthError()) global.mRedditData.initiateLogin(context, false);
+                if (exception.isAuthError()) {
+                    global.mRedditData.initiateLogin(context, false);
+                }
                 // show error
                 Utilities.showApiErrorToastOrDialog(context, exception);
             }
         }
-        if (result)
+        if (result) {
             global.mSharedPreferences.edit().putLong("last_sync_time", System.currentTimeMillis()).apply();
+        }
 
-        if (callback != null)
+        if (callback != null) {
             callback.run();
+        }
     }
 }

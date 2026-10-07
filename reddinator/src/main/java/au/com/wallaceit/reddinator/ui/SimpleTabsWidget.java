@@ -111,8 +111,9 @@ public class SimpleTabsWidget {
                 indicatorItems.get(i).setVisibility(View.INVISIBLE);
             }
         }
-        if (scrollView != null)
+        if (scrollView != null) {
             scrollView.smoothScrollTo(tabWidget.getChildAt(position).getRight() - (tabWidget.getWidth() / 2), 0);
+        }
     }
 
     class TabClickListener implements View.OnClickListener {
@@ -125,15 +126,17 @@ public class SimpleTabsWidget {
         @Override
         public void onClick(View view) {
             setTab(index);
-            if (viewPager != null)
+            if (viewPager != null) {
                 viewPager.setCurrentItem(index);
+            }
         }
     }
 
     public void setBackgroundColor(int color) {
         tabWidget.setBackgroundColor(color);
-        if (scrollView != null)
+        if (scrollView != null) {
             scrollView.setBackgroundColor(color);
+        }
     }
 
     public void setTextColor(int color) {

@@ -81,7 +81,8 @@ public class VoteTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (voteCallback != null)
+        if (voteCallback != null) {
             voteCallback.onVoteComplete(result, exception, redditId, direction, netVote, listPosition);
+        }
     }
 }

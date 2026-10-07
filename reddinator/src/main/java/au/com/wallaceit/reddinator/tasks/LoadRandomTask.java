@@ -54,7 +54,8 @@ public class LoadRandomTask extends AsyncTask<String, Integer, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject data) {
-        if (randomCallback != null)
+        if (randomCallback != null) {
             randomCallback.onRandomSubredditLoaded(data, exception);
+        }
     }
 }

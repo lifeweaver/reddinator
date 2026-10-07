@@ -105,8 +105,9 @@ public class Reddinator extends Application {
         mThemeManager = new ThemeManager(Reddinator.this.getApplicationContext(), mSharedPreferences);
         // make webviews debuggable when running debug version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))
+            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
                 WebView.setWebContentsDebuggingEnabled(true);
+            }
         }
     }
 
@@ -186,8 +187,10 @@ public class Reddinator extends Application {
     public void deleteFeed(int feedId) {
         File feedFile = new File(getApplicationInfo().dataDir + FEED_DATA_DIR, "feed_" + feedId + ".json");
         if (feedFile.exists())
-            //noinspection ResultOfMethodCallIgnored
+        //noinspection ResultOfMethodCallIgnored
+        {
             feedFile.delete();
+        }
     }
 
     public JSONObject getFeedObject(int widgetId, int position, String redditId) {
@@ -211,8 +214,9 @@ public class Reddinator extends Application {
                 // remove post: fuck android for not having REMOVE in JSONArray until API 19.
                 JSONArray finalData = new JSONArray();
                 for (int i = 0; i < data.length(); i++) {
-                    if (i != position)
+                    if (i != position) {
                         finalData.put(data.get(i));
+                    }
                 }
                 // save new feed
                 setFeed(widgetId, finalData);
@@ -301,7 +305,9 @@ public class Reddinator extends Application {
             // On the very first sync, push local entries up to the server, up to the cap.
             if (mSharedPreferences.getLong("last_sync_time", 0) == 0) {
                 for (String name : current) {
-                    if (remote.size() >= ALL_FILTER_SERVER_LIMIT) break;
+                    if (remote.size() >= ALL_FILTER_SERVER_LIMIT) {
+                        break;
+                    }
                     if (!remote.contains(name)) {
                         mRedditData.addFilterSubreddit("all", name);
                         remote.add(name);
@@ -488,15 +494,18 @@ public class Reddinator extends Application {
     }
 
     public void clearDir(File dir, int time) {
-        if (dir.exists() && dir.isDirectory())
+        if (dir.exists() && dir.isDirectory()) {
             for (File file : dir.listFiles()) {
                 if (time > 0) {
                     long diff = System.currentTimeMillis() - file.lastModified();
                     if (diff < time) // don't delete the image if age is less than specified
+                    {
                         continue;
+                    }
                 }
                 //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
+        }
     }
 }

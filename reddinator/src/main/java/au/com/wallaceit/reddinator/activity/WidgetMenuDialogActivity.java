@@ -130,8 +130,9 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
         (menu.findItem(R.id.menu_feedprefs)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_list_alt).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_thememanager)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_cogs).color(iconColor).actionBarSize());
         MenuItem accountItem = (menu.findItem(R.id.menu_account));
-        if (global.mRedditData.isLoggedIn())
+        if (global.mRedditData.isLoggedIn()) {
             accountItem.setTitle(global.mRedditData.getUsername());
+        }
         accountItem.setIcon(new IconDrawable(this, Iconify.IconValue.fa_reddit_square).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_search)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_search).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_prefs)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_wrench).color(iconColor).actionBarSize());
@@ -218,15 +219,17 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
 
             case R.id.menu_search:
                 Intent searchIntent = new Intent(this, SearchActivity.class);
-                if (!global.getSubredditManager().isFeedMulti(widgetId))
+                if (!global.getSubredditManager().isFeedMulti(widgetId)) {
                     searchIntent.putExtra("feed_path", global.getSubredditManager().getCurrentFeedPath(widgetId));
+                }
                 startActivityAndFinish(searchIntent);
                 break;
 
             case R.id.menu_submit:
                 Intent submitIntent = new Intent(this, SubmitActivity.class);
-                if (!global.getSubredditManager().isFeedMulti(widgetId) && !global.getSubredditManager().isFeedSystemSubreddit(widgetId))
+                if (!global.getSubredditManager().isFeedMulti(widgetId) && !global.getSubredditManager().isFeedSystemSubreddit(widgetId)) {
                     submitIntent.putExtra("subreddit", global.getSubredditManager().getCurrentFeedName(widgetId));
+                }
                 startActivityAndFinish(submitIntent);
                 break;
 
@@ -347,8 +350,9 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
         builder.setPositiveButton(getString(R.string.close), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
-                if (needsUpdate)
+                if (needsUpdate) {
                     WidgetCommon.showLoaderAndUpdate(WidgetMenuDialogActivity.this, widgetId, false);
+                }
                 WidgetMenuDialogActivity.this.finish();
             }
         });
@@ -392,8 +396,9 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
         } else {
             Toast.makeText(this, "Error loading sidebar: " + exception.getMessage(), Toast.LENGTH_LONG).show();
         }
-        if (sidebarProg != null)
+        if (sidebarProg != null) {
             sidebarProg.dismiss();
+        }
     }
 
     private void startActivityAndFinish(Intent intent) {

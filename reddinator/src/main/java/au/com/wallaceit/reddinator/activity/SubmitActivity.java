@@ -71,21 +71,24 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         subreddit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!subreddit.getText().toString().equals(""))
+                if (!subreddit.getText().toString().equals("")) {
                     new SubmitTextTask().execute(subreddit.getText().toString());
+                }
             }
         });
         subreddit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                if (!b && !subreddit.getText().toString().equals(""))
+                if (!b && !subreddit.getText().toString().equals("")) {
                     new SubmitTextTask().execute(subreddit.getText().toString());
+                }
             }
         });
 
         String sub = getIntent().getStringExtra("subreddit");
-        if (sub != null)
+        if (sub != null) {
             subreddit.setText(sub);
+        }
 
         submitText = (TextView) findViewById(R.id.submission_text);
         submitText.setMovementMethod(new SafeLinkMethod());
@@ -181,8 +184,9 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
                 permalink = StringEscapeUtils.unescapeJava(data.getString("url").replace(".json", ""));
                 String url = isLink ? link.getText().toString() : permalink + ".compact";
 
-                if (permalink != null)
+                if (permalink != null) {
                     permalink = permalink.substring(permalink.indexOf("/r/")); // trim domain to get real permalink
+                }
 
                 Intent intent = new Intent(SubmitActivity.this, ViewRedditActivity.class);
                 intent.putExtra(Reddinator.ITEM_ID, id);
@@ -263,8 +267,9 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         protected Boolean doInBackground(String... strings) {
             try {
                 submitHtml = global.mRedditData.getSubmitText(strings[0]).getString("submit_text_html");
-                if (submitHtml.equals("null"))
+                if (submitHtml.equals("null")) {
                     submitHtml = "";
+                }
                 return true;
             } catch (RedditData.RedditApiException | JSONException e) {
                 e.printStackTrace();

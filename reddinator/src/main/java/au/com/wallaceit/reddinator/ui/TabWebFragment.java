@@ -136,7 +136,7 @@ public class TabWebFragment extends Fragment {
                         clearhistory = false;
                         mWebView.clearHistory();
                     }
-                    if (url.contains(".reddit.com/"))
+                    if (url.contains(".reddit.com/")) {
                         Utilities.executeJavascriptInWebview(mWebView,
                                 "var css = '.XPromoPill { display: none !important; }',\n" +
                                         "    head = document.head || document.getElementsByTagName('head')[0],\n" +
@@ -168,6 +168,7 @@ public class TabWebFragment extends Fragment {
                                         "}\n" +
                                         "setTimeout(clickRedditButton, 100)"
                         );
+                    }
 
                     super.onPageFinished(view, url);
                 }
@@ -191,7 +192,9 @@ public class TabWebFragment extends Fragment {
                 }
             });
             getActivity().registerForContextMenu(mWebView);
-            if (load) load();
+            if (load) {
+                load();
+            }
             mFirstTime = false;
             //System.out.println("Created fragment");
         } else {
@@ -233,13 +236,15 @@ public class TabWebFragment extends Fragment {
             if (isAdded()) {
                 boolean voteinprogress = ((ViewRedditActivity) mActivity).voteInProgress();
                 //Make the bar disappear after URL is loaded, and changes string to Loading...
-                if (!voteinprogress)
+                if (!voteinprogress) {
                     mActivity.setTitle(getResources().getString(R.string.loading)); // supress if vote in progress
+                }
                 mActivity.setProgress(progress * 100); //Make the bar disappear after URL is loaded
                 // Return the app name after finish loading
                 if (progress == 100) {
-                    if (!voteinprogress)
+                    if (!voteinprogress) {
                         mActivity.setTitle(R.string.app_name); // dont reset title if vote in prog. voting function will do that.
+                    }
                 }
                 actionBar = mActivity.getActionBar();
             }

@@ -202,8 +202,9 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
                 .setVisibleInDownloadsUi(prefs.getBoolean("download_nativeui", true))
                 .setDestinationInExternalPublicDir(downloadLocation.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), filename);
 
-        if (prefs.getBoolean("download_notify_complete", true))
+        if (prefs.getBoolean("download_notify_complete", true)) {
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
 
         mgr.enqueue(request);
     }

@@ -60,11 +60,14 @@ public class HidePostTask extends AsyncTask<String, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         if (!result) {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(context, fromWidget);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(context, fromWidget);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(context, exception);
         }
-        if (callback != null)
+        if (callback != null) {
             callback.run();
+        }
     }
 }

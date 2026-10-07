@@ -324,12 +324,14 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
 
         @JavascriptInterface
         public void reloadComments(String sort, int context) {
-            if (sort != null)
+            if (sort != null) {
                 currentSort = sort;
+            }
 
             System.out.println(context);
-            if (context > -1)
+            if (context > -1) {
                 contextLevels = context;
+            }
 
             loadComments();
         }
@@ -391,7 +393,9 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
             webView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", " + netVote + ")");
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(this, false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(this, false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(this, exception);
         }
@@ -414,7 +418,9 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
             }
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(this, false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(this, false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(this, exception);
             webView.loadUrl("javascript:commentCallback(\"" + redditId + "\", false)");

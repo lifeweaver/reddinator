@@ -57,8 +57,9 @@ public class WidgetVoteTask extends AsyncTask<String, Integer, Boolean> {
             redditid = item.getString("name");
             curVote = item.getString("likes");
             archived = item.getBoolean("archived");
-            if (archived)
+            if (archived) {
                 return;
+            }
         } catch (JSONException e) {
             redditid = "null";
             curVote = "null";
@@ -70,8 +71,9 @@ public class WidgetVoteTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected Boolean doInBackground(String... strings) {
-        if (archived)
+        if (archived) {
             return false;
+        }
         // enumerate current vote, score change & clicked direction
         if (direction == 1) {
             if (curVote.equals("true")) { // if already upvoted, neutralize.
@@ -122,7 +124,9 @@ public class WidgetVoteTask extends AsyncTask<String, Integer, Boolean> {
                 return;
             }
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(context, true);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(context, true);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(context, exception);
         }

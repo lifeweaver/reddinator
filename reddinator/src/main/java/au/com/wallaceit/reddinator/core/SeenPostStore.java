@@ -34,11 +34,15 @@ public class SeenPostStore {
     }
 
     private void load() {
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            return;
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty()) seen.add(line);
+                if (!line.isEmpty()) {
+                    seen.add(line);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

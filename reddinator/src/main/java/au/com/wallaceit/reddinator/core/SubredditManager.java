@@ -156,8 +156,9 @@ public class SubredditManager {
     // this sets the current feed using the supplied name, reddit url path and isMulti value.
     // isMulti is used to determine whether the items are from a different subreddit, in order to show that value to the user
     public void setFeed(int feedId, String name, String path, boolean isMulti) {
-        if (path.length() > 1 && '/' == (path.charAt(path.length() - 1)))
+        if (path.length() > 1 && '/' == (path.charAt(path.length() - 1))) {
             path = path.substring(0, path.length() - 1);
+        }
 
         JSONObject data = new JSONObject();
         try {
@@ -179,8 +180,9 @@ public class SubredditManager {
         if (path == null) {
             path = subreddit.equals("Front Page") ? "" : "/r/" + subreddit;
             // Strip last / from url if present
-        } else if (path.length() > 0 && path.charAt(path.length() - 1) == '/')
+        } else if (path.length() > 0 && path.charAt(path.length() - 1) == '/') {
             path = path.substring(0, path.length() - 1);
+        }
 
         setFeed(feedId, subreddit, path, isMulti);
     }
@@ -294,8 +296,9 @@ public class SubredditManager {
         if (filterAll) {
             filterAll = !prefs.getString("allFilter", "").equals("");
         }
-        if (!filterAll && !filterDuplicates && !filterPosts && !filterSeen)
+        if (!filterAll && !filterDuplicates && !filterPosts && !filterSeen) {
             return feedArray; // no filters applied
+        }
         // collect current ids
         ArrayList<String> ids = new ArrayList<>();
         if (filterDuplicates) {
@@ -310,8 +313,9 @@ public class SubredditManager {
         // filter the new feed
         JSONArray filtered = new JSONArray();
         ArrayList<String> filter = null;
-        if (filterAll)
+        if (filterAll) {
             filter = getAllFilter();
+        }
         JSONObject feedObj;
         String subreddit;
         for (int i = 0; i < feedArray.length(); i++) {
@@ -415,11 +419,13 @@ public class SubredditManager {
 
     public int getSubredditSubscribeCapability(String key) {
 
-        if ("Front Page".equals(key) || "all".equals(key) || "Popular".equals(key))
+        if ("Front Page".equals(key) || "all".equals(key) || "Popular".equals(key)) {
             return 0;
+        }
 
-        if (subreddits.has(key))
+        if (subreddits.has(key)) {
             return 2; // can unsubscribe
+        }
 
         return 1; // can subscribe
     }
@@ -497,8 +503,9 @@ public class SubredditManager {
     }
 
     public void addMultis(JSONArray subsArray, boolean clearCurrent) {
-        if (clearCurrent)
+        if (clearCurrent) {
             multis = new JSONObject();
+        }
 
         for (int i = 0; i < subsArray.length(); i++) {
             try {

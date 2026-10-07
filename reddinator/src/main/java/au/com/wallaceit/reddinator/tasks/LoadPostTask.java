@@ -54,7 +54,8 @@ public class LoadPostTask extends AsyncTask<String, Integer, JSONArray> {
 
     @Override
     protected void onPostExecute(JSONArray data) {
-        if (voteCallback != null)
+        if (voteCallback != null) {
             voteCallback.onPostLoaded(data, exception);
+        }
     }
 }

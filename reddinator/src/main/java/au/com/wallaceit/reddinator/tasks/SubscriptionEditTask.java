@@ -96,8 +96,9 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
     }
 
     protected void onPreExecute() {
-        if (contextRef.get() != null)
+        if (contextRef.get() != null) {
             progressDialog = ProgressDialog.show(contextRef.get(), loadingMessage, loadingMessage, true);
+        }
     }
 
     @Override
@@ -192,7 +193,8 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
 
-        if (callback != null)
+        if (callback != null) {
             callback.onSubscriptionEditComplete(result, exception, action, params, this.data);
+        }
     }
 }

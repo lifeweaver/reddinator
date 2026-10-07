@@ -114,7 +114,9 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
         });
 
         feedPath = getIntent().getStringExtra("feed_path");
-        if (feedPath == null) feedPath = ""; // default to front page
+        if (feedPath == null) {
+            feedPath = ""; // default to front page
+        }
 
         subredditLimitCb = (CheckBox) findViewById(R.id.limit_sr);
         final SubAutoCompleteAdapter subredditAdapter = new SubAutoCompleteAdapter(this, R.layout.autocomplete_list_item);
@@ -145,8 +147,9 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 restrictSub = isChecked;
-                if (!query.equals("") && !subredditLimitText.getText().toString().equals(""))
+                if (!query.equals("") && !subredditLimitText.getText().toString().equals("")) {
                     onSearchQueryEnter();
+                }
             }
         });
 
@@ -181,7 +184,9 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
                         sort = "top";
                         break;
                 }
-                if (!query.equals("")) search();
+                if (!query.equals("")) {
+                    search();
+                }
             }
 
             @Override
@@ -219,7 +224,9 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
                     default:
                         time = "all";
                 }
-                if (!query.equals("")) search();
+                if (!query.equals("")) {
+                    search();
+                }
             }
 
             @Override

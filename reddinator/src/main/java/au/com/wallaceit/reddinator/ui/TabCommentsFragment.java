@@ -185,12 +185,15 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (commentsLoader != null)
+        if (commentsLoader != null) {
             commentsLoader.cancel(true);
-        if (commentsVoteTask != null)
+        }
+        if (commentsVoteTask != null) {
             commentsVoteTask.cancel(false);
-        if (commentTask != null)
+        }
+        if (commentTask != null) {
             commentTask.cancel(false);
+        }
         if (mWebView != null) {
             mWebView.removeAllViews();
             mWebView.destroy();
@@ -199,15 +202,18 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
     @Override
     public void onVoteComplete(boolean result, RedditData.RedditApiException exception, String redditId, int direction, int netVote, int listPosition) {
-        if (getActivity() == null)
+        if (getActivity() == null) {
             return;
+        }
 
         ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
         if (result) {
             mWebView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", " + netVote + ")");
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(getActivity(), false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(getActivity(), exception);
         }
@@ -215,8 +221,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
     @Override
     public void onCommentComplete(JSONObject result, RedditData.RedditApiException exception, int action, String redditId) {
-        if (getActivity() == null)
+        if (getActivity() == null) {
             return;
+        }
 
         ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
         if (result != null) {
@@ -233,7 +240,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
             }
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(getActivity(), false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(getActivity(), exception);
             mWebView.loadUrl("javascript:commentCallback(\"" + redditId + "\", false)");
@@ -263,8 +272,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
         @JavascriptInterface
         public void vote(String thingId, int direction, int currentVote) {
-            if (getActivity() == null)
+            if (getActivity() == null) {
                 return;
+            }
             ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.voting));
             commentsVoteTask = new VoteTask(global, TabCommentsFragment.this, thingId, direction, currentVote);
             commentsVoteTask.execute();
@@ -272,8 +282,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
         @JavascriptInterface
         public void comment(String parentId, String text) {
-            if (getActivity() == null)
+            if (getActivity() == null) {
                 return;
+            }
             ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.submitting));
             commentTask = new CommentTask(global, parentId, text, 0, TabCommentsFragment.this);
             commentTask.execute();
@@ -281,8 +292,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
         @JavascriptInterface
         public void edit(String thingId, String text) {
-            if (getActivity() == null)
+            if (getActivity() == null) {
                 return;
+            }
             ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.submitting));
             commentTask = new CommentTask(global, thingId, text, 1, TabCommentsFragment.this);
             commentTask.execute();
@@ -290,8 +302,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
         @JavascriptInterface
         public void delete(String thingId) {
-            if (getActivity() == null)
+            if (getActivity() == null) {
                 return;
+            }
             ((ViewRedditActivity) getActivity()).setTitleText(resources.getString(R.string.deleting));
             commentTask = new CommentTask(global, thingId, null, -1, TabCommentsFragment.this);
             commentTask.execute();
@@ -329,8 +342,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
     }
 
     private void loadComments(String sort) {
-        if (sort != null)
+        if (sort != null) {
             currentSort = sort;
+        }
         commentsLoader = new CommentsLoader(currentSort);
         commentsLoader.execute();
     }
@@ -403,8 +417,9 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                         // reset load more button
                         Utilities.executeJavascriptInWebview(mWebView, "resetMoreClickEvent('" + mMoreId + "');");
                     }
-                    if (getActivity() != null)
+                    if (getActivity() != null) {
                         Toast.makeText(getActivity(), lastError, Toast.LENGTH_LONG).show();
+                    }
                     break;
                 default:
                     if (loadMore) {

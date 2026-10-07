@@ -42,8 +42,9 @@ public class SubAutoCompleteAdapter extends ArrayAdapter<String> implements Filt
 
     @Override
     public int getCount() {
-        if (suggestions == null)
+        if (suggestions == null) {
             return 0;
+        }
 
         return suggestions.length();
     }

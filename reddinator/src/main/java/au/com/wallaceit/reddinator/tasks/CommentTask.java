@@ -78,7 +78,8 @@ public class CommentTask extends AsyncTask<String, Integer, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject result) {
-        if (callback != null)
+        if (callback != null) {
             callback.onCommentComplete(result, exception, action, redditId);
+        }
     }
 }

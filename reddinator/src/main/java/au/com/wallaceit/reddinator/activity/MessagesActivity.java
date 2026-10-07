@@ -113,8 +113,9 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
             @Override
             public void onPageSelected(int position) {
                 Fragment fragment = pageAdapter.getRegisteredFragment(position);
-                if (fragment != null)
+                if (fragment != null) {
                     ((AccountFeedFragment) fragment).load();
+                }
             }
 
             @Override
@@ -130,13 +131,15 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
                 Fragment fragment;
                 for (int i = 0; i < pageAdapter.registeredFragments.size(); i++) {
                     fragment = pageAdapter.getRegisteredFragment(i);
-                    if (fragment != null && fragment.getClass().getSimpleName().equals("AccountFeedFragment"))
+                    if (fragment != null && fragment.getClass().getSimpleName().equals("AccountFeedFragment")) {
                         ((AccountFeedFragment) fragment).updateTheme();
+                    }
                 }
             }
         } else if (requestCode == 1) {
-            if (resultCode == 1)
+            if (resultCode == 1) {
                 reloadSentMessages();
+            }
         }
     }
 
@@ -149,7 +152,9 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
 
     public ThemeManager.Theme getCurrentTheme() {
         if (global == null) // TODO: Bug report in google play suggests this becomes null at some point, check back
+        {
             global = (Reddinator) getApplication();
+        }
         return global.mThemeManager.getActiveTheme("appthemepref");
     }
 
@@ -176,8 +181,9 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
         (menu.findItem(R.id.menu_submit)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_pencil).color(actionbarIconColor).actionBarSize());
         (menu.findItem(R.id.menu_refresh)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_refresh).color(actionbarIconColor).actionBarSize());
         MenuItem accountItem = (menu.findItem(R.id.menu_account));
-        if (global.mRedditData.isLoggedIn())
+        if (global.mRedditData.isLoggedIn()) {
             accountItem.setTitle(global.mRedditData.getUsername());
+        }
         accountItem.setIcon(new IconDrawable(this, Iconify.IconValue.fa_reddit_square).color(actionbarIconColor).actionBarSize());
         (menu.findItem(R.id.menu_viewonreddit)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_globe).color(actionbarIconColor).actionBarSize());
         (menu.findItem(R.id.menu_prefs)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_wrench).color(actionbarIconColor).actionBarSize());
@@ -260,8 +266,9 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
 
     public void reloadSentMessages() {
         Fragment fragment = pageAdapter.getRegisteredFragment(2);
-        if (fragment != null)
+        if (fragment != null) {
             ((AccountFeedFragment) fragment).reload();
+        }
     }
 
     /**

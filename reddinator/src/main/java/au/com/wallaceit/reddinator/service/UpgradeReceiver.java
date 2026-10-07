@@ -45,8 +45,9 @@ public class UpgradeReceiver extends BroadcastReceiver {
         global = (Reddinator) context.getApplicationContext();
         // Clear old thumbnails directory
         File oldCacheDir = new File(context.getCacheDir().getPath() + "/thumbnail_cache/");
-        if (oldCacheDir.exists())
+        if (oldCacheDir.exists()) {
             deleteRecursive(oldCacheDir);
+        }
         // Migrate feeds to new file storage and remove from preferences
         migrateFeedData(0); // app feed data
         AppWidgetManager mgr2 = AppWidgetManager.getInstance(context);
@@ -57,9 +58,11 @@ public class UpgradeReceiver extends BroadcastReceiver {
     }
 
     private void deleteRecursive(File fileOrDirectory) {
-        if (fileOrDirectory.isDirectory())
-            for (File child : fileOrDirectory.listFiles())
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
                 deleteRecursive(child);
+            }
+        }
 
         //noinspection ResultOfMethodCallIgnored
         fileOrDirectory.delete();
@@ -68,8 +71,9 @@ public class UpgradeReceiver extends BroadcastReceiver {
     private void migrateFeedData(int feedId) {
         String prefKey = "feeddata-" + (feedId == 0 ? "app" : feedId);
         String feedData = global.mSharedPreferences.getString(prefKey, null);
-        if (feedData == null)
+        if (feedData == null) {
             return;
+        }
         JSONArray data;
         try {
             data = new JSONArray(feedData);

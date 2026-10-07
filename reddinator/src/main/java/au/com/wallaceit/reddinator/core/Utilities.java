@@ -89,8 +89,9 @@ public class Utilities {
 
     public static String getScoreText(int score) {
         // Since reddit changes their scoring system, we need to abbreviate high scores. eg. 17.3k
-        if (score > 10000)
+        if (score > 10000) {
             return new BigDecimal((score / 1000)).setScale(1, BigDecimal.ROUND_HALF_UP).toString() + "k";
+        }
         return String.valueOf(score);
     }
 
@@ -156,32 +157,37 @@ public class Utilities {
     }
 
     public static boolean isImageUrl(String url) {
-        if (url == null)
+        if (url == null) {
             return false;
+        }
         // Check image extension
-        if (hasImageExtension(url))
+        if (hasImageExtension(url)) {
             return true;
+        }
         // Check for i.reddituploads.com images
         return url.toLowerCase().matches("(https?://(i.reddituploads.com/.*)$)") || isImgurUrl(url) || isGfycatUrl(url);
     }
 
     public static boolean isImgurUrl(String url) {
-        if (url == null)
+        if (url == null) {
             return false;
+        }
         // Check for imgur url without file extension (should not be album)
         return url.toLowerCase().matches("(https?://.*(imgur.com/(?!gallery/|a/).*)$)");
     }
 
     public static boolean isGfycatUrl(String url) {
-        if (url == null)
+        if (url == null) {
             return false;
+        }
         // Check for imgur url without file extension (should not be album)
         return url.toLowerCase().matches("(https?://.*(gfycat.com/[^/]*)$)");
     }
 
     public static boolean hasImageExtension(String url) {
-        if (url == null)
+        if (url == null) {
             return false;
+        }
         return url.toLowerCase().matches("([^\\s]+(\\.(?i)(jpe?g|png|gif?v|bmp))$)");
     }
 

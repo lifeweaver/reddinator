@@ -70,8 +70,9 @@ public class WidgetCommon {
     }
 
     static int getWidgetLayoutId(Class providerClass) {
-        if (providerClass.getSimpleName().equals(WIDGET_CLASS_STACK.getSimpleName()))
+        if (providerClass.getSimpleName().equals(WIDGET_CLASS_STACK.getSimpleName())) {
             return R.layout.widget_stack;
+        }
 
         return R.layout.widget;
     }

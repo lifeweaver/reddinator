@@ -140,8 +140,9 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
             @Override
             public void onPageSelected(int position) {
                 Fragment fragment = pageAdapter.getRegisteredFragment(position);
-                if (fragment != null)
+                if (fragment != null) {
                     ((AccountFeedFragment) fragment).load();
+                }
             }
 
             @Override
@@ -156,8 +157,9 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
             Fragment fragment;
             for (int i = 0; i < pageAdapter.registeredFragments.size(); i++) {
                 fragment = pageAdapter.getRegisteredFragment(i);
-                if (fragment != null && fragment.getClass().getSimpleName().equals("AccountFeedFragment"))
+                if (fragment != null && fragment.getClass().getSimpleName().equals("AccountFeedFragment")) {
                     ((AccountFeedFragment) fragment).updateTheme();
+                }
             }
         }
     }
@@ -179,8 +181,10 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
     }
 
     public ThemeManager.Theme getCurrentTheme() {
-        if (global == null) // TODO: Bug report in google play suggests this becomes null at some point, check back
+        // TODO: Bug report in google play suggests this becomes null at some point, check back
+        if (global == null) {
             global = (Reddinator) getApplication();
+        }
         return global.mThemeManager.getActiveTheme("appthemepref");
     }
 

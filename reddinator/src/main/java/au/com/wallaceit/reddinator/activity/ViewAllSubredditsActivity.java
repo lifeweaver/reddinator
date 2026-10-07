@@ -298,8 +298,9 @@ public class ViewAllSubredditsActivity extends ListActivity {
                 name = subreddit.getString("display_name");
                 description = subreddit.getString("public_description");
                 url = subreddit.getString("url");
-                if (subreddit.has("user_is_subscriber"))
+                if (subreddit.has("user_is_subscriber")) {
                     subscribed = subreddit.getString("user_is_subscriber");
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
                 return row;

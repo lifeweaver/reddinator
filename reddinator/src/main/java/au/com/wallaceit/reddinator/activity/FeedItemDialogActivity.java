@@ -296,7 +296,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
             switch (action) {
                 case SubscriptionEditTask.ACTION_MULTI_COPY:
                     try {
-                        if (data == null) return;
+                        if (data == null) {
+                            return;
+                        }
                         JSONObject multiObj = data.getJSONObject("data");
                         String path = multiObj.getString("path");
                         global.getSubredditManager().setMultiData(path, multiObj);
@@ -308,8 +310,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
             }
         } else {
             // check login required
-            if (exception.isAuthError())
+            if (exception.isAuthError()) {
                 global.mRedditData.initiateLogin(FeedItemDialogActivity.this, false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(FeedItemDialogActivity.this, exception);
         }
@@ -360,14 +363,17 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                 options.add(new String[]{"view_subreddit", getString(R.string.item_option_view_subreddit, getIntent().getStringExtra(Reddinator.ITEM_SUBREDDIT))});
             }
 
-            if (canViewDomain)
+            if (canViewDomain) {
                 options.add(new String[]{"view_domain", getString(R.string.item_option_view_domain, domain)});
+            }
 
-            if (Utilities.isFeedPathMulti(getIntent().getStringExtra(Reddinator.ITEM_URL)))
+            if (Utilities.isFeedPathMulti(getIntent().getStringExtra(Reddinator.ITEM_URL))) {
                 options.add(new String[]{"copy_multi", getString(R.string.copy_multi)});
+            }
 
-            if (getIntent().getBooleanExtra(EXTRA_IS_THEME, false))
+            if (getIntent().getBooleanExtra(EXTRA_IS_THEME, false)) {
                 options.add(new String[]{"open_theme", getString(R.string.open_theme)});
+            }
         }
 
         @Override
@@ -412,8 +418,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
     }
 
     private void close(int result, Intent sintent) {
-        if (dialog.isShowing())
+        if (dialog.isShowing()) {
             dialog.dismiss();
+        }
 
         if (result == 3 || result == 4 || (widgetId < 0 && result == 5)) {
             Intent intent = new Intent(this, MainActivity.class);

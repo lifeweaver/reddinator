@@ -65,10 +65,11 @@ public class MailCheckService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         String action = intent.getAction();
-        if (global.mRedditData.isLoggedIn())
+        if (global.mRedditData.isLoggedIn()) {
             if (ACTIVITY_CHECK_ACTION.equals(action) || NOTIFY_CHECK_ACTION.equals(action)) {
                 (new MailCheckTask(global, action)).execute();
             }
+        }
     }
 
     @Override
@@ -108,22 +109,27 @@ public class MailCheckService extends JobIntentService {
                     e.printStackTrace();
                 }
             } else {
-                if (oldCount > 0) global.clearUnreadMessages();
+                if (oldCount > 0) {
+                    global.clearUnreadMessages();
+                }
             }
             return true;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if (result)
+            if (result) {
                 if (action.equals(ACTIVITY_CHECK_ACTION)) {
                     // notify activity
                     Intent bIntent = new Intent(MAIL_CHECK_COMPLETE);
                     global.sendBroadcast(bIntent);
                 } else {
                     // show notification
-                    if (global.mRedditData.getInboxCount() > 0) setNotification();
+                    if (global.mRedditData.getInboxCount() > 0) {
+                        setNotification();
+                    }
                 }
+            }
         }
 
         private void setNotification() {

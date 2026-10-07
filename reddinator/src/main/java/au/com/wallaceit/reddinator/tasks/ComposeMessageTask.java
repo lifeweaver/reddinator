@@ -55,7 +55,8 @@ public class ComposeMessageTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (messageCallback != null)
+        if (messageCallback != null) {
             messageCallback.onMessageSent(result, exception, args);
+        }
     }
 }

@@ -51,8 +51,9 @@ public class ViewImageDialogActivity extends Activity {
         // fix imgur links so it's not redirected to full webpage
         if (Utilities.isImgurUrl(imageUrl)) {
             imageUrl = imageUrl.replaceFirst("//*.imgur.com/", "//i.imgur.com/");
-            if (!Utilities.hasImageExtension(imageUrl))
+            if (!Utilities.hasImageExtension(imageUrl)) {
                 imageUrl += ".jpg"; // any extension will work
+            }
         } else if (Utilities.isGfycatUrl(imageUrl)) {
             imageUrl = imageUrl.replace("gfycat.com", "gfycat.com/ifr");
             iframeContent = "<div style='position:relative; padding-bottom:calc(70.80% + 44px)'>" +
@@ -69,8 +70,9 @@ public class ViewImageDialogActivity extends Activity {
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        }
         boolean multi = getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
         webView.getSettings().setDisplayZoomControls(!multi);
         // Make sure we specify a proper user agent. Many sites block generic ones.

@@ -114,8 +114,10 @@ public class RedditData {
         Intent loginintent = new Intent(context, OAuthView.class);
         oauthstate = UUID.randomUUID().toString();
         loginintent.putExtra("oauthstate", oauthstate);
-        if (newTask) // widget requires new task as its intent is not an activity intent (causes runtime exception)
+        // widget requires new task as its intent is not an activity intent (causes runtime exception)
+        if (newTask) {
             loginintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         return loginintent;
     }
 
@@ -917,8 +919,9 @@ public class RedditData {
                 JSONObject errorJson = getErrorJson(responseText);
                 String errorMsg = errorJson != null ? getJsonErrorText(errorJson) : getHtmlErrorText(responseText);
                 boolean isAuthError = errorCode == 403 && isAuthenticationError(errorJson);
-                if (isAuthError)
+                if (isAuthError) {
                     errorMsg += "(Permission with Reddit required)";
+                }
                 throw new RedditApiException("Error " + String.valueOf(errorCode) + " " + (errorMsg.equals("") ? response.message() : errorMsg), isAuthError, errorCode);
             }
         } catch (IOException e) {
@@ -931,12 +934,13 @@ public class RedditData {
 
     private JSONObject getErrorJson(String response) {
         if (response != null) {
-            if (response.indexOf("{") == 0)
+            if (response.indexOf("{") == 0) {
                 try {
                     return new JSONObject(response);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
         }
         return null;
     }
@@ -959,12 +963,14 @@ public class RedditData {
             try {
                 if (errorJson.has("errors")) {
                     JSONArray errorArr = errorJson.getJSONArray("errors");
-                    if (errorArr.length() > 0)
+                    if (errorArr.length() > 0) {
                         errorMsg = errorArr.getJSONArray(0).getString(1);
+                    }
                 } else if (errorJson.has("message")) {
                     errorMsg = errorJson.getString("message");
-                    if (errorJson.has("explanation"))
+                    if (errorJson.has("explanation")) {
                         errorMsg += ": " + errorJson.getString("explanation");
+                    }
                 }
                 return errorMsg;
             } catch (JSONException e) {
@@ -1122,11 +1128,13 @@ public class RedditData {
     }
 
     private void checkAppToken() throws RedditApiException {
-        if (oauthAppToken == null)
+        if (oauthAppToken == null) {
             retrieveAppToken();
+        }
 
-        if (isTokenExpired(false))
+        if (isTokenExpired(false)) {
             retrieveAppToken();
+        }
     }
 
     // retrieve application only oauth token, used for logged out api calls.

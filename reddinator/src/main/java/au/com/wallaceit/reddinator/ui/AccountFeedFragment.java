@@ -144,7 +144,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
 
             public void onPageFinished(WebView view, String url) {
                 mWebView.loadUrl("javascript:init(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\", \"" + global.mRedditData.getUsername() + "\", \"" + type + "\")");
-                if (load) load();
+                if (load) {
+                    load();
+                }
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient());
@@ -154,8 +156,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         mWebView.addJavascriptInterface(webInterface, "Reddinator");
         getActivity().registerForContextMenu(mWebView);
 
-        if (type.equals("unread") || type.equals("inbox") || type.equals("sent"))
+        if (type.equals("unread") || type.equals("inbox") || type.equals("sent")) {
             isMessages = true;
+        }
 
         mWebView.loadUrl("file:///android_asset/" + (isMessages ? "messages" : "account") + ".html");
     }
@@ -192,12 +195,15 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (feedLoader != null)
+        if (feedLoader != null) {
             feedLoader.cancel(true);
-        if (commentsVoteTask != null)
+        }
+        if (commentsVoteTask != null) {
             commentsVoteTask.cancel(false);
-        if (commentTask != null)
+        }
+        if (commentTask != null) {
             commentTask.cancel(false);
+        }
     }
 
     @Override
@@ -207,7 +213,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
             mWebView.loadUrl("javascript:voteCallback(\"" + redditId + "\", \"" + direction + "\", " + netVote + ")");
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(getActivity(), false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(getActivity(), exception);
         }
@@ -230,7 +238,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
             }
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(getActivity(), false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(getActivity(), false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(getActivity(), exception);
             mWebView.loadUrl("javascript:commentCallback(\"" + redditId + "\", false)");
@@ -243,8 +253,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         if (result) {
             mWebView.loadUrl("javascript:messageCallback(\"" + args[4] + "\", true);");
             // reload sent feed
-            if (isMessages)
+            if (isMessages) {
                 ((MessagesActivity) getActivity()).reloadSentMessages();
+            }
             Toast.makeText(getActivity(), resources.getString(R.string.message_sent), Toast.LENGTH_LONG).show();
         } else {
             Utilities.showApiErrorToastOrDialog(getActivity(), exception);
@@ -363,8 +374,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     }
 
     private void loadComments(String sort) {
-        if (sort != null)
+        if (sort != null) {
             currentSort = sort;
+        }
         feedLoader = new FeedLoader(currentSort);
         feedLoader.execute();
     }
@@ -446,12 +458,14 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
                         executeJavascript("resetMoreClickEvent('" + mMoreId + "');");
                     }
 
-                    if (getActivity() == null)
+                    if (getActivity() == null) {
                         return;
+                    }
 
                     // check login required
-                    if (exception.isAuthError())
+                    if (exception.isAuthError()) {
                         global.mRedditData.initiateLogin(getActivity(), false);
+                    }
 
                     Utilities.showApiErrorToastOrDialog(getActivity(), exception);
                     break;

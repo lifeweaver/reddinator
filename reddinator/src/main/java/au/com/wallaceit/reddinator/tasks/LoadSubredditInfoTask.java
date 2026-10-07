@@ -54,7 +54,8 @@ public class LoadSubredditInfoTask extends AsyncTask<String, Integer, JSONObject
 
     @Override
     protected void onPostExecute(JSONObject data) {
-        if (callback != null)
+        if (callback != null) {
             callback.onSubredditInfoLoaded(data, exception);
+        }
     }
 }

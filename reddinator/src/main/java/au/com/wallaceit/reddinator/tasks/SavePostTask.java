@@ -64,14 +64,18 @@ public class SavePostTask extends AsyncTask<String, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         if (!result) {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(context, fromWidget);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(context, fromWidget);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(context, exception);
         } else {
-            if (!unsave)
+            if (!unsave) {
                 Toast.makeText(context, context.getString(R.string.post_saved), Toast.LENGTH_SHORT).show();
+            }
         }
-        if (callback != null)
+        if (callback != null) {
             callback.run();
+        }
     }
 }

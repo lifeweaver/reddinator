@@ -93,8 +93,9 @@ public class ThemeManager {
 
     public JSONObject getThemeJSON(String key) {
         JSONObject theme = null;
-        if (previewTheme != null)
+        if (previewTheme != null) {
             return previewTheme;
+        }
         if (themes.has(key)) {
             try {
                 theme = themes.getJSONObject(key);
@@ -120,16 +121,18 @@ public class ThemeManager {
 
     // below 5 functions are used for previewing custom themes from /r/reddinator
     public boolean setPreviewTheme(JSONObject theme) {
-        if (!validateThemeJson(theme))
+        if (!validateThemeJson(theme)) {
             return false;
+        }
 
         previewTheme = theme;
         return true;
     }
 
     public String getPreviewName() {
-        if (previewTheme == null)
+        if (previewTheme == null) {
             return null;
+        }
         try {
             return previewTheme.getString("name");
         } catch (JSONException e) {
@@ -143,8 +146,9 @@ public class ThemeManager {
     }
 
     public boolean savePreviewTheme() {
-        if (previewTheme == null)
+        if (previewTheme == null) {
             return false;
+        }
 
         saveCustomTheme("theme-" + UUID.randomUUID(), new Theme(previewTheme));
         previewTheme = null;
@@ -152,8 +156,9 @@ public class ThemeManager {
     }
 
     public boolean importTheme(JSONObject theme) {
-        if (!validateThemeJson(theme))
+        if (!validateThemeJson(theme)) {
             return false;
+        }
 
         saveCustomTheme("theme-" + UUID.randomUUID(), new Theme(theme));
         return true;
@@ -162,8 +167,9 @@ public class ThemeManager {
     private boolean validateThemeJson(JSONObject theme) {
         // check name
         try {
-            if (!theme.has("name") || "".equals(theme.get("name")))
+            if (!theme.has("name") || "".equals(theme.get("name"))) {
                 return false;
+            }
 
             // decode Html entities in name
             theme.put("name", Utilities.fromHtml(theme.getString("name")));
@@ -214,14 +220,16 @@ public class ThemeManager {
     }
 
     public Theme getActiveTheme(String themePrefKey) {
-        if (themePrefKey == null)
+        if (themePrefKey == null) {
             return getTheme(prefs.getString("appthemepref", "reddit_classic"));
+        }
 
         String themeKey = prefs.getString(themePrefKey, "app_select");
 
         boolean appSelect = themeKey.equals("app_select");
-        if (appSelect || (!themes.has(themeKey) && !customThemes.has(themeKey)))
+        if (appSelect || (!themes.has(themeKey) && !customThemes.has(themeKey))) {
             return getTheme(prefs.getString("appthemepref", "reddit_classic"));
+        }
 
         return getTheme(themeKey);
     }
@@ -280,8 +288,9 @@ public class ThemeManager {
             while (it.hasNext()) {
                 list.put(customThemes.getJSONObject(it.next()));
             }
-            if (list.length() == 0)
+            if (list.length() == 0) {
                 return null;
+            }
             JSONObject root = new JSONObject();
             root.put("reddinator_themes", 1); // format version
             root.put("themes", list);
@@ -295,15 +304,17 @@ public class ThemeManager {
     // Imports themes produced by exportCustomThemes(). A theme with the same name as an existing custom
     // theme replaces it; otherwise it is added. Returns the number imported, or -1 if the text isn't valid.
     public int importThemes(String text) {
-        if (text == null)
+        if (text == null) {
             return -1;
+        }
         try {
             JSONArray list = new JSONObject(text.trim()).getJSONArray("themes");
             int count = 0;
             for (int i = 0; i < list.length(); i++) {
                 JSONObject theme = list.getJSONObject(i);
-                if (!validateThemeJson(theme))
+                if (!validateThemeJson(theme)) {
                     continue;
+                }
                 String name = theme.getString("name");
                 String id = null;
                 Iterator<String> it = customThemes.keys();
@@ -314,8 +325,9 @@ public class ThemeManager {
                         break;
                     }
                 }
-                if (id == null)
+                if (id == null) {
                     id = "theme-" + UUID.randomUUID();
+                }
                 saveCustomTheme(id, new Theme(theme));
                 count++;
             }
@@ -339,13 +351,14 @@ public class ThemeManager {
                 e.printStackTrace();
             }
             // backward compatibility fix for old value
-            if (!jsonValues.has("comments_count"))
+            if (!jsonValues.has("comments_count")) {
                 try {
                     jsonValues.put("comments_count", (jsonValues.has("comments_text") ? jsonValues.get("comments_text") : "#000000"));
                     jsonValues.remove("comments_text");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
         }
 
         public JSONObject getTheme() {
@@ -353,8 +366,9 @@ public class ThemeManager {
         }
 
         JSONObject cloneJsonValues() {
-            if (values == null)
+            if (values == null) {
                 loadValues();
+            }
             try {
                 return new JSONObject(jsonValues, values.keySet().toArray(new String[values.size()]));
             } catch (JSONException e) {
@@ -411,29 +425,34 @@ public class ThemeManager {
         }
 
         public HashMap<String, String> getValues() {
-            if (values == null)
+            if (values == null) {
                 loadValues();
+            }
 
             return values;
         }
 
         public String getValue(String key) {
-            if (values == null)
+            if (values == null) {
                 loadValues();
+            }
 
-            if (values.containsKey(key))
+            if (values.containsKey(key)) {
                 return values.get(key);
+            }
 
-            if (!this.equals(defaultValues))
+            if (!this.equals(defaultValues)) {
                 return defaultValues.getValue(key);
+            }
             System.err.println("Theme value not found in current theme or fallback values");
             return "#DBDBDB";
         }
 
         public void setValue(String key, String newValue) {
             // update in index if loaded
-            if (values != null)
+            if (values != null) {
                 values.put(key, newValue);
+            }
             // update in json source
             try {
                 jsonValues.put(key, newValue);

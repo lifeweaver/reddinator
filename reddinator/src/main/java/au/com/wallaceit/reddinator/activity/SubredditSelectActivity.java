@@ -281,15 +281,17 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                     }
                 });
                 if (global.mRedditData.isLoggedIn()) {
-                    if (System.currentTimeMillis() > global.mSharedPreferences.getLong("last_sync_time", 0) + 86400000)
+                    if (System.currentTimeMillis() > global.mSharedPreferences.getLong("last_sync_time", 0) + 86400000) {
                         new SyncUserDataTask(SubredditSelectActivity.this, new Runnable() {
                             @Override
                             public void run() {
                                 refreshSubredditsList();
-                                if (multiSubsAdapter != null)
+                                if (multiSubsAdapter != null) {
                                     multiSubsAdapter.refreshList();
+                                }
                             }
                         }, false, 0).execute();
+                    }
                 }
             }
         }, 20);
@@ -302,10 +304,12 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 int inboxColor = global.mRedditData.getInboxCount() > 0 ? Color.parseColor("#E06B6C") : Utilities.getActionbarIconColor();
                 messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
             }
-            if (mMultiAdapter != null)
+            if (mMultiAdapter != null) {
                 mMultiAdapter.refreshMultis();
-            if (multiSubsAdapter != null)
+            }
+            if (multiSubsAdapter != null) {
                 multiSubsAdapter.refreshList();
+            }
         } else {
             isCreated = true;
         }
@@ -477,8 +481,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         }
         (menu.findItem(R.id.menu_thememanager)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_cogs).color(iconColor).actionBarSize());
         MenuItem accountItem = (menu.findItem(R.id.menu_account));
-        if (global.mRedditData.isLoggedIn())
+        if (global.mRedditData.isLoggedIn()) {
             accountItem.setTitle(global.mRedditData.getUsername());
+        }
         accountItem.setIcon(new IconDrawable(this, Iconify.IconValue.fa_reddit_square).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_saved)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_save).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_search)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_search).color(iconColor).actionBarSize());
@@ -540,8 +545,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
             case R.id.menu_search:
                 Intent searchIntent = new Intent(SubredditSelectActivity.this, SearchActivity.class);
-                if (!global.getSubredditManager().isFeedMulti(mAppWidgetId))
+                if (!global.getSubredditManager().isFeedMulti(mAppWidgetId)) {
                     searchIntent.putExtra("feed_path", global.getSubredditManager().getCurrentFeedPath(mAppWidgetId));
+                }
                 startActivity(searchIntent);
                 break;
 
@@ -757,8 +763,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
             if (topSubs.contains(s) || topSubs.contains(t1)) {
 
-                if (topSubs.contains(s) && topSubs.contains(t1))
+                if (topSubs.contains(s) && topSubs.contains(t1)) {
                     return topSubs.indexOf(s) < topSubs.indexOf(t1) ? -1 : 1;
+                }
 
                 return topSubs.contains(s) ? -1 : 1;
             }
@@ -780,7 +787,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 e.printStackTrace();
             }
         }
-        if (randomProg != null) randomProg.dismiss();
+        if (randomProg != null) {
+            randomProg.dismiss();
+        }
     }
 
     // list adapter
@@ -931,8 +940,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0)
+            if (position == 0) {
                 return 1;
+            }
             return 0;
         }
 
@@ -1092,8 +1102,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0)
+            if (position == 0) {
                 return 1;
+            }
             return 0;
         }
 
@@ -1271,8 +1282,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                     }
                 }).show();
         dialog.setCanceledOnTouchOutside(true);
-        if (dialog.getWindow() != null)
+        if (dialog.getWindow() != null) {
             dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        }
     }
 
     class SubsListAdapter extends BaseAdapter {
@@ -1396,8 +1408,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 subsList.add(subreddit);
                 global.getSubredditManager().setAllFilter(subsList);
                 System.out.println(global.getSubredditManager().getCurrentFeedName(mAppWidgetId));
-                if ("all".equals(global.getSubredditManager().getCurrentFeedName(mAppWidgetId)))
+                if ("all".equals(global.getSubredditManager().getCurrentFeedName(mAppWidgetId))) {
                     needsFeedUpdate = true;
+                }
                 notifyDataSetChanged();
             }
         }
@@ -1406,12 +1419,14 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             if (mode == MODE_MULTI) {
                 new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_SUB_REMOVE).execute(multiPath, subreddit);
             } else {
-                if (global.mRedditData.isLoggedIn())
+                if (global.mRedditData.isLoggedIn()) {
                     new SubscriptionEditTask(global, SubredditSelectActivity.this, null, SubscriptionEditTask.ACTION_FILTER_SUB_REMOVE).execute("all", subreddit);
+                }
                 subsList.remove(subreddit);
                 global.getSubredditManager().setAllFilter(subsList);
-                if ("all".equals(global.getSubredditManager().getCurrentFeedName(mAppWidgetId)))
+                if ("all".equals(global.getSubredditManager().getCurrentFeedName(mAppWidgetId))) {
                     needsFeedUpdate = true;
+                }
                 notifyDataSetChanged();
             }
         }
@@ -1423,8 +1438,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         @Override
         public int getItemViewType(int position) {
-            if (position == subsList.size())
+            if (position == subsList.size()) {
                 return 1;
+            }
             return 0;
         }
 
@@ -1476,7 +1492,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                     break;
                 case SubscriptionEditTask.ACTION_MULTI_CREATE:
                     try {
-                        if (data == null) return;
+                        if (data == null) {
+                            return;
+                        }
                         JSONObject multiObj = data.getJSONObject("data");
                         String path = multiObj.getString("path");
                         global.getSubredditManager().setMultiData(path, multiObj);
@@ -1488,7 +1506,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                     break;
                 case SubscriptionEditTask.ACTION_MULTI_EDIT:
                     try {
-                        if (data == null) return;
+                        if (data == null) {
+                            return;
+                        }
                         JSONObject multiObj = data.getJSONObject("data");
                         global.getSubredditManager().setMultiData(params[0].toString(), multiObj);
                     } catch (JSONException e) {
@@ -1529,8 +1549,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         }
         if (!result) {
             // check login required
-            if (exception.isAuthError())
+            if (exception.isAuthError()) {
                 global.mRedditData.initiateLogin(SubredditSelectActivity.this, false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(SubredditSelectActivity.this, exception);
         }

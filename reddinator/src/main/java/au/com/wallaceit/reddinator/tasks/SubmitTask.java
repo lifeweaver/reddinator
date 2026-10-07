@@ -63,7 +63,8 @@ public class SubmitTask extends AsyncTask<String, Integer, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        if (submitCallback != null)
+        if (submitCallback != null) {
             submitCallback.onSubmitted(jsonResult, exception, isLink);
+        }
     }
 }

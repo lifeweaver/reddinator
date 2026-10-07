@@ -86,8 +86,11 @@ public class ThemeEditorActivity extends ListActivity {
     public void onBackPressed() {
         if (themeChanged) {
             global.mThemeManager.saveCustomTheme(themeId, theme);
-            if (getIntent().getExtras().getInt("requestCode") != ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) // update widgets straight away if the requesting activity does not process the result
+
+            // update widgets straight away if the requesting activity does not process the result
+            if (getIntent().getExtras().getInt("requestCode") != ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) {
                 WidgetCommon.refreshAllWidgetViews(global);
+            }
 
             setResult(ThemesActivity.RESULT_CODE_THEME_UPDATED);
         }

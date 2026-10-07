@@ -192,7 +192,9 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                 String clipText = null;
                 if (importCm.hasPrimaryClip() && importCm.getPrimaryClip().getItemCount() > 0) {
                     CharSequence cs = importCm.getPrimaryClip().getItemAt(0).coerceToText(this);
-                    if (cs != null) clipText = cs.toString();
+                    if (cs != null) {
+                        clipText = cs.toString();
+                    }
                 }
                 int imported = global.mThemeManager.importThemes(clipText);
                 if (imported > 0) {
@@ -237,8 +239,9 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                 permalink = StringEscapeUtils.unescapeJava(data.getString("url").replace(".json", ""));
                 String url = permalink + ".compact";
 
-                if (permalink != null)
+                if (permalink != null) {
                     permalink = permalink.substring(permalink.indexOf("/r/")); // trim domain to get real permalink
+                }
 
                 Intent intent = new Intent(ThemesActivity.this, ViewRedditActivity.class);
                 intent.putExtra(Reddinator.ITEM_ID, id);

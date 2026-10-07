@@ -125,12 +125,13 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         if (position > -1) {
             JSONArray tempArr = new JSONArray();
             for (int i = 0; i < data.length(); i++) {
-                if (i != position)
+                if (i != position) {
                     try {
                         tempArr.put(data.get(i));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                }
             }
             data = tempArr;
             notifyDataSetChanged();
@@ -149,8 +150,9 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             }
             feedInterface.showLoader();
             redditid = item.getString("name");
-            if (item.has("likes"))
+            if (item.has("likes")) {
                 curVote = Utilities.voteDirectionToInt(item.getString("likes"));
+            }
             new VoteTask(global, this, redditid, listposition, direction, curVote).execute();
         } catch (JSONException e) {
             Toast.makeText(context, "Error initializing vote: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -166,7 +168,9 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             global.setItemVote(0, listposition, redditId, voteVal, netVote);
         } else {
             // check login required
-            if (exception.isAuthError()) global.mRedditData.initiateLogin(context, false);
+            if (exception.isAuthError()) {
+                global.mRedditData.initiateLogin(context, false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(context, exception);
         }
@@ -507,8 +511,9 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                     }
                 } else if (view.getTag() == redditid) {
                     view.setVisibility(View.GONE);
-                    if (expandView != null)
+                    if (expandView != null) {
                         expandView.setVisibility(View.GONE);
+                    }
                 }
             }
         }).execute();

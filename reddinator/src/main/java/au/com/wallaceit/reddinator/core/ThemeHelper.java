@@ -88,13 +88,14 @@ public class ThemeHelper {
                                 }
                             }
                         });
-                if (openPostRunnable != null)
+                if (openPostRunnable != null) {
                     builder.setNegativeButton(R.string.view_comments_noicon, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             openPostRunnable.run();
                         }
                     });
+                }
                 builder.show().setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {

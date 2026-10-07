@@ -177,8 +177,9 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 loadmorerow.setTextViewText(R.id.loadmoretxt, mContext.getResources().getString(R.string.load_more));
             }
             loadmorerow.setTextColor(R.id.loadmoretxt, themeColors.get("load_text"));
-            if (providerClass == WidgetCommon.WIDGET_CLASS_STACK)
+            if (providerClass == WidgetCommon.WIDGET_CLASS_STACK) {
                 loadmorerow.setInt(R.id.load_row, "setBackgroundColor", themeColors.get("background_color"));
+            }
             Intent i = new Intent();
             Bundle extras = new Bundle();
             extras.putString(Reddinator.ITEM_ID, "0"); // zero will be an indicator in the onreceive function of widget provider if its not present it forces a reload

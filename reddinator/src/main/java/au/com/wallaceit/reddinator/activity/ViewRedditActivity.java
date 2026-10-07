@@ -247,8 +247,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == 6) {
             updateTheme();
-            if (pageAdapter.getRegisteredFragment(1) != null && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment)
+            if (pageAdapter.getRegisteredFragment(1) != null && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment) {
                 ((TabCommentsFragment) pageAdapter.getRegisteredFragment(1)).updateTheme();
+            }
             setResult(6);
         }
     }
@@ -284,7 +285,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         super.onResume();
         // Register receiver & check for new messages if logged in, enabled and due
         int checkPref = Integer.parseInt(prefs.getString("mail_check_pref", "300000"));
-        if (global.mRedditData.isLoggedIn() || checkPref != 0)
+        if (global.mRedditData.isLoggedIn() || checkPref != 0) {
             if ((global.mRedditData.getLastUserUpdateTime() + checkPref) < (new Date()).getTime()) {
                 inboxReceiver = new BroadcastReceiver() {
                     @Override
@@ -299,6 +300,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
                 MailCheckService.checkMail(ViewRedditActivity.this, MailCheckService.ACTIVITY_CHECK_ACTION);
             }
+        }
 
         setInboxIcon();
     }
@@ -319,8 +321,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 WidgetCommon.hideLoaderAndRefreshViews(this, widgetId, false);
             }
         }
-        if (loadPostTask != null)
+        if (loadPostTask != null) {
             loadPostTask.cancel(false);
+        }
         ViewGroup view = (ViewGroup) getWindow().getDecorView();
         view.removeAllViews();
         super.finish();
@@ -328,7 +331,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
     public void onBackPressed() {
         TabWebFragment webFragment = (TabWebFragment) pageAdapter.getRegisteredFragment(0);
-        if (webFragment != null)
+        if (webFragment != null) {
             if (webFragment.mFullSView != null) {
                 webFragment.mChromeClient.onHideCustomView();
             } else if (infoPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
@@ -340,6 +343,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 webFragment.mWebView.loadData("", "text/html", "utf-8");
                 this.finish();
             }
+        }
     }
 
     @Override
@@ -348,8 +352,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         inflater.inflate(R.menu.view_menu, menu);
         // set options menu view
         MenuItem accountItem = (menu.findItem(R.id.menu_account));
-        if (global.mRedditData.isLoggedIn())
+        if (global.mRedditData.isLoggedIn()) {
             accountItem.setTitle(global.mRedditData.getUsername());
+        }
         accountItem.setIcon(new IconDrawable(this, Iconify.IconValue.fa_reddit_square).color(actionbarIconColor).actionBarSize());
         (menu.findItem(R.id.menu_share)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_share_alt).color(actionbarIconColor).actionBarSize());
         (menu.findItem(R.id.menu_open)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_globe).color(actionbarIconColor).actionBarSize());
@@ -369,7 +374,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     }
 
     private void setVoteIcons() {
-        if (upvote != null)
+        if (upvote != null) {
             if (userLikes != null && !userLikes.equals("null")) {
                 if (userLikes.equals("true")) {
                     upvote.setIcon(new IconDrawable(this, Iconify.IconValue.fa_arrow_up).color(Color.parseColor(Reddinator.COLOR_UPVOTE_ACTIVE)).actionBarSize());
@@ -385,6 +390,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 downvote.setIcon(new IconDrawable(this, Iconify.IconValue.fa_arrow_down).color(actionbarIconColor).actionBarSize());
                 curvote = 0;
             }
+        }
     }
 
     private void setInboxIcon() {
@@ -479,8 +485,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
             case R.id.menu_submit:
                 Intent submitIntent = new Intent(ViewRedditActivity.this, SubmitActivity.class);
-                if (!global.getSubredditManager().isFeedMulti(widgetId) && !global.getSubredditManager().isFeedSystemSubreddit(widgetId))
+                if (!global.getSubredditManager().isFeedMulti(widgetId) && !global.getSubredditManager().isFeedSystemSubreddit(widgetId)) {
                     submitIntent.putExtra("subreddit", global.getSubredditManager().getCurrentFeedName(widgetId));
+                }
                 startActivity(submitIntent);
                 break;
 
@@ -536,7 +543,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     }
 
     private void upVote() {
-        if (archivedPostCheck()) return;
+        if (archivedPostCheck()) {
+            return;
+        }
 
         VoteTask task = new VoteTask(global, ViewRedditActivity.this, redditItemId, 1, curvote);
         voteinprogress = true;
@@ -545,7 +554,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     }
 
     private void downVote() {
-        if (archivedPostCheck()) return;
+        if (archivedPostCheck()) {
+            return;
+        }
 
         VoteTask task = new VoteTask(global, ViewRedditActivity.this, redditItemId, -1, curvote);
         voteinprogress = true;
@@ -591,8 +602,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             setVoteUpdateRecord(redditId, Utilities.voteDirectionToString(direction), netVote);
         } else {
             // check login required
-            if (exception.isAuthError())
+            if (exception.isAuthError()) {
                 global.mRedditData.initiateLogin(ViewRedditActivity.this, false);
+            }
             // show error
             Utilities.showApiErrorToastOrDialog(ViewRedditActivity.this, exception);
         }
@@ -731,8 +743,9 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
         @Override
         public Fragment getItem(int position) {
-            if (registeredFragments.indexOfKey(position) > -1)
+            if (registeredFragments.indexOfKey(position) > -1) {
                 return registeredFragments.get(position);
+            }
             String url;
             int fontsize;
             boolean commentsPref = prefs.getBoolean("commentsfirstpref", false);
