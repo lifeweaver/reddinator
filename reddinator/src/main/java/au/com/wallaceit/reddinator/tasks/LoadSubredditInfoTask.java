@@ -27,7 +27,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class LoadSubredditInfoTask extends AsyncTask<String, Integer, JSONObject> {
-    private Reddinator global;
+    private final Reddinator global;
     private RedditData.RedditApiException exception = null;
     private Callback callback = null;
 

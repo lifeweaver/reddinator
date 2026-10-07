@@ -21,16 +21,18 @@ package au.com.wallaceit.reddinator.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.PagerAdapter;
 
 public class SimpleTabsAdapter extends PagerAdapter {
 
     private View layout = null;
-    private String[] labels;
-    private int[] layoutIds;
-    private Activity context;
+    private final String[] labels;
+    private final int[] layoutIds;
+    private final Activity context;
 
     public SimpleTabsAdapter(String[] labels, int[] layoutIds, Context context, View layout) {
         this.context = (Activity) context;
@@ -39,7 +41,7 @@ public class SimpleTabsAdapter extends PagerAdapter {
         this.layoutIds = layoutIds;
     }
 
-    public Object instantiateItem(ViewGroup collection, int position) {
+    public Object instantiateItem(@NonNull ViewGroup collection, int position) {
         if (position > labels.length) {
             return null;
         }
@@ -49,7 +51,7 @@ public class SimpleTabsAdapter extends PagerAdapter {
         return layout.findViewById(layoutIds[position]);
     }
 
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
 
     }
 
@@ -67,7 +69,7 @@ public class SimpleTabsAdapter extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(View arg0, Object arg1) {
+    public boolean isViewFromObject(@NonNull View arg0, @NonNull Object arg1) {
         return arg0 == arg1;
     }
 }

@@ -32,7 +32,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.IconTextView;
@@ -86,199 +85,180 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
         // check if it is a self post and remove view domain option
 
         final ItemOptionsAdapter adapter = new ItemOptionsAdapter();
-        ListView listview = (ListView) dialog.findViewById(R.id.opt_list);
+        ListView listview = dialog.findViewById(R.id.opt_list);
         listview.setAdapter(adapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String key = adapter.getItemKey(position);
-                String redditId;
-                switch (key) {
-                    case "hide_post":
-                        redditId = getIntent().getStringExtra(Reddinator.ITEM_ID);
-                        int feedPos = getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, 0);
-                        if (global.mRedditData.isLoggedIn()) {
-                            new HidePostTask(FeedItemDialogActivity.this, false, null).execute(redditId);
+        listview.setOnItemClickListener((parent, view, position, id) -> {
+            String key = adapter.getItemKey(position);
+            String redditId;
+            switch (key) {
+                case "hide_post":
+                    redditId = getIntent().getStringExtra(Reddinator.ITEM_ID);
+                    int feedPos = getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, 0);
+                    if (global.mRedditData.isLoggedIn()) {
+                        new HidePostTask(FeedItemDialogActivity.this, false, null).execute(redditId);
+                    } else {
+                        global.getSubredditManager().addPostFilter(widgetId, redditId);
+                    }
+                    global.removePostFromFeed(widgetId, feedPos, redditId);
+                    if (widgetId > 0) {
+                        WidgetCommon.hideLoaderAndRefreshViews(FeedItemDialogActivity.this, widgetId, false);
+                    } else {
+                        close(5); // tell main activity to refresh views
+                        return;
+                    }
+                    break;
+                case "save_post":
+                    redditId = getIntent().getStringExtra(Reddinator.ITEM_ID);
+                    (new SavePostTask(FeedItemDialogActivity.this, widgetId > 0, null)).execute("link", redditId);
+                    break;
+                case "share_post":
+                    Utilities.showPostShareDialog(
+                                    FeedItemDialogActivity.this,
+                                    getIntent().getStringExtra(Reddinator.ITEM_URL),
+                                    getIntent().getStringExtra(Reddinator.ITEM_PERMALINK))
+                            .setOnDismissListener(dialog -> close(0));
+                    dialog.dismiss();
+                    return;
+                case "open_post":
+                    // open link in browser
+                    Utilities.intentActionView(FeedItemDialogActivity.this, getIntent().getStringExtra(Reddinator.ITEM_URL));
+                    break;
+                case "open_comments":
+                    // open reddit comments page in browser
+                    Utilities.intentActionView(FeedItemDialogActivity.this, "https://www.reddit.com" + getIntent().getStringExtra(Reddinator.ITEM_PERMALINK));
+                    break;
+                case "view_subreddit":
+                    // view subreddit of this item
+                    String subreddit = getIntent().getStringExtra(Reddinator.ITEM_SUBREDDIT);
+                    if (widgetId < 0) {
+                        String feedPath = "/r/" + subreddit;
+                        if (widgetId == -2) {
+                            // If currently in search activity, open a temp feed on the main activity
+                            global.openSubredditFeed(FeedItemDialogActivity.this, Reddinator.REDDIT_BASE_URL + feedPath);
+                            close(0);
                         } else {
-                            global.getSubredditManager().addPostFilter(widgetId, redditId);
+                            // replace current temporary feed in main activity
+                            Intent intent = new Intent(FeedItemDialogActivity.this, MainActivity.class);
+                            intent.putExtra(MainActivity.EXTRA_FEED_PATH, feedPath);
+                            intent.putExtra(MainActivity.EXTRA_FEED_NAME, subreddit);
+                            close(2, intent);
                         }
-                        global.removePostFromFeed(widgetId, feedPos, redditId);
+                    } else {
+                        global.getSubredditManager().setFeedSubreddit(widgetId, subreddit, null);
                         if (widgetId > 0) {
-                            WidgetCommon.hideLoaderAndRefreshViews(FeedItemDialogActivity.this, widgetId, false);
+                            WidgetCommon.showLoaderAndUpdate(FeedItemDialogActivity.this, widgetId, false);
                         } else {
-                            close(5); // tell main activity to refresh views
+                            close(2); // tell main activity to update
                             return;
                         }
-                        break;
-                    case "save_post":
-                        redditId = getIntent().getStringExtra(Reddinator.ITEM_ID);
-                        (new SavePostTask(FeedItemDialogActivity.this, widgetId > 0, null)).execute("link", redditId);
-                        break;
-                    case "share_post":
-                        Utilities.showPostShareDialog(
-                                        FeedItemDialogActivity.this,
-                                        getIntent().getStringExtra(Reddinator.ITEM_URL),
-                                        getIntent().getStringExtra(Reddinator.ITEM_PERMALINK))
-                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(DialogInterface dialog) {
-                                        close(0);
-                                    }
-                                });
-                        dialog.dismiss();
-                        return;
-                    case "open_post":
-                        // open link in browser
-                        Utilities.intentActionView(FeedItemDialogActivity.this, getIntent().getStringExtra(Reddinator.ITEM_URL));
-                        break;
-                    case "open_comments":
-                        // open reddit comments page in browser
-                        Utilities.intentActionView(FeedItemDialogActivity.this, "https://www.reddit.com" + getIntent().getStringExtra(Reddinator.ITEM_PERMALINK));
-                        break;
-                    case "view_subreddit":
-                        // view subreddit of this item
-                        String subreddit = getIntent().getStringExtra(Reddinator.ITEM_SUBREDDIT);
-                        if (widgetId < 0) {
-                            String feedPath = "/r/" + subreddit;
-                            if (widgetId == -2) {
-                                // If currently in search activity, open a temp feed on the main activity
-                                global.openSubredditFeed(FeedItemDialogActivity.this, Reddinator.REDDIT_BASE_URL + feedPath);
-                                close(0);
-                            } else {
-                                // replace current temporary feed in main activity
-                                Intent intent = new Intent(FeedItemDialogActivity.this, MainActivity.class);
-                                intent.putExtra(MainActivity.EXTRA_FEED_PATH, feedPath);
-                                intent.putExtra(MainActivity.EXTRA_FEED_NAME, subreddit);
-                                close(2, intent);
-                            }
+                    }
+                    break;
+                case "open_subreddit":
+                    Intent intent = new Intent(FeedItemDialogActivity.this, MainActivity.class);
+                    intent.setAction(ACTION_VIEW);
+                    intent.setData(Uri.parse(Reddinator.REDDIT_BASE_URL + "/r/" + getIntent().getStringExtra(Reddinator.ITEM_SUBREDDIT)));
+                    startActivity(intent);
+                    close(0);
+                    break;
+                case "view_domain":
+                    // view listings for the domain of this item
+                    String domain = getIntent().getStringExtra(Reddinator.ITEM_DOMAIN);
+                    if (widgetId < 0) {
+                        String feedPath = "/domain/" + domain;
+                        if (widgetId == -2) {
+                            global.openSubredditFeed(FeedItemDialogActivity.this, Reddinator.REDDIT_BASE_URL + feedPath);
+                            close(0);
                         } else {
-                            global.getSubredditManager().setFeedSubreddit(widgetId, subreddit, null);
-                            if (widgetId > 0) {
-                                WidgetCommon.showLoaderAndUpdate(FeedItemDialogActivity.this, widgetId, false);
-                            } else {
-                                close(2); // tell main activity to update
-                                return;
-                            }
+                            intent = new Intent(FeedItemDialogActivity.this, MainActivity.class);
+                            intent.putExtra(MainActivity.EXTRA_FEED_PATH, feedPath);
+                            intent.putExtra(MainActivity.EXTRA_FEED_NAME, domain);
+                            close(2, intent);
                         }
-                        break;
-                    case "open_subreddit":
-                        Intent intent = new Intent(FeedItemDialogActivity.this, MainActivity.class);
-                        intent.setAction(ACTION_VIEW);
-                        intent.setData(Uri.parse(Reddinator.REDDIT_BASE_URL + "/r/" + getIntent().getStringExtra(Reddinator.ITEM_SUBREDDIT)));
-                        startActivity(intent);
-                        close(0);
-                        break;
-                    case "view_domain":
-                        // view listings for the domain of this item
-                        String domain = getIntent().getStringExtra(Reddinator.ITEM_DOMAIN);
-                        if (widgetId < 0) {
-                            String feedPath = "/domain/" + domain;
-                            if (widgetId == -2) {
-                                global.openSubredditFeed(FeedItemDialogActivity.this, Reddinator.REDDIT_BASE_URL + feedPath);
-                                close(0);
-                            } else {
-                                intent = new Intent(FeedItemDialogActivity.this, MainActivity.class);
-                                intent.putExtra(MainActivity.EXTRA_FEED_PATH, feedPath);
-                                intent.putExtra(MainActivity.EXTRA_FEED_NAME, domain);
-                                close(2, intent);
-                            }
+                    } else {
+                        global.getSubredditManager().setFeedDomain(widgetId, domain);
+                        if (widgetId > 0) {
+                            WidgetCommon.showLoaderAndUpdate(FeedItemDialogActivity.this, widgetId, false);
                         } else {
-                            global.getSubredditManager().setFeedDomain(widgetId, domain);
-                            if (widgetId > 0) {
-                                WidgetCommon.showLoaderAndUpdate(FeedItemDialogActivity.this, widgetId, false);
-                            } else {
-                                close(2);
-                                return;
-                            }
-                        }
-                        break;
-                    case "copy_multi":
-                        dialog.dismiss();
-                        LinearLayout layout = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_multi_add, null, false);
-                        final EditText name = (EditText) layout.findViewById(R.id.new_multi_name);
-                        final String multiPath = getIntent().getStringExtra(Reddinator.ITEM_URL);
-                        name.setText(multiPath.substring(multiPath.lastIndexOf("/") + 1));
-                        name.selectAll();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(FeedItemDialogActivity.this);
-                        builder.setView(layout).setTitle(getString(R.string.copy_multi))
-                                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                })
-                                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        if (name.getText().toString().equals("")) {
-                                            Toast.makeText(FeedItemDialogActivity.this, getString(R.string.enter_multi_name_error), Toast.LENGTH_LONG).show();
-                                            return;
-                                        }
-                                        new SubscriptionEditTask(global, FeedItemDialogActivity.this, FeedItemDialogActivity.this, SubscriptionEditTask.ACTION_MULTI_COPY)
-                                                .execute(name.getText().toString(), multiPath.replaceFirst(".*reddit.com", ""));
-                                        dialogInterface.dismiss();
-                                    }
-                                })
-                                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        close(0);
-                                    }
-                                })
-                                .show().setCanceledOnTouchOutside(true);
-                        return;
-                    case "open_theme":
-                        try {
-                            dialog.dismiss();
-                            ThemeHelper.handleThemeInstall(FeedItemDialogActivity.this, global, FeedItemDialogActivity.this, new JSONObject(getIntent().getStringExtra(EXTRA_POST_DATA)), null);
+                            close(2);
                             return;
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                }
-                close(0);
+                    }
+                    break;
+                case "copy_multi":
+                    dialog.dismiss();
+                    LinearLayout layout = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_multi_add, null, false);
+                    final EditText name = layout.findViewById(R.id.new_multi_name);
+                    final String multiPath = getIntent().getStringExtra(Reddinator.ITEM_URL);
+                    name.setText(multiPath.substring(multiPath.lastIndexOf("/") + 1));
+                    name.selectAll();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(FeedItemDialogActivity.this);
+                    builder.setView(layout).setTitle(getString(R.string.copy_multi))
+                            .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            })
+                            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if (name.getText().toString().isEmpty()) {
+                                        Toast.makeText(FeedItemDialogActivity.this, getString(R.string.enter_multi_name_error), Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                    new SubscriptionEditTask(global, FeedItemDialogActivity.this, FeedItemDialogActivity.this, SubscriptionEditTask.ACTION_MULTI_COPY)
+                                            .execute(name.getText().toString(), multiPath.replaceFirst(".*reddit.com", ""));
+                                    dialogInterface.dismiss();
+                                }
+                            })
+                            .setOnCancelListener(dialog -> close(0))
+                            .show().setCanceledOnTouchOutside(true);
+                    return;
+                case "open_theme":
+                    try {
+                        dialog.dismiss();
+                        ThemeHelper.handleThemeInstall(FeedItemDialogActivity.this, global, FeedItemDialogActivity.this, new JSONObject(getIntent().getStringExtra(EXTRA_POST_DATA)), null);
+                        return;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
             }
+            close(0);
         });
         // setup voting buttons
         String userLikes = getIntent().getStringExtra(Reddinator.ITEM_USERLIKES);
-        IconTextView upvote = (IconTextView) dialog.findViewById(R.id.opt_upvote);
-        IconTextView downvote = (IconTextView) dialog.findViewById(R.id.opt_downvote);
-        if (!userLikes.equals("null")) {
+        IconTextView upvote = dialog.findViewById(R.id.opt_upvote);
+        IconTextView downvote = dialog.findViewById(R.id.opt_downvote);
+        if (userLikes != null && !userLikes.equals("null")) {
             if (userLikes.equals("true")) {
                 upvote.setTextColor(Color.parseColor(Reddinator.COLOR_UPVOTE_ACTIVE));
             } else {
                 downvote.setTextColor(Color.parseColor(Reddinator.COLOR_DOWNVOTE_ACTIVE));
             }
         }
-        upvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (widgetId > 0) {
-                    new WidgetVoteTask(
-                            FeedItemDialogActivity.this,
-                            getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0),
-                            1,
-                            getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1),
-                            getIntent().getStringExtra(Reddinator.ITEM_ID)
-                    ).execute();
-                }
-                close(3);
+        upvote.setOnClickListener(v -> {
+            if (widgetId > 0) {
+                new WidgetVoteTask(
+                        FeedItemDialogActivity.this,
+                        getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0),
+                        1,
+                        getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1),
+                        getIntent().getStringExtra(Reddinator.ITEM_ID)
+                ).execute();
             }
+            close(3);
         });
-        downvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (widgetId > 0) {
-                    new WidgetVoteTask(
-                            FeedItemDialogActivity.this,
-                            getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0),
-                            -1,
-                            getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1),
-                            getIntent().getStringExtra(Reddinator.ITEM_ID)
-                    ).execute();
-                }
-                close(4);
+        downvote.setOnClickListener(v -> {
+            if (widgetId > 0) {
+                new WidgetVoteTask(
+                        FeedItemDialogActivity.this,
+                        getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0),
+                        -1,
+                        getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1),
+                        getIntent().getStringExtra(Reddinator.ITEM_ID)
+                ).execute();
             }
+            close(4);
         });
         // setup theme, use widget theme if coming from a widget
         ThemeManager.Theme theme = global.mThemeManager.getActiveTheme((widgetId > 0 ? "widgettheme-" + widgetId : "appthemepref"));
@@ -293,20 +273,18 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
         if (result) {
             //if (this.data!=null)
             //System.out.println("resultData: "+this.data.toString());
-            switch (action) {
-                case SubscriptionEditTask.ACTION_MULTI_COPY:
-                    try {
-                        if (data == null) {
-                            return;
-                        }
-                        JSONObject multiObj = data.getJSONObject("data");
-                        String path = multiObj.getString("path");
-                        global.getSubredditManager().setMultiData(path, multiObj);
-                        Toast.makeText(FeedItemDialogActivity.this, R.string.copy_multi_success, Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            if (action == SubscriptionEditTask.ACTION_MULTI_COPY) {
+                try {
+                    if (data == null) {
+                        return;
                     }
-                    break;
+                    JSONObject multiObj = data.getJSONObject("data");
+                    String path = multiObj.getString("path");
+                    global.getSubredditManager().setMultiData(path, multiObj);
+                    Toast.makeText(FeedItemDialogActivity.this, R.string.copy_multi_success, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             // check login required
@@ -346,16 +324,16 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
             if (widgetId < 0) {
                 // for temp feeds and searches this needs to be calculated
                 String feedPath = getIntent().getStringExtra(EXTRA_CURRENT_FEED_PATH);
-                if (feedPath != null && !feedPath.equals("") && !feedPath.equals("/r/all") && feedPath.contains("/r/")) {
+                if (feedPath != null && !feedPath.equals("/r/all") && feedPath.contains("/r/")) {
                     canViewSubreddit = false;
                 }
-                if (domain.indexOf("self.") == 0 || domain.indexOf("reddit.com") == 0 || (feedPath != null && Utilities.isFeedPathDomain(feedPath))) {
+                if ((domain != null && (domain.indexOf("self.") == 0 || domain.indexOf("reddit.com") == 0)) || (feedPath != null && Utilities.isFeedPathDomain(feedPath))) {
                     canViewDomain = false;
                 }
             } else {
                 // for the widget and app feeds this data is available readily
                 canViewSubreddit = global.getSubredditManager().isFeedMulti(widgetId);
-                canViewDomain = (domain.indexOf("self.") != 0 && !global.getSubredditManager().getCurrentFeedName(widgetId).equals(domain));
+                canViewDomain = (domain != null && domain.indexOf("self.") != 0 && !global.getSubredditManager().getCurrentFeedName(widgetId).equals(domain));
             }
 
             if (canViewSubreddit) {
@@ -406,7 +384,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                 view = convertView;
             }
 
-            text = (TextView) view.findViewById(R.id.item_text);
+            text = view.findViewById(R.id.item_text);
             text.setText((String) getItem(position));
 
             return view;

@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -41,7 +42,7 @@ public class HtmlDialog extends AlertDialog {
         super(context, R.style.HtmlDialog);
         @SuppressLint("InflateParams")
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_html, null);
-        WebView wv = (WebView) view.findViewById(R.id.webView);
+        WebView wv = view.findViewById(R.id.webView);
         setTitle(title);
         setView(view);
         setCancelable(true);
@@ -54,7 +55,8 @@ public class HtmlDialog extends AlertDialog {
 
     private class NoNavClient extends WebViewClient {
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
 
             ((Reddinator) getContext().getApplicationContext()).handleLink(getContext(), url);
             return true;

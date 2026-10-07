@@ -21,8 +21,6 @@ package au.com.wallaceit.reddinator.ui;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,18 +28,21 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import java.util.ArrayList;
 
 import au.com.wallaceit.reddinator.R;
 
 public class SimpleTabsWidget {
-    private LayoutInflater inflater;
-    private LinearLayout tabWidget;
+    private final LayoutInflater inflater;
+    private final LinearLayout tabWidget;
     private HorizontalScrollView scrollView = null;
     private ViewPager viewPager;
-    private ArrayList<LinearLayout> indicatorItems = new ArrayList<>();
-    private ArrayList<TextView> tabItems = new ArrayList<>();
-    private int[] colors = new int[]{Color.WHITE, Color.BLACK};
+    private final ArrayList<LinearLayout> indicatorItems = new ArrayList<>();
+    private final ArrayList<TextView> tabItems = new ArrayList<>();
+    private final int[] colors = new int[]{Color.WHITE, Color.BLACK};
 
     public SimpleTabsWidget(Context context, LinearLayout tabView) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -90,12 +91,12 @@ public class SimpleTabsWidget {
         LinearLayout tabContainer = (LinearLayout) inflater.inflate(R.layout.tab, tabWidget, false);
         tabContainer.setOnClickListener(clickListener);
 
-        TextView tabText = (TextView) tabContainer.findViewById(R.id.tab_text);
+        TextView tabText = tabContainer.findViewById(R.id.tab_text);
         tabText.setText(text);
         tabText.setTextColor(colors[0]);
         tabItems.add(tabText);
 
-        LinearLayout indicator = (LinearLayout) tabContainer.findViewById(R.id.tab_indicator);
+        LinearLayout indicator = tabContainer.findViewById(R.id.tab_indicator);
         indicator.setBackgroundColor(colors[1]);
         indicatorItems.add(indicator);
 
@@ -117,7 +118,7 @@ public class SimpleTabsWidget {
     }
 
     class TabClickListener implements View.OnClickListener {
-        private int index;
+        private final int index;
 
         public TabClickListener(int index) {
             this.index = index;

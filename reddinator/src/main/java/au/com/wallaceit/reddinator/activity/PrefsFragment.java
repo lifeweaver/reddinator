@@ -11,11 +11,12 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.view.MenuItem;
 import android.webkit.CookieManager;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import net.rdrei.android.dirchooser.DirectoryChooserConfig;
 import net.rdrei.android.dirchooser.DirectoryChooserFragment;
@@ -62,31 +63,25 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             addPreferencesFromResource(R.xml.account_preferences);
             Preference logoutbtn = findPreference("logout");
             final PreferenceCategory accountSettings = (PreferenceCategory) findPreference("account");
-            logoutbtn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    // clear oauth token, userdata, webview cookies and load default subreddits
-                    global.mRedditData.purgeAccountData();
-                    global.getSubredditManager().clearMultis();
-                    global.getSubredditManager().loadDefaultSubreddits();
-                    global.getSubredditManager().clearAllFilter();
-                    clearWebviewCookies();
-                    // remove mail check alarm
-                    MailCheckReceiver.setAlarm(getActivity());
-                    // remove account prefs screen
-                    getPreferenceScreen().removePreference(accountSettings);
-                    Toast.makeText(getActivity(), getResources().getString(R.string.account_disconnected), Toast.LENGTH_LONG).show();
-                    getActivity().setResult(7);
-                    return true;
-                }
+            logoutbtn.setOnPreferenceClickListener(preference -> {
+                // clear oauth token, userdata, webview cookies and load default subreddits
+                global.mRedditData.purgeAccountData();
+                global.getSubredditManager().clearMultis();
+                global.getSubredditManager().loadDefaultSubreddits();
+                global.getSubredditManager().clearAllFilter();
+                clearWebviewCookies();
+                // remove mail check alarm
+                MailCheckReceiver.setAlarm(getActivity());
+                // remove account prefs screen
+                getPreferenceScreen().removePreference(accountSettings);
+                Toast.makeText(getActivity(), getResources().getString(R.string.account_disconnected), Toast.LENGTH_LONG).show();
+                getActivity().setResult(7);
+                return true;
             });
             Preference refreshbtn = findPreference("refresh_data");
-            refreshbtn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new SyncUserDataTask(getActivity(), null, true, 0).execute();
-                    return false;
-                }
+            refreshbtn.setOnPreferenceClickListener(preference -> {
+                new SyncUserDataTask(getActivity(), null, true, 0).execute();
+                return false;
             });
         }
 
@@ -95,101 +90,77 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         appearanceCat = (PreferenceCategory) findPreference("appearance");
 
         Preference themeManagerButton = findPreference("theme_manager_button");
-        themeManagerButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(getActivity(), ThemesActivity.class);
-                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
-                return true;
-            }
+        themeManagerButton.setOnPreferenceClickListener(preference -> {
+            Intent intent = new Intent(getActivity(), ThemesActivity.class);
+            startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+            return true;
         });
 
         themeEditorButton = findPreference("theme_editor_button");
-        themeEditorButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(getActivity(), ThemeEditorActivity.class);
-                intent.putExtra("themeId", mAppTheme);
-                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
-                return true;
-            }
+        themeEditorButton.setOnPreferenceClickListener(preference -> {
+            Intent intent = new Intent(getActivity(), ThemeEditorActivity.class);
+            intent.putExtra("themeId", mAppTheme);
+            startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+            return true;
         });
 
         Preference clearFilterButton = findPreference("clear_post_filter");
         if (!global.mRedditData.isLoggedIn()) {
             clearFilterButton.setSummary(getString(R.string.clear_post_filter_summary, global.getSubredditManager().getPostFilterCount()));
-            clearFilterButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    global.getSubredditManager().clearPostFilters();
-                    Toast.makeText(getActivity(), getString(R.string.clear_post_filter_message), Toast.LENGTH_LONG).show();
-                    return true;
-                }
+            clearFilterButton.setOnPreferenceClickListener(preference -> {
+                global.getSubredditManager().clearPostFilters();
+                Toast.makeText(getActivity(), getString(R.string.clear_post_filter_message), Toast.LENGTH_LONG).show();
+                return true;
             });
         } else {
             clearFilterButton.setSummary(getString(R.string.clear_post_filter_summary_disabled));
-            clearFilterButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), AccountActivity.class);
-                    intent.setAction(AccountActivity.ACTION_HIDDEN);
-                    startActivity(intent);
-                    getActivity().finish();
-                    return true;
-                }
+            clearFilterButton.setOnPreferenceClickListener(preference -> {
+                Intent intent = new Intent(getActivity(), AccountActivity.class);
+                intent.setAction(AccountActivity.ACTION_HIDDEN);
+                startActivity(intent);
+                getActivity().finish();
+                return true;
             });
         }
 
         clearCookiesBtn = findPreference("clear_cookies");
-        clearCookiesBtn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                clearWebviewCookies();
-                Toast.makeText(getActivity(), getResources().getString(R.string.cookies_cleared), Toast.LENGTH_LONG).show();
-                return true;
-            }
+        clearCookiesBtn.setOnPreferenceClickListener(preference -> {
+            clearWebviewCookies();
+            Toast.makeText(getActivity(), getResources().getString(R.string.cookies_cleared), Toast.LENGTH_LONG).show();
+            return true;
         });
 
         final Preference clearImageCacheBtn = findPreference("clear_image_cache");
         clearImageCacheBtn.setSummary(getString(R.string.clear_image_cache_summary, Utilities.getImageCacheSize(getActivity())));
-        clearImageCacheBtn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                global.clearImageCache(0);
-                clearImageCacheBtn.setSummary(getString(R.string.clear_image_cache_summary, Utilities.getImageCacheSize(getActivity())));
-                Toast.makeText(getActivity(), getResources().getString(R.string.image_cache_cleared), Toast.LENGTH_LONG).show();
-                clearImageCacheBtn.setEnabled(false);
-                return true;
-            }
+        clearImageCacheBtn.setOnPreferenceClickListener(preference -> {
+            global.clearImageCache(0);
+            clearImageCacheBtn.setSummary(getString(R.string.clear_image_cache_summary, Utilities.getImageCacheSize(getActivity())));
+            Toast.makeText(getActivity(), getResources().getString(R.string.image_cache_cleared), Toast.LENGTH_LONG).show();
+            clearImageCacheBtn.setEnabled(false);
+            return true;
         });
 
         final Preference clearFeedDataBtn = findPreference("clear_feed_data");
         clearFeedDataBtn.setSummary(getString(R.string.clear_feed_data_summary, Utilities.getFeedDataSize(getActivity())));
-        clearFeedDataBtn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                global.clearFeedData();
-                clearFeedDataBtn.setSummary(getString(R.string.clear_feed_data_summary, Utilities.getFeedDataSize(getActivity())));
-                Toast.makeText(getActivity(), getResources().getString(R.string.feed_data_cleared), Toast.LENGTH_LONG).show();
-                clearFeedDataBtn.setEnabled(false);
-                return true;
-            }
+        clearFeedDataBtn.setOnPreferenceClickListener(preference -> {
+            global.clearFeedData();
+            clearFeedDataBtn.setSummary(getString(R.string.clear_feed_data_summary, Utilities.getFeedDataSize(getActivity())));
+            Toast.makeText(getActivity(), getResources().getString(R.string.feed_data_cleared), Toast.LENGTH_LONG).show();
+            clearFeedDataBtn.setEnabled(false);
+            return true;
         });
 
         curDownloadPath = mSharedPreferences.getString("download_location", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
         downloadLocationBtn = findPreference("download_location");
-        downloadLocationBtn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                DirectoryChooserConfig config = DirectoryChooserConfig.builder()
-                        .allowNewDirectoryNameModification(true)
-                        .newDirectoryName("")
-                        .initialDirectory(curDownloadPath).build();
-                mDialog = DirectoryChooserFragment.newInstance(config);
-                mDialog.setDirectoryChooserListener(PrefsFragment.this);
-                mDialog.show(getFragmentManager(), null);
-                return false;
-            }
+        downloadLocationBtn.setOnPreferenceClickListener(preference -> {
+            DirectoryChooserConfig config = DirectoryChooserConfig.builder()
+                    .allowNewDirectoryNameModification(true)
+                    .newDirectoryName("")
+                    .initialDirectory(curDownloadPath).build();
+            mDialog = DirectoryChooserFragment.newInstance(config);
+            mDialog.setDirectoryChooserListener(PrefsFragment.this);
+            mDialog.show(getFragmentManager(), null);
+            return false;
         });
         downloadLocationBtn.setSummary(curDownloadPath);
 
@@ -246,8 +217,8 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
         // set themes list
         LinkedHashMap<String, String> themeList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_ALL);
-        themePref.setEntries(themeList.values().toArray(new CharSequence[themeList.values().size()]));
-        themePref.setEntryValues(themeList.keySet().toArray(new CharSequence[themeList.keySet().size()]));
+        themePref.setEntries(themeList.values().toArray(new CharSequence[0]));
+        themePref.setEntryValues(themeList.keySet().toArray(new CharSequence[0]));
 
         //Toast.makeText(this, "Press the back button to save settings", Toast.LENGTH_SHORT).show();
     }

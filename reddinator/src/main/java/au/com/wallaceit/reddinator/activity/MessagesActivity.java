@@ -17,19 +17,12 @@
  */
 package au.com.wallaceit.reddinator.activity;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +32,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
@@ -62,7 +62,7 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
     private RedditPageAdapter pageAdapter;
     private SimpleTabsWidget tabsIndicator;
     private Resources resources;
-    private int actionbarIconColor = Utilities.getActionbarIconColor();
+    private final int actionbarIconColor = Utilities.getActionbarIconColor();
     public static final String ACTION_UNREAD = "unread";
 
     /**
@@ -70,7 +70,6 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
      *
      * @see FragmentActivity#onCreate(Bundle)
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     protected void onCreate(Bundle savedInstanceState) {
         // set window flags
         getWindow().requestFeature(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -84,17 +83,17 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
         // set content view
         setContentView(R.layout.activity_messages);
         // Setup View Pager and widget
-        viewPager = (ViewPager) findViewById(R.id.tab_content);
+        viewPager = findViewById(R.id.tab_content);
         pageAdapter = new RedditPageAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pageAdapter);
-        LinearLayout tabLayout = (LinearLayout) findViewById(R.id.tab_widget);
+        LinearLayout tabLayout = findViewById(R.id.tab_widget);
         tabsIndicator = new SimpleTabsWidget(MessagesActivity.this, tabLayout);
         tabsIndicator.setViewPager(viewPager);
         // theme
@@ -151,8 +150,7 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
     }
 
     public ThemeManager.Theme getCurrentTheme() {
-        if (global == null) // TODO: Bug report in google play suggests this becomes null at some point, check back
-        {
+        if (global == null) { // TODO: Bug report in google play suggests this becomes null at some point, check back
             global = (Reddinator) getApplication();
         }
         return global.mThemeManager.getActiveTheme("appthemepref");
@@ -193,8 +191,8 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) { // Keep null check due to google bug
             if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
                 try {
                     Method m = menu.getClass().getDeclaredMethod(
@@ -256,12 +254,7 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
     }
 
     public void setTitleText(final String title) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                actionBar.setTitle(title);
-            }
-        });
+        runOnUiThread(() -> actionBar.setTitle(title));
     }
 
     public void reloadSentMessages() {
@@ -320,15 +313,16 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
             return 3;
         }
 
+        @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             registeredFragments.put(position, fragment);
             return fragment;
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             registeredFragments.remove(position);
             super.destroyItem(container, position, object);
         }
@@ -336,7 +330,5 @@ public class MessagesActivity extends ActionbarFragmentActivity implements Accou
         Fragment getRegisteredFragment(int position) {
             return registeredFragments.get(position);
         }
-
     }
-
 }

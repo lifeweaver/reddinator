@@ -32,13 +32,13 @@ public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
     public static int MODE_SUBREDDITS = 1;
     public static int MODE_MULTIS = 2;
 
-    private Reddinator global;
+    private final Reddinator global;
     private RedditData.RedditApiException exception;
-    private Context context;
-    private Runnable callback;
-    private boolean showUI;
+    private final Context context;
+    private final Runnable callback;
+    private final boolean showUI;
     private ProgressDialog progressDialog = null;
-    private int mode;
+    private final int mode;
 
     public SyncUserDataTask(Context context, Runnable callback, boolean showUI, int mode) {
         this.context = context;

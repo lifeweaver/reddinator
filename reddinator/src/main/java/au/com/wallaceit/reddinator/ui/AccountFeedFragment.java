@@ -26,22 +26,24 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -136,7 +138,8 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         final String themeStr = global.mThemeManager.getActiveTheme("appthemepref").getValuesString(true);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
 
                 global.handleLink(getContext(), url);
                 return true; // always override url
@@ -168,7 +171,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         Utilities.executeJavascriptInWebview(mWebView, "setTheme(\"" + StringEscapeUtils.escapeEcmaScript(themeStr) + "\")");
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         if (container == null) {
             return null;
@@ -181,7 +184,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         //mWebView.saveState(outState);
     }
@@ -321,12 +324,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         @JavascriptInterface
         public void unSave(final String thingId) {
             ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.deleting));
-            SavePostTask savePostTask = new SavePostTask(getActivity(), false, new Runnable() {
-                @Override
-                public void run() {
-                    ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-                    mWebView.loadUrl("javascript:deleteCallback('" + thingId + "')");
-                }
+            SavePostTask savePostTask = new SavePostTask(getActivity(), false, () -> {
+                ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
+                mWebView.loadUrl("javascript:deleteCallback('" + thingId + "')");
             });
             savePostTask.execute("unsave", thingId);
         }
@@ -334,12 +334,9 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         @JavascriptInterface
         public void unHide(final String thingId) {
             ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.deleting));
-            HidePostTask hidePostTask = new HidePostTask(getActivity(), false, new Runnable() {
-                @Override
-                public void run() {
-                    ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
-                    mWebView.loadUrl("javascript:deleteCallback('" + thingId + "')");
-                }
+            HidePostTask hidePostTask = new HidePostTask(getActivity(), false, () -> {
+                ((ActivityInterface) getActivity()).setTitleText(resources.getString(R.string.app_name)); // reset title
+                mWebView.loadUrl("javascript:deleteCallback('" + thingId + "')");
             });
             hidePostTask.execute("unhide", thingId);
         }
@@ -395,7 +392,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
 
         FeedLoader(String sort, String moreId) {
             mSort = sort;
-            if (moreId != null && !moreId.equals("")) {
+            if (moreId != null && !moreId.isEmpty()) {
                 loadMore = true;
                 mMoreId = moreId;
             }
@@ -472,7 +469,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
                 default:
                     executeJavascript("populateFeed('" + StringEscapeUtils.escapeEcmaScript(result) + "', " + loadMore + ");");
                     // Mark messages read; this clears cached messages and count once completed
-                    if (unreadIds != null && unreadIds.size() > 0) {
+                    if (unreadIds != null && !unreadIds.isEmpty()) {
                         new MarkMessageTask(global, unreadIds).execute();
                     }
                     break;
@@ -481,10 +478,6 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
     }
 
     private void executeJavascript(String javascript) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mWebView.evaluateJavascript(javascript, null);
-        } else {
-            mWebView.loadUrl("javascript:" + javascript);
-        }
+        mWebView.evaluateJavascript(javascript, null);
     }
 }

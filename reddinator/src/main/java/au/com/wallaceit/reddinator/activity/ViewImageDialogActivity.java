@@ -22,11 +22,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.IconButton;
@@ -60,7 +60,7 @@ public class ViewImageDialogActivity extends Activity {
                     "<iframe src='" + imageUrl + "' frameborder='0' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen></iframe></div>";
         }
         // setup image view
-        WebView webView = (WebView) findViewById(R.id.imagewebview);
+        WebView webView = findViewById(R.id.imagewebview);
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setWebViewClient(new ImageWebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
@@ -70,38 +70,33 @@ public class ViewImageDialogActivity extends Activity {
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
-        }
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         boolean multi = getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
         webView.getSettings().setDisplayZoomControls(!multi);
         // Make sure we specify a proper user agent. Many sites block generic ones.
         webView.getSettings().setUserAgentString("Android/Reddinator v3.22.1");
 
-        if (iframeContent == null) {
+        if (iframeContent == null && imageUrl != null) {
             webView.loadUrl(imageUrl);
-        } else {
+        } else if (iframeContent != null) {
             webView.loadData(iframeContent, "text/html", "utf-8");
         }
 
         registerForContextMenu(webView);
         // setup open comments button
-        IconButton button = (IconButton) findViewById(R.id.commentsbutton);
+        IconButton button = findViewById(R.id.commentsbutton);
         ThemeManager.Theme theme = global.mThemeManager.getActiveTheme("appthemepref");
         int headerBg = Color.parseColor(theme.getValue("header_color"));
         int headerText = Color.parseColor(theme.getValue("header_text"));
         button.setBackgroundColor(headerBg);
         button.setTextColor(headerText);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle extras = getIntent().getExtras();
-                extras.putBoolean("view_comments", true);
-                Intent commentsIntent = new Intent(ViewImageDialogActivity.this, ViewRedditActivity.class);
-                commentsIntent.putExtras(extras);
-                startActivity(commentsIntent);
-                finish();
-            }
+        button.setOnClickListener(v -> {
+            Bundle extras = getIntent().getExtras();
+            extras.putBoolean("view_comments", true);
+            Intent commentsIntent = new Intent(ViewImageDialogActivity.this, ViewRedditActivity.class);
+            commentsIntent.putExtras(extras);
+            startActivity(commentsIntent);
+            finish();
         });
         setFinishOnTouchOutside(true);
     }
@@ -111,7 +106,7 @@ public class ViewImageDialogActivity extends Activity {
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
 
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             return true;
         }
     }

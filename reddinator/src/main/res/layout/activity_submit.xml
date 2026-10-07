@@ -50,7 +50,7 @@
             android:layout_marginStart="6dp"
             android:text="@string/characters_left_300" />
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/pager"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -69,7 +69,7 @@
                 android:gravity="top"
                 android:id="@+id/link"
                 android:hint="@string/link" />
-        </android.support.v4.view.ViewPager>
+        </androidx.viewpager.widget.ViewPager>
 
         <ScrollView
             android:layout_width="fill_parent"

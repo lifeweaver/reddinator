@@ -30,25 +30,17 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.ColorMatrixColorFilter;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 import android.text.InputType;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
@@ -62,6 +54,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
+import androidx.preference.PreferenceManager;
+import androidx.viewpager.widget.ViewPager;
+
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
 
@@ -71,7 +69,6 @@ import org.json.JSONObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
@@ -127,39 +124,36 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         final ListView subListView = findViewById(R.id.sublist);
         subListView.setAdapter(subsAdapter);
         subListView.setTextFilterEnabled(true);
-        subListView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                if (position == 0) {
-                    Intent intent = new Intent(SubredditSelectActivity.this, ViewAllSubredditsActivity.class);
-                    startActivityForResult(intent, 1);
-                    return;
+        subListView.setOnItemClickListener((parent, view, position, id) -> {
+            if (position == 0) {
+                Intent intent = new Intent(SubredditSelectActivity.this, ViewAllSubredditsActivity.class);
+                startActivityForResult(intent, 1);
+                return;
+            }
+
+            String subreddit = ((TextView) view.findViewById(R.id.subreddit_name)).getText().toString();
+            try {
+                JSONObject subData = global.getSubredditManager().getSubredditData(subreddit);
+                String url = subData.has("url") ? subData.getString("url") : null;
+                global.getSubredditManager().setFeedSubreddit(mAppWidgetId, subreddit, url);
+
+                // Only reset sort if:
+                // 1. current sort is best and the subreddit isn't the front page. OR
+                // 2. The reset sort preference is enabled and the user hasn't specified a sort.
+                String path = global.getSubredditManager().getCurrentFeedPath(mAppWidgetId);
+                String curSort = mSharedPreferences.getString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), "");
+
+                if (("best".equals(curSort) && !path.isEmpty() && !path.equals("/default")) ||
+                        (!userSelSort && mSharedPreferences.getBoolean("resetsortpref", false))) {
+
+                    String sort = (path.isEmpty() || path.equals("/default") ? "best" : "hot");
+                    global.mSharedPreferences.edit().putString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), sort).apply();
                 }
 
-                String subreddit = ((TextView) view.findViewById(R.id.subreddit_name)).getText().toString();
-                try {
-                    JSONObject subData = global.getSubredditManager().getSubredditData(subreddit);
-                    String url = subData.has("url") ? subData.getString("url") : null;
-                    global.getSubredditManager().setFeedSubreddit(mAppWidgetId, subreddit, url);
-
-                    // Only reset sort if:
-                    // 1. current sort is best and the subreddit isn't the front page. OR
-                    // 2. The reset sort preference is enabled and the user hasn't specified a sort.
-                    String path = global.getSubredditManager().getCurrentFeedPath(mAppWidgetId);
-                    String curSort = mSharedPreferences.getString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), "");
-
-                    if (("best".equals(curSort) && !path.equals("") && !path.equals("/default")) ||
-                            (!userSelSort && mSharedPreferences.getBoolean("resetsortpref", false))) {
-
-                        String sort = (path.equals("") || path.equals("/default") ? "best" : "hot");
-                        global.mSharedPreferences.edit().putString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), sort).apply();
-                    }
-
-                    updateFeedAndFinish();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(SubredditSelectActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                }
+                updateFeedAndFinish();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(SubredditSelectActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
         subsAdapter.sort(subComparator);
@@ -186,40 +180,32 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         tabs.setViewPager(pager);
 
         refreshButton = findViewById(R.id.refreshloginbutton);
-        refreshButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                if (global.mRedditData.isLoggedIn()) {
-                    if (pager.getCurrentItem() == 1) {
-                        new SyncUserDataTask(SubredditSelectActivity.this, new Runnable() {
-                            @Override
-                            public void run() {
-                                mMultiAdapter.refreshMultis();
-                            }
-                        }, true, SyncUserDataTask.MODE_MULTIS).execute();
-                    } else {
-                        new SyncUserDataTask(SubredditSelectActivity.this, new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshSubredditsList();
-                            }
-                        }, true, SyncUserDataTask.MODE_SUBREDDITS).execute();
-                    }
+        refreshButton.setOnClickListener(arg0 -> {
+            if (global.mRedditData.isLoggedIn()) {
+                if (pager.getCurrentItem() == 1) {
+                    new SyncUserDataTask(SubredditSelectActivity.this, new Runnable() {
+                        @Override
+                        public void run() {
+                            mMultiAdapter.refreshMultis();
+                        }
+                    }, true, SyncUserDataTask.MODE_MULTIS).execute();
                 } else {
-                    global.mRedditData.initiateLoginForResult(SubredditSelectActivity.this, false);
+                    new SyncUserDataTask(SubredditSelectActivity.this, new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshSubredditsList();
+                        }
+                    }, true, SyncUserDataTask.MODE_SUBREDDITS).execute();
                 }
+            } else {
+                global.mRedditData.initiateLoginForResult(SubredditSelectActivity.this, false);
             }
         });
         // sort button
         sortBtn = findViewById(R.id.sortselect);
         String sortTxt = resources.getString(R.string.sort_label) + mSharedPreferences.getString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), "hot");
         sortBtn.setText(sortTxt);
-        sortBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                showSortDialog();
-            }
-        });
+        sortBtn.setOnClickListener(arg0 -> showSortDialog());
 
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
@@ -235,19 +221,16 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                         .setTitle(R.string.sub_reddinator)
                         .setMessage(R.string.sub_reddinator_message)
                         .setNegativeButton(R.string.no, null)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                JSONObject subObj = new JSONObject();
-                                try {
-                                    subObj.put("name", "t5_37ysa");
-                                    subObj.put("display_name", "reddinator");
-                                    subObj.put("public description", "Reddinator provides a hightly customisable Reddit experience on Android, with both an Application and Widget interface.\n\nThis is the official subreddit of Reddinator.\n\nCome here to get support, discuss improvements and request new features.");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_SUBSCRIBE).execute(subObj);
+                        .setPositiveButton(R.string.yes, (dialog, which) -> {
+                            JSONObject subObj = new JSONObject();
+                            try {
+                                subObj.put("name", "t5_37ysa");
+                                subObj.put("display_name", "reddinator");
+                                subObj.put("public description", "Reddinator provides a hightly customisable Reddit experience on Android, with both an Application and Widget interface.\n\nThis is the official subreddit of Reddinator.\n\nCome here to get support, discuss improvements and request new features.");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                            new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_SUBSCRIBE).execute(subObj);
                         }).show();
                 mSharedPreferences.edit().putBoolean("subscribeDialogShown", true).apply();
             }
@@ -257,41 +240,32 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     public void startupTasks() {
         // get multi list and set adapter
         final ListView multiListView = findViewById(R.id.multilist);
-        multiListView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mMultiAdapter = new MyMultisAdapter(SubredditSelectActivity.this);
-                multiListView.setAdapter(mMultiAdapter);
-                multiListView.setTextFilterEnabled(true);
-                multiListView.setOnItemClickListener(new OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View view,
-                                            int position, long id) {
-                        if (position < mMultiAdapter.getCount()) {
-                            JSONObject multiObj = mMultiAdapter.getItem(position);
-                            try {
-                                String name = multiObj.getString("display_name");
-                                String path = multiObj.getString("path");
-                                global.getSubredditManager().setFeed(mAppWidgetId, name, path, true);
-                                updateFeedAndFinish();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(SubredditSelectActivity.this, resources.getString(R.string.multi_open_error), Toast.LENGTH_LONG).show();
-                            }
+        multiListView.postDelayed(() -> {
+            mMultiAdapter = new MyMultisAdapter(SubredditSelectActivity.this);
+            multiListView.setAdapter(mMultiAdapter);
+            multiListView.setTextFilterEnabled(true);
+            multiListView.setOnItemClickListener((parent, view, position, id) -> {
+                if (position < mMultiAdapter.getCount()) {
+                    JSONObject multiObj = mMultiAdapter.getItem(position);
+                    try {
+                        String name = multiObj.getString("display_name");
+                        String path = multiObj.getString("path");
+                        global.getSubredditManager().setFeed(mAppWidgetId, name, path, true);
+                        updateFeedAndFinish();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(SubredditSelectActivity.this, resources.getString(R.string.multi_open_error), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            if (global.mRedditData.isLoggedIn()) {
+                if (System.currentTimeMillis() > global.mSharedPreferences.getLong("last_sync_time", 0) + 86400000) {
+                    new SyncUserDataTask(SubredditSelectActivity.this, () -> {
+                        refreshSubredditsList();
+                        if (multiSubsAdapter != null) {
+                            multiSubsAdapter.refreshList();
                         }
-                    }
-                });
-                if (global.mRedditData.isLoggedIn()) {
-                    if (System.currentTimeMillis() > global.mSharedPreferences.getLong("last_sync_time", 0) + 86400000) {
-                        new SyncUserDataTask(SubredditSelectActivity.this, new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshSubredditsList();
-                                if (multiSubsAdapter != null) {
-                                    multiSubsAdapter.refreshList();
-                                }
-                            }
-                        }, false, 0).execute();
-                    }
+                    }, false, 0).execute();
                 }
             }
         }, 20);
@@ -495,8 +469,8 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) { // Keep null check due to google bug
             if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
                 try {
                     Method m = menu.getClass().getDeclaredMethod(
@@ -605,20 +579,17 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         builder.setTitle(getString(R.string.view_domain_posts));
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String domain = input.getText().toString();
-                String pattern = "^(([a-zA-Z])|([a-zA-Z][a-zA-Z])|([a-zA-Z][0-9])|([0-9][a-zA-Z])|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\\.[a-zA-Z]{2,3})$";
-                Pattern r = Pattern.compile(pattern);
-                Matcher m = r.matcher(domain);
-                if (m.find()) {
-                    dialog.dismiss();
-                    global.getSubredditManager().setFeedDomain(mAppWidgetId, domain);
-                    updateFeedAndFinish();
-                } else {
-                    Toast.makeText(SubredditSelectActivity.this, getString(R.string.enter_valid_domain), Toast.LENGTH_LONG).show();
-                }
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String domain = input.getText().toString();
+            String pattern = "^(([a-zA-Z])|([a-zA-Z][a-zA-Z])|([a-zA-Z][0-9])|([0-9][a-zA-Z])|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\\.[a-zA-Z]{2,3})$";
+            Pattern r = Pattern.compile(pattern);
+            Matcher m = r.matcher(domain);
+            if (m.find()) {
+                dialog.dismiss();
+                global.getSubredditManager().setFeedDomain(mAppWidgetId, domain);
+                updateFeedAndFinish();
+            } else {
+                Toast.makeText(SubredditSelectActivity.this, getString(R.string.enter_valid_domain), Toast.LENGTH_LONG).show();
             }
         });
         builder.show().setCanceledOnTouchOutside(true);
@@ -634,44 +605,42 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         String path = global.getSubredditManager().getCurrentFeedPath(mAppWidgetId);
 
-        if (path.equals("") || path.equals("/default")) {
+        if (path.isEmpty() || path.equals("/default")) {
             sorts.add(5, "best");
         }
 
-        builder.setItems(sorts.toArray(new String[]{}), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                Editor prefsedit = mSharedPreferences.edit();
-                String sort = "hot"; // default if fails
-                // find index
-                switch (which) {
-                    case 0:
-                        sort = "hot";
-                        break;
-                    case 1:
-                        sort = "new";
-                        break;
-                    case 2:
-                        sort = "rising";
-                        break;
-                    case 3:
-                        sort = "controversial";
-                        break;
-                    case 4:
-                        sort = "top";
-                        break;
-                    case 5:
-                        sort = "best";
-                        break;
-                }
-                prefsedit.putString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), sort);
-                prefsedit.apply();
-                // set new text in button
-                String sorttxt = resources.getString(R.string.sort_label) + sort;
-                sortBtn.setText(sorttxt);
-                needsFeedUpdate = true; // mark feed for updating
-                userSelSort = true;
-                dialog.dismiss();
+        builder.setItems(sorts.toArray(new String[]{}), (dialog, which) -> {
+            Editor prefsedit = mSharedPreferences.edit();
+            String sort = "hot"; // default if fails
+            // find index
+            switch (which) {
+                case 0:
+                    sort = "hot";
+                    break;
+                case 1:
+                    sort = "new";
+                    break;
+                case 2:
+                    sort = "rising";
+                    break;
+                case 3:
+                    sort = "controversial";
+                    break;
+                case 4:
+                    sort = "top";
+                    break;
+                case 5:
+                    sort = "best";
+                    break;
             }
+            prefsedit.putString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), sort);
+            prefsedit.apply();
+            // set new text in button
+            String sorttxt = resources.getString(R.string.sort_label) + sort;
+            sortBtn.setText(sorttxt);
+            needsFeedUpdate = true; // mark feed for updating
+            userSelSort = true;
+            dialog.dismiss();
         });
         builder.show().setCanceledOnTouchOutside(true);
     }
@@ -704,11 +673,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 needsFeedViewUpdate = true;
             }
         });
-        builder.setPositiveButton(resources.getString(R.string.close), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
+        builder.setPositiveButton(resources.getString(R.string.close), (dialog, id) -> dialog.cancel());
         builder.show().setCanceledOnTouchOutside(true);
     }
 
@@ -717,7 +682,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         // set themes list
         LinkedHashMap<String, String> themeList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_ALL);
         themeList.put("app_select", resources.getString(R.string.use_app_theme));
-        final String[] keys = themeList.keySet().toArray(new String[themeList.keySet().size()]);
+        final String[] keys = themeList.keySet().toArray(new String[0]);
         String curTheme = mSharedPreferences.getString("widgettheme-" + mAppWidgetId, "app_select");
         int curIndex = 0;
         for (int i = 0; i < keys.length; i++) {
@@ -728,22 +693,15 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(resources.getString(R.string.select_widget_theme))
-                .setSingleChoiceItems(themeList.values().toArray(new String[themeList.values().size()]), curIndex,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                needsThemeUpdate = true;
-                                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                                editor.putString("widgettheme-" + mAppWidgetId, keys[i]);
-                                editor.apply();
-                                dialogInterface.cancel();
-                            }
+                .setSingleChoiceItems(themeList.values().toArray(new String[0]), curIndex,
+                        (dialogInterface, i) -> {
+                            needsThemeUpdate = true;
+                            Editor editor = mSharedPreferences.edit();
+                            editor.putString("widgettheme-" + mAppWidgetId, keys[i]);
+                            editor.apply();
+                            dialogInterface.cancel();
                         }
-                ).setPositiveButton(resources.getString(R.string.close), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }).show().setCanceledOnTouchOutside(true);
+                ).setPositiveButton(resources.getString(R.string.close), (dialog, id) -> dialog.cancel()).show().setCanceledOnTouchOutside(true);
     }
 
     private void refreshSubredditsList() {
@@ -754,15 +712,14 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         subsAdapter.sort(subComparator);
     }
 
-    private Comparator<String> subComparator = new Comparator<String>() {
+    private final Comparator<String> subComparator = new Comparator<>() {
 
-        ArrayList<String> topSubs = new ArrayList<>(Arrays.asList("Front Page", "Popular", "all"));
+        final ArrayList<String> topSubs = new ArrayList<>(Arrays.asList("Front Page", "Popular", "all"));
 
         @Override
         public int compare(String s, String t1) {
 
             if (topSubs.contains(s) || topSubs.contains(t1)) {
-
                 if (topSubs.contains(s) && topSubs.contains(t1)) {
                     return topSubs.indexOf(s) < topSubs.indexOf(t1) ? -1 : 1;
                 }
@@ -794,7 +751,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
     // list adapter
     class MySubredditsAdapter extends ArrayAdapter<String> {
-        private LayoutInflater inflater;
+        private final LayoutInflater inflater;
 
         MySubredditsAdapter(Context context, ArrayList<String> objects) {
             super(context, R.layout.myredditlistitem, R.id.subreddit_name, objects);
@@ -840,12 +797,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
                     if ("all".equals(item)) {
                         viewHolder.filterIcon.setVisibility(View.VISIBLE);
-                        viewHolder.filterIcon.setOnClickListener(new OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                showFilterEditDialog();
-                            }
-                        });
+                        viewHolder.filterIcon.setOnClickListener(v -> showFilterEditDialog());
                     } else {
                         viewHolder.filterIcon.setVisibility(View.GONE);
                     }
@@ -855,26 +807,20 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
                         if (global.mRedditData.isLoggedIn()) {
                             viewHolder.defaultIcon.setVisibility(View.VISIBLE);
-                            viewHolder.defaultIcon.setOnClickListener(new OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    global.getSubredditManager().setFeed(mAppWidgetId, "Default Front Page", "/default", true);
-                                    updateFeedAndFinish();
-                                }
+                            viewHolder.defaultIcon.setOnClickListener(v -> {
+                                global.getSubredditManager().setFeed(mAppWidgetId, "Default Front Page", "/default", true);
+                                updateFeedAndFinish();
                             });
                         } else {
                             viewHolder.defaultIcon.setVisibility(View.GONE);
                         }
 
                         viewHolder.randomIcon.setVisibility(View.VISIBLE);
-                        viewHolder.randomIcon.setOnClickListener(new OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                randomProg = new ProgressDialog(SubredditSelectActivity.this);
-                                randomProg.setTitle(R.string.loading);
-                                randomProg.show();
-                                new LoadRandomTask(global, SubredditSelectActivity.this).execute();
-                            }
+                        viewHolder.randomIcon.setOnClickListener(v -> {
+                            randomProg = new ProgressDialog(SubredditSelectActivity.this);
+                            randomProg.setTitle(R.string.loading);
+                            randomProg.show();
+                            new LoadRandomTask(global, SubredditSelectActivity.this).execute();
                         });
 
                     } else {
@@ -890,28 +836,25 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
                     viewHolder.deleteIcon.setVisibility(View.VISIBLE);
 
-                    viewHolder.deleteIcon.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final String sreddit = ((TextView) ((View) v.getParent()).findViewById(R.id.subreddit_name)).getText().toString();
-                            if (global.mRedditData.isLoggedIn() && (!sreddit.equals("Front Page") && !sreddit.equals("all"))) {
-                                new AlertDialog.Builder(SubredditSelectActivity.this).setTitle(resources.getString(R.string.unsubscribe))
-                                        .setMessage(resources.getString(R.string.confirm_unsubscribe, sreddit))
-                                        .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                            }
-                                        }).setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_UNSUBSCRIBE).execute(sreddit);
-                                            }
-                                        }).show().setCanceledOnTouchOutside(true);
-                            } else {
-                                global.getSubredditManager().removeSubreddit(sreddit);
-                                subredditList.remove(sreddit);
-                                refreshSubredditsList();
-                            }
+                    viewHolder.deleteIcon.setOnClickListener(v -> {
+                        final String sreddit = ((TextView) ((View) v.getParent()).findViewById(R.id.subreddit_name)).getText().toString();
+                        if (global.mRedditData.isLoggedIn() && (!sreddit.equals("Front Page") && !sreddit.equals("all"))) {
+                            new AlertDialog.Builder(SubredditSelectActivity.this).setTitle(resources.getString(R.string.unsubscribe))
+                                    .setMessage(resources.getString(R.string.confirm_unsubscribe, sreddit))
+                                    .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                        }
+                                    }).setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_UNSUBSCRIBE).execute(sreddit);
+                                        }
+                                    }).show().setCanceledOnTouchOutside(true);
+                        } else {
+                            global.getSubredditManager().removeSubreddit(sreddit);
+                            subredditList.remove(sreddit);
+                            refreshSubredditsList();
                         }
                     });
                 }
@@ -956,7 +899,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     }
 
     class MyMultisAdapter extends BaseAdapter {
-        private LayoutInflater inflater;
+        private final LayoutInflater inflater;
         private ArrayList<JSONObject> multiList;
 
         MyMultisAdapter(Context context) {
@@ -966,15 +909,12 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         void refreshMultis() {
             multiList = global.getSubredditManager().getMultiList();
-            Collections.sort(multiList, new Comparator<JSONObject>() {
-                @Override
-                public int compare(JSONObject s, JSONObject t1) {
-                    try {
-                        return s.getString("display_name").compareToIgnoreCase(t1.getString("display_name"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        return 0;
-                    }
+            multiList.sort((s, t1) -> {
+                try {
+                    return s.getString("display_name").compareToIgnoreCase(t1.getString("display_name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return 0;
                 }
             });
             this.notifyDataSetChanged();
@@ -992,42 +932,23 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 if (position == 0) {
                     convertView = inflater.inflate(R.layout.mymultilistitem_add, parent, false);
                     convertView.findViewById(R.id.multi_browse_btn)
-                            .setOnClickListener(new OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    global.openSubredditFeed(SubredditSelectActivity.this, Reddinator.REDDIT_BASE_URL + "/r/" + Reddinator.SUBREDDIT_MULTIHUB);
-                                }
-                            });
+                            .setOnClickListener(v -> global.openSubredditFeed(SubredditSelectActivity.this, Reddinator.REDDIT_BASE_URL + "/r/" + Reddinator.SUBREDDIT_MULTIHUB));
                     convertView.findViewById(R.id.multi_add_btn)
-                            .setOnClickListener(new OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    LinearLayout layout = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_multi_add, parent, false);
-                                    final EditText name = layout.findViewById(R.id.new_multi_name);
-                                    name.setSingleLine();
-                                    name.setImeOptions(EditorInfo.IME_ACTION_GO);
-                                    name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                                        @Override
-                                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                            .setOnClickListener(v -> {
+                                LinearLayout layout = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_multi_add, parent, false);
+                                final EditText name = layout.findViewById(R.id.new_multi_name);
+                                name.setSingleLine();
+                                name.setImeOptions(EditorInfo.IME_ACTION_GO);
+                                name.setOnEditorActionListener((v1, actionId, event) -> {
+                                    createMulti(name.getText().toString());
+                                    return false;
+                                });
+                                AlertDialog.Builder builder = new AlertDialog.Builder(SubredditSelectActivity.this);
+                                builder.setTitle(resources.getString(R.string.create_a_multi)).setView(layout)
+                                        .setNegativeButton(resources.getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton(resources.getString(R.string.ok), (dialogInterface, i) -> {
                                             createMulti(name.getText().toString());
-                                            return false;
-                                        }
-                                    });
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(SubredditSelectActivity.this);
-                                    builder.setTitle(resources.getString(R.string.create_a_multi)).setView(layout)
-                                            .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    dialogInterface.dismiss();
-                                                }
-                                            }).setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    createMulti(name.getText().toString());
-                                                    dialogInterface.dismiss();
-                                                }
-                                            }).show().setCanceledOnTouchOutside(true);
-                                }
+                                            dialogInterface.dismiss();
+                                        }).show().setCanceledOnTouchOutside(true);
                             });
                 } else {
                     convertView = inflater.inflate(R.layout.mymultilistitem, parent, false);
@@ -1054,26 +975,18 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 }
                 // setup the row
                 viewHolder.name.setText(displayName);
-                viewHolder.deleteIcon.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (canEdit) {
-                            showMultiDeleteDialog(path);
-                        } else {
-                            global.getSubredditManager().removeMulti(path);
-                            subsAdapter.notifyDataSetChanged();
-                        }
+                viewHolder.deleteIcon.setOnClickListener(v -> {
+                    if (canEdit) {
+                        showMultiDeleteDialog(path);
+                    } else {
+                        global.getSubredditManager().removeMulti(path);
+                        subsAdapter.notifyDataSetChanged();
                     }
                 });
                 if (canEdit) {
                     viewHolder.editIcon.setVisibility(View.VISIBLE);
                     //viewHolder.subsIcon.setVisibility(View.VISIBLE);
-                    viewHolder.editIcon.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            showMultiEditDialog(path);
-                        }
-                    });
+                    viewHolder.editIcon.setOnClickListener(view -> showMultiEditDialog(path));
                 }
             }
 
@@ -1083,7 +996,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         }
 
         private void createMulti(String name) {
-            if (name.equals("")) {
+            if (name.isEmpty()) {
                 Toast.makeText(SubredditSelectActivity.this, resources.getString(R.string.enter_multi_name_error), Toast.LENGTH_LONG).show();
                 return;
             }
@@ -1128,17 +1041,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     private void showMultiDeleteDialog(final String multiPath) {
         AlertDialog.Builder builder = new AlertDialog.Builder(SubredditSelectActivity.this);
         builder.setTitle(resources.getString(R.string.delete_multi)).setMessage(resources.getString(R.string.delete_multi_message));
-        builder.setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_DELETE).execute(multiPath);
-            }
+        builder.setNegativeButton(resources.getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton(resources.getString(R.string.ok), (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_DELETE).execute(multiPath);
         }).show().setCanceledOnTouchOutside(true);
     }
 
@@ -1147,17 +1052,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         final EditText nameInput = new EditText(SubredditSelectActivity.this);
         nameInput.setHint(resources.getString(R.string.multi_name_hint));
         builder.setTitle(resources.getString(R.string.rename_multi)).setView(nameInput)
-                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_RENAME).execute(multiPath, nameInput.getText().toString().replaceAll("\\s+", ""));
-                    }
+                .setNegativeButton(resources.getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton(resources.getString(R.string.ok), (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_RENAME).execute(multiPath, nameInput.getText().toString().replaceAll("\\s+", ""));
                 }).show().setCanceledOnTouchOutside(true);
     }
 
@@ -1196,7 +1093,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             description.setText(multiObj.getString("description_md"));
             color.setText(multiObj.getString("key_color"));
             String iconName = multiObj.getString("icon_name");
-            icon.setSelection(iconAdapter.getPosition(iconName.equals("") ? "none" : iconName));
+            icon.setSelection(iconAdapter.getPosition(iconName.isEmpty() ? "none" : iconName));
             visibility.setSelection(iconAdapter.getPosition(multiObj.getString("visibility")));
             weighting.setSelection(iconAdapter.getPosition(multiObj.getString("weighting_scheme")));
         } catch (JSONException e) {
@@ -1218,35 +1115,27 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         ListView subList = dialogView.findViewById(R.id.multi_subredditList);
         multiSubsAdapter = new SubsListAdapter(SubredditSelectActivity.this, multiPath);
         subList.setAdapter(multiSubsAdapter);
-        renameButton.getBackground().setColorFilter(headerColor, PorterDuff.Mode.MULTIPLY);
+        renameButton.getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(headerColor, BlendModeCompat.MULTIPLY));
         renameButton.setTextColor(headerText);
-        renameButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showMultiRenameDialog(multiPath);
-            }
-        });
+        renameButton.setOnClickListener(v -> showMultiRenameDialog(multiPath));
 
-        saveButton.getBackground().setColorFilter(headerColor, PorterDuff.Mode.MULTIPLY);
+        saveButton.getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(headerColor, BlendModeCompat.MULTIPLY));
         saveButton.setTextColor(headerText);
-        saveButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject multiObj = new JSONObject();
-                try {
-                    multiObj.put("decription_md", description.getText().toString());
-                    multiObj.put("display_name", displayName.getText().toString());
-                    multiObj.put("icon_name", icon.getSelectedItem().toString().equals("none") ? "" : icon.getSelectedItem().toString());
-                    multiObj.put("key_color", color.getText().toString());
-                    multiObj.put("subreddits", global.getSubredditManager().getMultiData(multiPath).getJSONArray("subreddits"));
-                    multiObj.put("visibility", visibility.getSelectedItem().toString());
-                    multiObj.put("weighting_scheme", weighting.getSelectedItem().toString());
+        saveButton.setOnClickListener(view -> {
+            JSONObject multiObj1 = new JSONObject();
+            try {
+                multiObj1.put("decription_md", description.getText().toString());
+                multiObj1.put("display_name", displayName.getText().toString());
+                multiObj1.put("icon_name", icon.getSelectedItem().toString().equals("none") ? "" : icon.getSelectedItem().toString());
+                multiObj1.put("key_color", color.getText().toString());
+                multiObj1.put("subreddits", global.getSubredditManager().getMultiData(multiPath).getJSONArray("subreddits"));
+                multiObj1.put("visibility", visibility.getSelectedItem().toString());
+                multiObj1.put("weighting_scheme", weighting.getSelectedItem().toString());
 
-                    new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_EDIT).execute(multiPath, multiObj);
+                new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_MULTI_EDIT).execute(multiPath, multiObj1);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         });
 
@@ -1274,12 +1163,9 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         AlertDialog.Builder builder = new AlertDialog.Builder(SubredditSelectActivity.this);
         AlertDialog dialog = builder.setView(dialogView)
-                .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        needsFeedUpdate = true; // mark feed for updating
-                    }
+                .setPositiveButton(resources.getString(R.string.ok), (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    needsFeedUpdate = true; // mark feed for updating
                 }).show();
         dialog.setCanceledOnTouchOutside(true);
         if (dialog.getWindow() != null) {
@@ -1290,10 +1176,10 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     class SubsListAdapter extends BaseAdapter {
         private final int MODE_MULTI = 1;
         private int mode = 0;
-        private LayoutInflater inflater;
+        private final LayoutInflater inflater;
         private ArrayList<String> subsList;
         private String multiPath;
-        private SubAutoCompleteAdapter autoCompleteAdapter;
+        private final SubAutoCompleteAdapter autoCompleteAdapter;
 
         SubsListAdapter(Context context, String multiPath) {
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -1338,40 +1224,28 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             // setup the row
             if (position == subsList.size()) {
                 viewHolder.nameInput.setAdapter(autoCompleteAdapter);
-                viewHolder.nameInput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                viewHolder.nameInput.setOnItemClickListener((adapterView, view, i, l) -> {
+                    performAdd(viewHolder.nameInput.getText().toString());
+                    viewHolder.nameInput.setText("");
+                });
+                viewHolder.nameInput.setOnEditorActionListener((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_GO) {
                         performAdd(viewHolder.nameInput.getText().toString());
                         viewHolder.nameInput.setText("");
                     }
+                    return false;
                 });
-                viewHolder.nameInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        if (actionId == EditorInfo.IME_ACTION_GO) {
-                            performAdd(viewHolder.nameInput.getText().toString());
-                            viewHolder.nameInput.setText("");
-                        }
-                        return false;
-                    }
-                });
-                viewHolder.addIcon.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        performAdd(viewHolder.nameInput.getText().toString());
-                        viewHolder.nameInput.setText("");
-                    }
+                viewHolder.addIcon.setOnClickListener(view -> {
+                    performAdd(viewHolder.nameInput.getText().toString());
+                    viewHolder.nameInput.setText("");
                 });
                 if (mode == MODE_MULTI) {
                     viewHolder.searchIcon.setVisibility(View.VISIBLE);
-                    viewHolder.searchIcon.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(SubredditSelectActivity.this, ViewAllSubredditsActivity.class);
-                            intent.setAction(ViewAllSubredditsActivity.ACTION_ADD_MULTI_SUB);
-                            intent.putExtra("multipath", multiPath);
-                            startActivityForResult(intent, 1);
-                        }
+                    viewHolder.searchIcon.setOnClickListener(view -> {
+                        Intent intent = new Intent(SubredditSelectActivity.this, ViewAllSubredditsActivity.class);
+                        intent.setAction(ViewAllSubredditsActivity.ACTION_ADD_MULTI_SUB);
+                        intent.putExtra("multipath", multiPath);
+                        startActivityForResult(intent, 1);
                     });
                 } else {
                     // search isn't implemented here yet, you could if you want to but I don't see much point
@@ -1380,12 +1254,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             } else {
                 final String subreddit = getItem(position);
                 viewHolder.name.setText(subreddit);
-                viewHolder.removeIcon.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        performRemove(subreddit);
-                    }
-                });
+                viewHolder.removeIcon.setOnClickListener(view -> performRemove(subreddit));
             }
             convertView.setTag(viewHolder);
 
@@ -1393,7 +1262,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         }
 
         private void performAdd(String subreddit) {
-            if (subreddit.equals("")) {
+            if (subreddit.isEmpty()) {
                 Toast.makeText(SubredditSelectActivity.this, resources.getString(R.string.sub_name_error), Toast.LENGTH_SHORT).show();
                 return;
             }

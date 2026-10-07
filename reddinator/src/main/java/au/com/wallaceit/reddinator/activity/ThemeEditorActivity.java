@@ -72,7 +72,7 @@ public class ThemeEditorActivity extends ListActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
@@ -145,12 +145,12 @@ public class ThemeEditorActivity extends ListActivity {
                 convertView = getLayoutInflater().inflate(R.layout.theme_editor_row, parent, false);
                 // setup the row
                 viewHolder = new ViewHolder();
-                viewHolder.settingName = (TextView) convertView.findViewById(R.id.theme_value_name);
-                viewHolder.settingValue = (TextView) convertView.findViewById(R.id.theme_value);
-                viewHolder.colorPreview = (ImageView) convertView.findViewById(R.id.color_preview);
-                viewHolder.colorOptions = (LinearLayout) convertView.findViewById(R.id.color_options);
-                viewHolder.simplePickBtn = (IconTextView) convertView.findViewById(R.id.simple_color_btn);
-                viewHolder.customPickBtn = (IconTextView) convertView.findViewById(R.id.custom_color_btn);
+                viewHolder.settingName = convertView.findViewById(R.id.theme_value_name);
+                viewHolder.settingValue = convertView.findViewById(R.id.theme_value);
+                viewHolder.colorPreview = convertView.findViewById(R.id.color_preview);
+                viewHolder.colorOptions = convertView.findViewById(R.id.color_options);
+                viewHolder.simplePickBtn = convertView.findViewById(R.id.simple_color_btn);
+                viewHolder.customPickBtn = convertView.findViewById(R.id.custom_color_btn);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
@@ -159,31 +159,20 @@ public class ThemeEditorActivity extends ListActivity {
                 viewHolder.settingValue.setText(theme.getName());
                 viewHolder.colorPreview.setVisibility(View.GONE);
                 viewHolder.colorOptions.setVisibility(View.GONE);
-                convertView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
-                        final EditText input = new EditText(ThemeEditorActivity.this);
-                        input.setInputType(InputType.TYPE_CLASS_TEXT);
-                        input.setText(theme.getName());
-                        input.selectAll();
-                        builder.setTitle(resources.getString(R.string.theme_name))
-                                .setView(input)
-                                .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        theme.setName(input.getText().toString());
-                                        themeChanged = true;
-                                        refreshList();
-                                    }
-                                })
-                                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }).show();
-                    }
+                convertView.setOnClickListener(v -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
+                    final EditText input = new EditText(ThemeEditorActivity.this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    input.setText(theme.getName());
+                    input.selectAll();
+                    builder.setTitle(resources.getString(R.string.theme_name))
+                            .setView(input)
+                            .setPositiveButton(resources.getString(R.string.ok), (dialog, which) -> {
+                                theme.setName(input.getText().toString());
+                                themeChanged = true;
+                                refreshList();
+                            })
+                            .setNegativeButton(resources.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).show();
                 });
             } else {
                 String key;
@@ -215,10 +204,10 @@ public class ThemeEditorActivity extends ListActivity {
                         dialog.setTitle(resources.getString(R.string.select_color));
                         dialog.setContentView(R.layout.color_picker_dialog);
                         // Initialise the color picker
-                        final ColorPicker picker = (ColorPicker) dialog.findViewById(R.id.picker);
-                        SaturationBar sBar = (SaturationBar) dialog.findViewById(R.id.saturationbar);
-                        ValueBar vBar = (ValueBar) dialog.findViewById(R.id.valuebar);
-                        OpacityBar opacityBar = (OpacityBar) dialog.findViewById(R.id.opacitybar);
+                        final ColorPicker picker = dialog.findViewById(R.id.picker);
+                        SaturationBar sBar = dialog.findViewById(R.id.saturationbar);
+                        ValueBar vBar = dialog.findViewById(R.id.valuebar);
+                        OpacityBar opacityBar = dialog.findViewById(R.id.opacitybar);
                         picker.addSaturationBar(sBar);
                         picker.addValueBar(vBar);
                         // is opacity needed?
@@ -238,90 +227,70 @@ public class ThemeEditorActivity extends ListActivity {
                         picker.setColor(curColor);
                         picker.setOldCenterColor(curColor);
 
-                        Button okButton = (Button) dialog.findViewById(R.id.button_ok);
-                        okButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String hexColor = useAlpha ? ("#" + Integer.toHexString(picker.getColor())) : String.format("#%06X", (0xFFFFFF & picker.getColor()));
-                                theme.setValue(finalKey, hexColor.toUpperCase());
-                                themeChanged = true;
-                                refreshList();
-                                dialog.dismiss();
-                            }
+                        Button okButton = dialog.findViewById(R.id.button_ok);
+                        okButton.setOnClickListener(v1 -> {
+                            String hexColor = useAlpha ? ("#" + Integer.toHexString(picker.getColor())) : String.format("#%06X", (0xFFFFFF & picker.getColor()));
+                            theme.setValue(finalKey, hexColor.toUpperCase());
+                            themeChanged = true;
+                            refreshList();
+                            dialog.dismiss();
                         });
 
-                        Button cancelButton = (Button) dialog.findViewById(R.id.button_cancel);
-                        cancelButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
+                        Button cancelButton = dialog.findViewById(R.id.button_cancel);
+                        cancelButton.setOnClickListener(v2 -> dialog.dismiss());
 
                         dialog.show();
                     }
                 });
 
-                viewHolder.simplePickBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
-                        builder.setTitle(resources.getString(R.string.pick_basic_color))
-                                .setItems(R.array.fontcolor_names, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        String hexColor = getResources().getStringArray(R.array.fontcolor_values)[i];
-                                        if (theme.getValue(finalKey).length() > 7) {
-                                            // Add alpha values if needed
-                                            hexColor = "#FF" + hexColor.substring(1);
-                                        }
-                                        theme.setValue(finalKey, hexColor);
-                                        themeChanged = true;
-                                        refreshList();
-                                        dialogInterface.dismiss();
-                                    }
-                                })
-                                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }).show();
-                    }
+                viewHolder.simplePickBtn.setOnClickListener(view -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
+                    builder.setTitle(resources.getString(R.string.pick_basic_color))
+                            .setItems(R.array.fontcolor_names, (dialogInterface, i) -> {
+                                String hexColor = getResources().getStringArray(R.array.fontcolor_values)[i];
+                                if (theme.getValue(finalKey).length() > 7) {
+                                    // Add alpha values if needed
+                                    hexColor = "#FF" + hexColor.substring(1);
+                                }
+                                theme.setValue(finalKey, hexColor);
+                                themeChanged = true;
+                                refreshList();
+                                dialogInterface.dismiss();
+                            })
+                            .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            }).show();
                 });
-                viewHolder.customPickBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
-                        final EditText input = new EditText(ThemeEditorActivity.this);
-                        input.setText(value);
-                        builder.setView(input);
-                        builder.setTitle(resources.getString(R.string.custom_hex_color))
-                                .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        // validate input
-                                        String hexCode = input.getText().toString();
-                                        dialogInterface.dismiss();
-                                        try {
-                                            Color.parseColor(hexCode);
-                                        } catch (IllegalArgumentException iae) {
-                                            // This color string is not valid
-                                            Toast.makeText(ThemeEditorActivity.this, "Please enter a valid hex color code", Toast.LENGTH_LONG).show();
-                                            return;
-                                        }
-                                        theme.setValue(finalKey, hexCode);
-                                        themeChanged = true;
-                                        refreshList();
-                                    }
-                                })
-                                .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }).show();
-                    }
+                viewHolder.customPickBtn.setOnClickListener(view -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
+                    final EditText input = new EditText(ThemeEditorActivity.this);
+                    input.setText(value);
+                    builder.setView(input);
+                    builder.setTitle(resources.getString(R.string.custom_hex_color))
+                            .setPositiveButton(resources.getString(R.string.ok), (dialogInterface, i) -> {
+                                // validate input
+                                String hexCode = input.getText().toString();
+                                dialogInterface.dismiss();
+                                try {
+                                    Color.parseColor(hexCode);
+                                } catch (IllegalArgumentException iae) {
+                                    // This color string is not valid
+                                    Toast.makeText(ThemeEditorActivity.this, "Please enter a valid hex color code", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                theme.setValue(finalKey, hexCode);
+                                themeChanged = true;
+                                refreshList();
+                            })
+                            .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            }).show();
                 });
             }
 
@@ -337,7 +306,7 @@ public class ThemeEditorActivity extends ListActivity {
 
         @Override
         public boolean isEmpty() {
-            return theme.getValues().size() == 0;
+            return theme.getValues().isEmpty();
         }
 
         class ViewHolder {

@@ -17,7 +17,6 @@
  */
 package au.com.wallaceit.reddinator.service;
 
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -25,9 +24,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
+
+import androidx.annotation.NonNull;
 
 import com.joanzapata.android.iconify.Iconify;
 
@@ -40,7 +39,6 @@ import au.com.wallaceit.reddinator.activity.SubredditSelectActivity;
 import au.com.wallaceit.reddinator.activity.WidgetMenuDialogActivity;
 import au.com.wallaceit.reddinator.core.Utilities;
 
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class WidgetProvider extends WidgetProviderBase {
 
     @Override
@@ -130,12 +128,7 @@ public class WidgetProvider extends WidgetProviderBase {
             views.setTextColor(R.id.subreddittxt, themeColors.get("header_text"));
 
             // Set remote adapter for widget.
-            if (Build.VERSION.SDK_INT >= 14) {
-                views.setRemoteAdapter(R.id.adapterview, serviceIntent); // API 14 and above
-            } else {
-                //noinspection deprecation
-                views.setRemoteAdapter(appWidgetId, R.id.adapterview, serviceIntent); // older version compatibility
-            }
+            views.setRemoteAdapter(R.id.adapterview, serviceIntent); // API 14 and above
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }

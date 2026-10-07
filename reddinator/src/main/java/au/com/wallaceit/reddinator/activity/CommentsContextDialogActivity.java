@@ -30,15 +30,14 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -48,13 +47,16 @@ import android.widget.IconTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.preference.PreferenceManager;
+
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,7 +113,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
                 permalink = matcher.group(1);
                 articleId = "t3_" + matcher.group(2);
                 commentId = matcher.group(3);
-                contextLevels = matcher.group(5) != null ? Integer.parseInt(matcher.group(5)) : 3;
+                contextLevels = matcher.group(5) != null ? Integer.parseInt(Objects.requireNonNull(matcher.group(5))) : 3;
             } else {
                 Toast.makeText(this, "Could not decode post URL", Toast.LENGTH_LONG).show();
                 this.finish();
@@ -122,16 +124,16 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
             return;
         }
         // setup info panel views
-        sourceText = (TextView) findViewById(R.id.source_txt);
-        votesText = (TextView) findViewById(R.id.votes_txt);
-        votesIcon = (IconTextView) findViewById(R.id.votes_icon);
-        commentsText = (TextView) findViewById(R.id.comments_txt);
-        commentsIcon = (IconTextView) findViewById(R.id.comments_icon);
-        titleText = (TextView) findViewById(R.id.post_title);
-        infoText = (TextView) findViewById(R.id.info_txt);
+        sourceText = findViewById(R.id.source_txt);
+        votesText = findViewById(R.id.votes_txt);
+        votesIcon = findViewById(R.id.votes_icon);
+        commentsText = findViewById(R.id.comments_txt);
+        commentsIcon = findViewById(R.id.comments_icon);
+        titleText = findViewById(R.id.post_title);
+        infoText = findViewById(R.id.info_txt);
         setTheme();
         // setup web view
-        webView = (WebView) findViewById(R.id.commentswebview);
+        webView = findViewById(R.id.commentswebview);
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setWebViewClient(new CommentViewClient());
         webView.setWebChromeClient(new WebChromeClient());
@@ -152,36 +154,25 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         registerForContextMenu(webView);
         webView.loadUrl("file:///android_asset/comments_context.html#" + articleId);
         // setup open comments button
-        IconButton button = (IconButton) findViewById(R.id.commentsbutton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent commentsIntent = new Intent(CommentsContextDialogActivity.this, ViewRedditActivity.class);
-                commentsIntent.setAction(Intent.ACTION_VIEW);
-                commentsIntent.setData(Uri.parse(url));
-                commentsIntent.putExtra("view_comments", true);
-                startActivity(commentsIntent);
-                finish();
-            }
+        IconButton button = findViewById(R.id.commentsbutton);
+        button.setOnClickListener(v -> {
+            Intent commentsIntent = new Intent(CommentsContextDialogActivity.this, ViewRedditActivity.class);
+            commentsIntent.setAction(Intent.ACTION_VIEW);
+            commentsIntent.setData(Uri.parse(url));
+            commentsIntent.putExtra("view_comments", true);
+            startActivity(commentsIntent);
+            finish();
         });
-        IconButton openbutton = (IconButton) findViewById(R.id.linkbutton);
-        openbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent linkIntent = new Intent(CommentsContextDialogActivity.this, WebViewActivity.class);
-                linkIntent.putExtra("url", url.replace("https://www.reddit.com", global.getDefaultMobileSite()));
-                startActivity(linkIntent);
-                finish();
-            }
+        IconButton openbutton = findViewById(R.id.linkbutton);
+        openbutton.setOnClickListener(v -> {
+            Intent linkIntent = new Intent(CommentsContextDialogActivity.this, WebViewActivity.class);
+            linkIntent.putExtra("url", url.replace("https://www.reddit.com", global.getDefaultMobileSite()));
+            startActivity(linkIntent);
+            finish();
         });
 
-        panelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        panelLayout.setFadeOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                panelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            }
-        });
+        panelLayout = findViewById(R.id.sliding_layout);
+        panelLayout.setFadeOnClickListener(v -> panelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED));
 
         new AndroidBug5497Workaround(this);
     }
@@ -191,18 +182,14 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         // For more information, see https://code.google.com/p/android/issues/detail?id=5497
         // To use this class, simply invoke assistActivity() on an Activity that already has its content view set.
 
-        private View mChildOfContent;
+        private final View mChildOfContent;
         private int usableHeightPrevious;
-        private FrameLayout.LayoutParams frameLayoutParams;
+        private final FrameLayout.LayoutParams frameLayoutParams;
 
         private AndroidBug5497Workaround(Activity activity) {
-            FrameLayout content = (FrameLayout) activity.findViewById(android.R.id.content);
+            FrameLayout content = activity.findViewById(android.R.id.content);
             mChildOfContent = content.getChildAt(0);
-            mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                public void onGlobalLayout() {
-                    possiblyResizeChildOfContent();
-                }
-            });
+            mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(this::possiblyResizeChildOfContent);
             frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
         }
 
@@ -237,10 +224,10 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         int headerText = Color.parseColor(theme.getValue("header_text"));
         // info panel
         findViewById(R.id.info_panel).setBackgroundColor(headerBg);
-        IconButton postButton = (IconButton) findViewById(R.id.commentsbutton);
+        IconButton postButton = findViewById(R.id.commentsbutton);
         postButton.setBackgroundColor(headerBg);
         postButton.setTextColor(headerText);
-        IconButton openButton = (IconButton) findViewById(R.id.linkbutton);
+        IconButton openButton = findViewById(R.id.linkbutton);
         openButton.setBackgroundColor(headerBg);
         openButton.setTextColor(headerText);
         sourceText.setTextColor(headerText);
@@ -277,17 +264,14 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
 
             final String selftext = postInfo.getString("selftext_html");
             if (!selftext.equals("null")) {
-                IconTextView textButton = (IconTextView) findViewById(R.id.selftext_button);
-                textButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                IconTextView textButton = findViewById(R.id.selftext_button);
+                textButton.setOnClickListener(v -> {
 
-                        String html = "<html><head><style type=\"text/css\"> a { word-wrap: break-word; } </style></head><body>";
-                        html += Utilities.fromHtml(selftext).toString();
-                        html += "</body></html>";
-                        HtmlDialog.init(CommentsContextDialogActivity.this, getString(R.string.post_text), html);
+                    String html = "<html><head><style type=\"text/css\"> a { word-wrap: break-word; } </style></head><body>";
+                    html += Utilities.fromHtml(selftext).toString();
+                    html += "</body></html>";
+                    HtmlDialog.init(CommentsContextDialogActivity.this, getString(R.string.post_text), html);
 
-                    }
                 });
                 textButton.setVisibility(View.VISIBLE);
             }
@@ -298,7 +282,8 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
 
     private class CommentViewClient extends WebViewClient {
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
 
             global.handleLink(CommentsContextDialogActivity.this, url);
             return true; // always override url
@@ -444,7 +429,7 @@ public class CommentsContextDialogActivity extends Activity implements VoteTask.
         }
 
         CommentsContextLoader(String moreId, String children) {
-            if (children != null && !children.equals("")) {
+            if (children != null && !children.isEmpty()) {
                 loadMore = true;
                 mMoreId = moreId;
                 mChildren = children;

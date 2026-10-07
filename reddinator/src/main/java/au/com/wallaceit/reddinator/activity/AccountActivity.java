@@ -17,7 +17,6 @@
  */
 package au.com.wallaceit.reddinator.activity;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -25,13 +24,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +37,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
@@ -74,7 +74,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
     private RedditPageAdapter pageAdapter;
     private SimpleTabsWidget tabsIndicator;
     private Resources resources;
-    private int actionbarIconColor = Utilities.getActionbarIconColor();
+    private final int actionbarIconColor = Utilities.getActionbarIconColor();
     public static final String ACTION_SAVED = "saved";
     public static final String ACTION_HIDDEN = "hidden";
     private String section = "overview";
@@ -85,7 +85,6 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
      *
      * @see FragmentActivity#onCreate(Bundle)
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     protected void onCreate(Bundle savedInstanceState) {
         // set window flags
         getWindow().requestFeature(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -99,7 +98,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
@@ -108,11 +107,11 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         // set content view
         setContentView(R.layout.activity_account);
         // Setup View Pager and widget
-        ViewPager viewPager = (ViewPager) findViewById(R.id.tab_content);
+        ViewPager viewPager = findViewById(R.id.tab_content);
         pageAdapter = new RedditPageAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pageAdapter);
-        LinearLayout tabLayout = (LinearLayout) findViewById(R.id.tabs);
-        final HorizontalScrollView scrollView = (HorizontalScrollView) findViewById(R.id.tab_widget);
+        LinearLayout tabLayout = findViewById(R.id.tabs);
+        final HorizontalScrollView scrollView = findViewById(R.id.tab_widget);
         tabsIndicator = new SimpleTabsWidget(AccountActivity.this, tabLayout, scrollView);
         tabsIndicator.setViewPager(viewPager);
         // theme
@@ -235,8 +234,8 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) { // Keep null check due to google bug
             if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
                 try {
                     Method m = menu.getClass().getDeclaredMethod(
@@ -498,15 +497,16 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
             return 8;
         }
 
+        @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             registeredFragments.put(position, fragment);
             return fragment;
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             registeredFragments.remove(position);
             super.destroyItem(container, position, object);
         }

@@ -1,22 +1,21 @@
 package au.com.wallaceit.reddinator.activity;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -35,7 +34,6 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
     private EditText textField;
     private Resources resources;
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +41,10 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
         global = (Reddinator) getApplicationContext();
         resources = getResources();
 
-        charsLeft = (TextView) findViewById(R.id.subject_chars_left);
-        subjectField = (EditText) findViewById(R.id.subject);
-        toField = (EditText) findViewById(R.id.to);
-        textField = (EditText) findViewById(R.id.text);
+        charsLeft = findViewById(R.id.subject_chars_left);
+        subjectField = findViewById(R.id.subject);
+        toField = findViewById(R.id.to);
+        textField = findViewById(R.id.text);
 
         subjectField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -67,7 +65,7 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
@@ -76,21 +74,18 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
         int headerColor = Color.parseColor(theme.getValue("header_color"));
         int headerText = Color.parseColor(theme.getValue("header_text"));
 
-        Button submitButton = (Button) findViewById(R.id.submit_button);
-        submitButton.getBackground().setColorFilter(headerColor, PorterDuff.Mode.MULTIPLY);
+        Button submitButton = findViewById(R.id.submit_button);
+        submitButton.getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(headerColor, BlendModeCompat.MULTIPLY));
         submitButton.setTextColor(headerText);
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!global.mRedditData.isLoggedIn()) {
-                    global.mRedditData.initiateLogin(ComposeMessageActivity.this, false);
-                } else {
-                    if (validateInput()) {
-                        String to = toField.getText().toString();
-                        String subject = subjectField.getText().toString();
-                        String text = textField.getText().toString();
-                        (new ComposeMessageTask(global, ComposeMessageActivity.this, new String[]{to, subject, text})).execute();
-                    }
+        submitButton.setOnClickListener(view1 -> {
+            if (!global.mRedditData.isLoggedIn()) {
+                global.mRedditData.initiateLogin(ComposeMessageActivity.this, false);
+            } else {
+                if (validateInput()) {
+                    String to = toField.getText().toString();
+                    String subject = subjectField.getText().toString();
+                    String text = textField.getText().toString();
+                    (new ComposeMessageTask(global, ComposeMessageActivity.this, new String[]{to, subject, text})).execute();
                 }
             }
         });
@@ -98,12 +93,12 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
 
     private boolean validateInput() {
         String toText = subjectField.getText().toString();
-        if (toText.equals("")) {
+        if (toText.isEmpty()) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_recipient_error));
             return false;
         }
         String subjectText = subjectField.getText().toString();
-        if (subjectText.equals("")) {
+        if (subjectText.isEmpty()) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_subject_error));
             return false;
         } else if (subjectText.length() > 100) {
@@ -111,7 +106,7 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
             return false;
         }
         String content = textField.getText().toString();
-        if (content.equals("")) {
+        if (content.isEmpty()) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_message_text_error));
             return false;
         }
@@ -121,13 +116,11 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            this.onBackPressed();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

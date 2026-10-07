@@ -29,19 +29,19 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.IconTextView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
@@ -111,22 +111,17 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             actionBar.setCustomView(R.layout.appheader);
         }
         // get actionBar Views
-        loader = (ProgressBar) findViewById(R.id.appsrloader);
-        errorIcon = (IconTextView) findViewById(R.id.apperroricon);
-        refreshbutton = (IconTextView) findViewById(R.id.apprefreshbutton);
-        LinearLayout srbutton = (LinearLayout) findViewById(R.id.sub_container);
-        srtext = (TextView) findViewById(R.id.appsubreddittxt);
+        loader = findViewById(R.id.appsrloader);
+        errorIcon = findViewById(R.id.apperroricon);
+        refreshbutton = findViewById(R.id.apprefreshbutton);
+        LinearLayout srbutton = findViewById(R.id.sub_container);
+        srtext = findViewById(R.id.appsubreddittxt);
 
         // set theme colors
         setThemeColors();
 
         // setup button onclicks
-        refreshbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                reloadReddits();
-            }
-        });
+        refreshbutton.setOnClickListener(view -> reloadReddits());
         View.OnClickListener srclick;
         // check intent and set needed feed params accordingly
         if (getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
@@ -166,12 +161,9 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             subredditName = global.getSubredditManager().getCurrentFeedName(0);
             subredditSort = global.mSharedPreferences.getString("sort-app", "hot");
             hasMultipleSubs = global.getSubredditManager().isFeedMulti(0);
-            srclick = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent srintent = new Intent(MainActivity.this, SubredditSelectActivity.class);
-                    startActivityForResult(srintent, 0);
-                }
+            srclick = view -> {
+                Intent srintent = new Intent(MainActivity.this, SubredditSelectActivity.class);
+                startActivityForResult(srintent, 0);
             };
             findViewById(R.id.appcaret).setOnClickListener(srclick);
         }
@@ -193,79 +185,73 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         } else {
             data = new JSONArray();
         }
-        listView = (ListView) findViewById(R.id.applistview);
+        listView = findViewById(R.id.applistview);
         listAdapter = new SubredditFeedAdapter(this, this, global, theme, feedId, data, !endOfFeed, hasMultipleSubs);
         listView.setAdapter(listAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                final Bundle extras = listAdapter.getItemExtras(position);
-                if (extras == null) {
-                    Toast.makeText(MainActivity.this, R.string.data_error, Toast.LENGTH_LONG).show();
-                    return;
-                }
-                String subreddit = extras.getString(Reddinator.ITEM_SUBREDDIT);
-                if (Reddinator.SUBREDDIT_MULTIHUB.equals(subreddit)) {
-                    // Extract name from multi path
-                    String url = extras.getString(Reddinator.ITEM_URL);
-                    if (url != null) {
-                        Pattern pattern = Pattern.compile(".*reddit.com(/user/.*/m/([^/]*))");
-                        Matcher matcher = pattern.matcher(url);
-                        if (matcher.find()) {
-                            // open in a new temporary activity
-                            global.openSubredditFeed(MainActivity.this, Reddinator.REDDIT_BASE_URL + url);
-                            return;
-                        }
-                    }
-                } else if (Reddinator.SUBREDDIT_REDDINATOR.equals(subreddit)) {
-                    try {
-                        JSONObject postData = listAdapter.getItem(position);
-                        if (viewThemes || postData.getString("title").indexOf("[Theme]") == 0) {
-                            ThemeHelper.handleThemeInstall(MainActivity.this, global, MainActivity.this, postData, new Runnable() {
-                                @Override
-                                public void run() {
-                                    openPostView(extras, true);
-                                }
-                            });
-                            return;
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // open in the reddinator view
-                openPostView(extras, false);
+        listView.setOnItemClickListener((adapterView, view, position, l) -> {
+            final Bundle extras = listAdapter.getItemExtras(position);
+            if (extras == null) {
+                Toast.makeText(MainActivity.this, R.string.data_error, Toast.LENGTH_LONG).show();
+                return;
             }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Bundle extras = listAdapter.getItemExtras(position);
-                if (extras == null) {
-                    Toast.makeText(MainActivity.this, R.string.data_error, Toast.LENGTH_LONG).show();
-                    return true;
+            String subreddit = extras.getString(Reddinator.ITEM_SUBREDDIT);
+            if (Reddinator.SUBREDDIT_MULTIHUB.equals(subreddit)) {
+                // Extract name from multi path
+                String url = extras.getString(Reddinator.ITEM_URL);
+                if (url != null) {
+                    Pattern pattern = Pattern.compile(".*reddit.com(/user/.*/m/([^/]*))");
+                    Matcher matcher = pattern.matcher(url);
+                    if (matcher.find()) {
+                        // open in a new temporary activity
+                        global.openSubredditFeed(MainActivity.this, Reddinator.REDDIT_BASE_URL + url);
+                        return;
+                    }
                 }
-                Intent ointent = new Intent(MainActivity.this, FeedItemDialogActivity.class);
-                // if this is a temp feed, pass the feed path to the dialog so it knows whether to show, subreddit and domain buttons
-                if (feedId < 0) {
-                    extras.putString(FeedItemDialogActivity.EXTRA_CURRENT_FEED_PATH, subredditPath);
-                }
+            } else if (Reddinator.SUBREDDIT_REDDINATOR.equals(subreddit)) {
                 try {
-                    String subreddit = extras.getString(Reddinator.ITEM_SUBREDDIT);
                     JSONObject postData = listAdapter.getItem(position);
-                    if ((Reddinator.SUBREDDIT_REDDINATOR.equals(subreddit) && (viewThemes || postData.getString("title").indexOf("[Theme]") == 0))) {
-                        extras.putBoolean(FeedItemDialogActivity.EXTRA_IS_THEME, true);
-                        extras.putString(FeedItemDialogActivity.EXTRA_POST_DATA, postData.toString());
+                    if (viewThemes || postData.getString("title").indexOf("[Theme]") == 0) {
+                        ThemeHelper.handleThemeInstall(MainActivity.this, global, MainActivity.this, postData, new Runnable() {
+                            @Override
+                            public void run() {
+                                openPostView(extras, true);
+                            }
+                        });
+                        return;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                ointent.putExtras(extras);
-                MainActivity.this.startActivityForResult(ointent, 1);
+            }
+            // open in the reddinator view
+            openPostView(extras, false);
+        });
+
+        listView.setOnItemLongClickListener((adapterView, view, position, l) -> {
+            Bundle extras = listAdapter.getItemExtras(position);
+            if (extras == null) {
+                Toast.makeText(MainActivity.this, R.string.data_error, Toast.LENGTH_LONG).show();
                 return true;
             }
+            Intent ointent = new Intent(MainActivity.this, FeedItemDialogActivity.class);
+            // if this is a temp feed, pass the feed path to the dialog so it knows whether to show, subreddit and domain buttons
+            if (feedId < 0) {
+                extras.putString(FeedItemDialogActivity.EXTRA_CURRENT_FEED_PATH, subredditPath);
+            }
+            try {
+                String subreddit = extras.getString(Reddinator.ITEM_SUBREDDIT);
+                JSONObject postData = listAdapter.getItem(position);
+                if ((Reddinator.SUBREDDIT_REDDINATOR.equals(subreddit) && (viewThemes || postData.getString("title").indexOf("[Theme]") == 0))) {
+                    extras.putBoolean(FeedItemDialogActivity.EXTRA_IS_THEME, true);
+                    extras.putString(FeedItemDialogActivity.EXTRA_POST_DATA, postData.toString());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ointent.putExtras(extras);
+            MainActivity.this.startActivityForResult(ointent, 1);
+            return true;
         });
 
         // set the current subreddit name
@@ -299,11 +285,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
         }
         if (sidebarIcon != null) {
-            if (feedId == -1 || !global.getSubredditManager().isFeedMulti(0)) {
-                sidebarIcon.setVisible(true);
-            } else {
-                sidebarIcon.setVisible(false);
-            }
+            sidebarIcon.setVisible(feedId == -1 || !global.getSubredditManager().isFeedMulti(0));
         }
     }
 
@@ -339,7 +321,6 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         int subCap = global.getSubredditManager().getSubredditSubscribeCapability(subredditName);
 
         if (subCap > 0) {
-
             if (subCap == 1) {
                 (menu.findItem(R.id.menu_subscribe))
                         .setIcon(new IconDrawable(this, Iconify.IconValue.fa_plus_circle).color(iconColor).actionBarSize())
@@ -355,8 +336,8 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) { // Keep null check due to google bug
             if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
                 try {
                     Method m = menu.getClass().getDeclaredMethod(
@@ -492,19 +473,12 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
                 needsFeedViewUpdate = true;
             }
         });
-        builder.setPositiveButton(getString(R.string.close), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                if (needsFeedViewUpdate) {
-                    listAdapter.loadFeedPrefs();
-                    listView.invalidateViews();
-                    needsFeedViewUpdate = false;
-                }
+        builder.setPositiveButton(getString(R.string.close), (dialog, id) -> dialog.cancel());
+        builder.setOnCancelListener(dialog -> {
+            if (needsFeedViewUpdate) {
+                listAdapter.loadFeedPrefs();
+                listView.invalidateViews();
+                needsFeedViewUpdate = false;
             }
         });
         builder.show().setCanceledOnTouchOutside(true);
@@ -518,45 +492,43 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
 
         ArrayList<String> sorts = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.reddit_sorts)));
 
-        if (subredditPath.equals("") || subredditPath.equals("/default")) {
+        if (subredditPath.isEmpty() || subredditPath.equals("/default")) {
             sorts.add(5, "best");
         }
 
-        builder.setItems(sorts.toArray(new String[]{}), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                SharedPreferences.Editor prefsedit = global.mSharedPreferences.edit();
-                String sort = "hot"; // default if fails
-                // find index
-                switch (which) {
-                    case 0:
-                        sort = "hot";
-                        break;
-                    case 1:
-                        sort = "new";
-                        break;
-                    case 2:
-                        sort = "rising";
-                        break;
-                    case 3:
-                        sort = "controversial";
-                        break;
-                    case 4:
-                        sort = "top";
-                        break;
-                    case 5:
-                        sort = "best";
-                        break;
-                }
-                if (feedId == 0) { // don't update persitent setting if it's a temp feed.
-                    prefsedit.putString("sort-app", sort);
-                    prefsedit.apply();
-                }
-                subredditSort = sort;
-                // set new text in button
-                sortItem.setTitle(getString(R.string.sort_label) + " " + subredditSort);
-                dialog.dismiss();
-                reloadReddits();
+        builder.setItems(sorts.toArray(new String[]{}), (dialog, which) -> {
+            SharedPreferences.Editor prefsedit = global.mSharedPreferences.edit();
+            String sort = "hot"; // default if fails
+            // find index
+            switch (which) {
+                case 0:
+                    sort = "hot";
+                    break;
+                case 1:
+                    sort = "new";
+                    break;
+                case 2:
+                    sort = "rising";
+                    break;
+                case 3:
+                    sort = "controversial";
+                    break;
+                case 4:
+                    sort = "top";
+                    break;
+                case 5:
+                    sort = "best";
+                    break;
             }
+            if (feedId == 0) { // don't update persitent setting if it's a temp feed.
+                prefsedit.putString("sort-app", sort);
+                prefsedit.apply();
+            }
+            subredditSort = sort;
+            // set new text in button
+            sortItem.setTitle(getString(R.string.sort_label) + " " + subredditSort);
+            dialog.dismiss();
+            reloadReddits();
         });
         builder.show().setCanceledOnTouchOutside(true);
     }
@@ -744,7 +716,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
 
     private class FeedLoader extends AsyncTask<Void, Integer, JSONArray> {
 
-        private Boolean loadMore;
+        private final Boolean loadMore;
         private RedditData.RedditApiException exception;
 
         FeedLoader(Boolean loadmore) {
@@ -756,7 +728,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             String curFeed = subredditPath;
             boolean isAll = subredditName.equals("all");
             String sort = subredditSort;
-            int pageSize = loadMore ? 25 : Integer.valueOf(global.mSharedPreferences.getString("numitemloadpref", "25"));
+            int pageSize = loadMore ? 25 : Integer.parseInt(global.mSharedPreferences.getString("numitemloadpref", "25"));
             String after = loadMore ? lastItemId : "0";
             JSONArray added = new JSONArray();
             boolean end = false;

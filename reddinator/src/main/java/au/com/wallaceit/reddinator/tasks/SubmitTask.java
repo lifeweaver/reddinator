@@ -27,14 +27,14 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class SubmitTask extends AsyncTask<String, Integer, Boolean> {
-    private Reddinator global;
-    private Callback submitCallback;
+    private final Reddinator global;
+    private final Callback submitCallback;
     private JSONObject jsonResult;
     private RedditData.RedditApiException exception;
-    private boolean isLink;
-    private String subreddit;
-    private String title;
-    private String data;
+    private final boolean isLink;
+    private final String subreddit;
+    private final String title;
+    private final String data;
 
     public interface Callback {
         void onSubmitted(JSONObject result, RedditData.RedditApiException exception, boolean isLink);

@@ -18,15 +18,15 @@
 package au.com.wallaceit.reddinator.activity;
 
 import android.app.ActionBar;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.preference.PreferenceManager;
 
 import java.util.Date;
 
@@ -53,12 +53,10 @@ public class PrefsActivity extends PreferenceActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.onBackPressed();
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            this.onBackPressed();
+        } else {
+            return super.onOptionsItemSelected(item);
         }
         return true;
     }
@@ -66,7 +64,7 @@ public class PrefsActivity extends PreferenceActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            Toast.makeText(this, "Last widget refresh: " + new Date(PreferenceManager.getDefaultSharedPreferences(this).getLong("last_auto_refresh", 0)).toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Last widget refresh: " + new Date(PreferenceManager.getDefaultSharedPreferences(this).getLong("last_auto_refresh", 0)), Toast.LENGTH_LONG).show();
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             Intent intent = new Intent(this, WidgetProvider.class);

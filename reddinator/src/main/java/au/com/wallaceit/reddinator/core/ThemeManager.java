@@ -30,14 +30,15 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
 public class ThemeManager {
-    private Context context;
-    private SharedPreferences prefs;
+    private final Context context;
+    private final SharedPreferences prefs;
     private JSONArray valueOrder;
     private JSONObject themes;
     private JSONArray themeOrder;
@@ -68,9 +69,9 @@ public class ThemeManager {
             }
         }
         if (mode == LISTMODE_ALL || mode == LISTMODE_CUSTOM) {
-            Iterator iterator = customThemes.keys();
+            Iterator<String> iterator = customThemes.keys();
             while (iterator.hasNext()) {
-                key = (String) iterator.next();
+                key = iterator.next();
                 try {
                     themeList.put(key, customThemes.getJSONObject(key).getString("name"));
                 } catch (JSONException e) {
@@ -248,7 +249,7 @@ public class ThemeManager {
             //noinspection ResultOfMethodCallIgnored
             is.read(buffer);
             is.close();
-            json = new String(buffer, "UTF-8");
+            json = new String(buffer, StandardCharsets.UTF_8);
             JSONObject themeData = new JSONObject(json);
             themes = themeData.getJSONObject("themes");
             themeOrder = themeData.getJSONArray("theme_order");
@@ -339,7 +340,7 @@ public class ThemeManager {
     }
 
     public class Theme {
-        private JSONObject mTheme;
+        private final JSONObject mTheme;
         private JSONObject jsonValues;
         private LinkedHashMap<String, String> values = null;
 
@@ -370,7 +371,7 @@ public class ThemeManager {
                 loadValues();
             }
             try {
-                return new JSONObject(jsonValues, values.keySet().toArray(new String[values.size()]));
+                return new JSONObject(jsonValues, values.keySet().toArray(new String[0]));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -465,12 +466,12 @@ public class ThemeManager {
         public HashMap<String, Integer> getIntColors() {
             HashMap<String, String> srcColors = getValues();
             HashMap<String, Integer> themeColors = new HashMap<>();
-            Iterator iterator = srcColors.keySet().iterator();
+            Iterator<String> iterator = srcColors.keySet().iterator();
             String key;
             int colorVal;
             Exception colorException;
             while (iterator.hasNext()) {
-                key = (String) iterator.next();
+                key = iterator.next();
                 try {
                     colorVal = Color.parseColor(srcColors.get(key));
                 } catch (IllegalArgumentException e) {

@@ -1,26 +1,19 @@
 package au.com.wallaceit.reddinator.activity;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,7 +22,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
+import androidx.viewpager.widget.ViewPager;
+
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,7 +56,6 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
     private Resources resources;
     private ProgressDialog progressDialog;
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,22 +63,16 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         global = (Reddinator) getApplicationContext();
         resources = getResources();
 
-        subreddit = (AutoCompleteTextView) findViewById(R.id.subreddit);
+        subreddit = findViewById(R.id.subreddit);
         subreddit.setAdapter(new SubAutoCompleteAdapter(this, R.layout.autocomplete_list_item));
-        subreddit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!subreddit.getText().toString().equals("")) {
-                    new SubmitTextTask().execute(subreddit.getText().toString());
-                }
+        subreddit.setOnItemClickListener((adapterView, view, i, l) -> {
+            if (!subreddit.getText().toString().isEmpty()) {
+                new SubmitTextTask().execute(subreddit.getText().toString());
             }
         });
-        subreddit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (!b && !subreddit.getText().toString().equals("")) {
-                    new SubmitTextTask().execute(subreddit.getText().toString());
-                }
+        subreddit.setOnFocusChangeListener((view, b) -> {
+            if (!b && !subreddit.getText().toString().isEmpty()) {
+                new SubmitTextTask().execute(subreddit.getText().toString());
             }
         });
 
@@ -90,12 +81,12 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
             subreddit.setText(sub);
         }
 
-        submitText = (TextView) findViewById(R.id.submission_text);
+        submitText = findViewById(R.id.submission_text);
         submitText.setMovementMethod(new SafeLinkMethod());
-        charsLeft = (TextView) findViewById(R.id.title_chars_left);
-        title = (EditText) findViewById(R.id.title);
-        link = (EditText) findViewById(R.id.link);
-        text = (EditText) findViewById(R.id.text);
+        charsLeft = findViewById(R.id.title_chars_left);
+        title = findViewById(R.id.title);
+        link = findViewById(R.id.link);
+        text = findViewById(R.id.text);
 
         title.addTextChangedListener(new TextWatcher() {
             @Override
@@ -122,14 +113,14 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
 
-        pager = (ViewPager) findViewById(R.id.pager);
+        pager = findViewById(R.id.pager);
         pager.setAdapter(new SimpleTabsAdapter(new String[]{resources.getString(R.string.link), resources.getString(R.string.text)}, new int[]{R.id.link, R.id.text}, SubmitActivity.this, null));
-        LinearLayout tabsLayout = (LinearLayout) findViewById(R.id.tab_widget);
+        LinearLayout tabsLayout = findViewById(R.id.tab_widget);
         SimpleTabsWidget tabs = new SimpleTabsWidget(SubmitActivity.this, tabsLayout);
         tabs.setViewPager(pager);
 
@@ -140,21 +131,18 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         tabs.setInidicatorColor(Color.parseColor(theme.getValue("tab_indicator")));
         tabs.setTextColor(headerText);
 
-        Button submitButton = (Button) findViewById(R.id.submit_button);
-        submitButton.getBackground().setColorFilter(headerColor, PorterDuff.Mode.MULTIPLY);
+        Button submitButton = findViewById(R.id.submit_button);
+        submitButton.getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(headerColor, BlendModeCompat.MULTIPLY));
         submitButton.setTextColor(headerText);
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!global.mRedditData.isLoggedIn()) {
-                    global.mRedditData.initiateLogin(SubmitActivity.this, false);
-                } else {
-                    if (validateInput()) {
-                        boolean isLink = pager.getCurrentItem() == 0;
-                        String data = isLink ? link.getText().toString() : text.getText().toString();
-                        progressDialog = ProgressDialog.show(SubmitActivity.this, "", resources.getString(R.string.submitting), true);
-                        new SubmitTask(global, subreddit.getText().toString(), title.getText().toString(), data, isLink, SubmitActivity.this).execute();
-                    }
+        submitButton.setOnClickListener(view1 -> {
+            if (!global.mRedditData.isLoggedIn()) {
+                global.mRedditData.initiateLogin(SubmitActivity.this, false);
+            } else {
+                if (validateInput()) {
+                    boolean isLink = pager.getCurrentItem() == 0;
+                    String data = isLink ? link.getText().toString() : text.getText().toString();
+                    progressDialog = ProgressDialog.show(SubmitActivity.this, "", resources.getString(R.string.submitting), true);
+                    new SubmitTask(global, subreddit.getText().toString(), title.getText().toString(), data, isLink, SubmitActivity.this).execute();
                 }
             }
         });
@@ -223,12 +211,12 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
 
     private boolean validateInput() {
         String subText = title.getText().toString();
-        if (subText.equals("")) {
+        if (subText.isEmpty()) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_subreddit_error));
             return false;
         }
         String titleText = title.getText().toString();
-        if (titleText.equals("")) {
+        if (titleText.isEmpty()) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_title_error));
             return false;
         } else if (titleText.length() > 300) {
@@ -241,7 +229,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         } else {
             content = text.getText().toString();
         }
-        if (content.equals("")) {
+        if (content.isEmpty()) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_content_error));
             return false;
         }

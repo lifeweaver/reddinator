@@ -29,21 +29,16 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.IconTextView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -65,7 +60,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
     public static final String ACTION_ADD_MULTI_SUB = "ADD_MULTI_SUBREDDIT";
     private String action;
     private Reddinator global;
-    private ArrayList<JSONObject> sreddits = new ArrayList<>();
+    private final ArrayList<JSONObject> sreddits = new ArrayList<>();
     private JSONArray srjson;
     private SubredditsAdapter listadapter;
     private EditText searchbox;
@@ -87,32 +82,21 @@ public class ViewAllSubredditsActivity extends ListActivity {
         ListView listview = getListView();
         listview.setTextFilterEnabled(true);
         listview.setEmptyView(findViewById(R.id.subredditload));
-        listview.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                returnResult(sreddits.get(position), false);
-            }
-        });
+        listview.setOnItemClickListener((parent, view, position, id) -> returnResult(sreddits.get(position), false));
         // get empty view text for easy access later
-        emptyview = (TextView) findViewById(R.id.poploadtxt);
+        emptyview = findViewById(R.id.poploadtxt);
         // setup search buttons
-        searchbox = (EditText) this.findViewById(R.id.searchbox);
-        searchbox.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    search(v.getText().toString());
-                }
-                return true;
+        searchbox = this.findViewById(R.id.searchbox);
+        searchbox.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                search(v.getText().toString());
             }
-
+            return true;
         });
-        searchbtn = (IconTextView) this.findViewById(R.id.searchbutton);
-        searchbtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String query = searchbox.getText().toString();
-                search(query);
-            }
+        searchbtn = this.findViewById(R.id.searchbutton);
+        searchbtn.setOnClickListener(v -> {
+            String query = searchbox.getText().toString();
+            search(query);
         });
         // get list data
         listadapter = new SubredditsAdapter(this);
@@ -141,7 +125,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
 
     public void onBackPressed() {
         // System.out.println("onBackPressed()");
-        if (searchbox.getText().toString().equals("")) {
+        if (searchbox.getText().toString().isEmpty()) {
             this.finish();
         } else {
             if (global.isSrlistCached()) {
@@ -183,7 +167,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
     }
 
     private void search(final String query) {
-        if (query.equals("")) {
+        if (query.isEmpty()) {
             Toast.makeText(ViewAllSubredditsActivity.this, getString(R.string.no_query_message), Toast.LENGTH_LONG).show();
             return;
         }
@@ -193,46 +177,40 @@ public class ViewAllSubredditsActivity extends ListActivity {
         }
         // use a thread for searching
         final ProgressDialog sdialog = ProgressDialog.show(ViewAllSubredditsActivity.this, "", resources.getString(R.string.searching), true);
-        Thread t = new Thread() {
-            public void run() {
-                // get all popular subreddits
-                try {
-                    srjson = global.mRedditData.searchSubreddits(query);
-                } catch (final RedditData.RedditApiException e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(ViewAllSubredditsActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                            sdialog.dismiss();
-                        }
-                    });
-                    return;
-                }
-                //System.out.println("search complete");
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        // put into arraylist
-                        sreddits.clear();
-                        int i = 0;
-                        while (i < srjson.length()) {
-                            try {
-                                sreddits.add(srjson.getJSONObject(i).getJSONObject("data"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            i++;
-                        }
-                        listadapter.notifyDataSetChanged();
-                        if (sreddits.size() == 0) {
-                            // set no result text in no items view
-                            emptyview.setText(resources.getString(R.string.no_subreddits_found));
-                        }
-                        sdialog.dismiss();
-                    }
+        Thread t = new Thread(() -> {
+            // get all popular subreddits
+            try {
+                srjson = global.mRedditData.searchSubreddits(query);
+            } catch (final RedditData.RedditApiException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    Toast.makeText(ViewAllSubredditsActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    sdialog.dismiss();
                 });
-
+                return;
             }
-        };
+            //System.out.println("search complete");
+            runOnUiThread(() -> {
+                // put into arraylist
+                sreddits.clear();
+                int i = 0;
+                while (i < srjson.length()) {
+                    try {
+                        sreddits.add(srjson.getJSONObject(i).getJSONObject("data"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    i++;
+                }
+                listadapter.notifyDataSetChanged();
+                if (sreddits.size() == 0) {
+                    // set no result text in no items view
+                    emptyview.setText(resources.getString(R.string.no_subreddits_found));
+                }
+                sdialog.dismiss();
+            });
+
+        });
         t.start();
     }
 
@@ -253,7 +231,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
     }
 
     class SubredditsAdapter extends BaseAdapter {
-        private LayoutInflater inflater;
+        private final LayoutInflater inflater;
 
         SubredditsAdapter(Context context) {
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -280,11 +258,11 @@ public class ViewAllSubredditsActivity extends ListActivity {
             if (row == null || row.getTag() == null) {
                 // inflate new view
                 row = inflater.inflate(R.layout.subreddititem, parent, false);
-                viewHolder.name = (TextView) row.findViewById(R.id.subreddit_name);
-                viewHolder.description = (TextView) row.findViewById(R.id.subreddit_description);
-                viewHolder.addIcon = (IconTextView) row.findViewById(R.id.subreddit_add_btn);
-                viewHolder.viewIcon = (IconTextView) row.findViewById(R.id.subreddit_view_btn);
-                viewHolder.subscribedIcon = (TextView) row.findViewById(R.id.subreddit_subscribed);
+                viewHolder.name = row.findViewById(R.id.subreddit_name);
+                viewHolder.description = row.findViewById(R.id.subreddit_description);
+                viewHolder.addIcon = row.findViewById(R.id.subreddit_add_btn);
+                viewHolder.viewIcon = row.findViewById(R.id.subreddit_view_btn);
+                viewHolder.subscribedIcon = row.findViewById(R.id.subreddit_subscribed);
             } else {
                 viewHolder = (ViewHolder) row.getTag();
             }
@@ -307,20 +285,12 @@ public class ViewAllSubredditsActivity extends ListActivity {
             }
             viewHolder.name.setText(name);
             viewHolder.description.setText(description);
-            viewHolder.addIcon.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    returnResult(sreddits.get(position), true);
-                }
-            });
-            viewHolder.viewIcon.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(ViewAllSubredditsActivity.this, MainActivity.class);
-                    intent.setAction(ACTION_VIEW);
-                    intent.setData(Uri.parse(Reddinator.REDDIT_BASE_URL + url));
-                    ViewAllSubredditsActivity.this.startActivity(intent);
-                }
+            viewHolder.addIcon.setOnClickListener(v -> returnResult(sreddits.get(position), true));
+            viewHolder.viewIcon.setOnClickListener(v -> {
+                Intent intent = new Intent(ViewAllSubredditsActivity.this, MainActivity.class);
+                intent.setAction(ACTION_VIEW);
+                intent.setData(Uri.parse(Reddinator.REDDIT_BASE_URL + url));
+                ViewAllSubredditsActivity.this.startActivity(intent);
             });
             if ("true".equals(subscribed)) {
                 viewHolder.subscribedIcon.setVisibility(View.VISIBLE);

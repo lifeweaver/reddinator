@@ -18,16 +18,13 @@
 package au.com.wallaceit.reddinator.ui;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +32,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
@@ -48,7 +49,7 @@ public class TabWebFragment extends Fragment {
     /**
      * (non-Javadoc)
      *
-     * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+     * @see androidx.core.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
      */
     private Context mContext;
     public WebView mWebView;
@@ -94,7 +95,7 @@ public class TabWebFragment extends Fragment {
 
 
     @SuppressLint("SetJavaScriptEnabled")
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContext = this.getActivity();
         if (container == null) {
             return null;
@@ -174,7 +175,8 @@ public class TabWebFragment extends Fragment {
                 }
 
                 @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                    String url = request.getUrl().toString();
 
                     if (url.contains("file://") || url.contains("https://") || url.contains("http://")) {
                         return false;
@@ -226,7 +228,7 @@ public class TabWebFragment extends Fragment {
     }
 
     // web chrome client
-    private WebChromeClient newchromeclient = new WebChromeClient() {
+    private final WebChromeClient newchromeclient = new WebChromeClient() {
         ActionBar actionBar;
         private FrameLayout mVideoFrame;
         private View mTabcontainer;
@@ -250,9 +252,8 @@ public class TabWebFragment extends Fragment {
             }
         }
 
-        FrameLayout.LayoutParams LayoutParameters = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        final FrameLayout.LayoutParams LayoutParameters = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
 
-        @TargetApi(Build.VERSION_CODES.KITKAT)
         @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
             // if a view already exists then immediately terminate the new one

@@ -25,12 +25,12 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class VoteTask extends AsyncTask<String, Integer, Boolean> {
-    private Reddinator global;
-    private String redditId;
+    private final Reddinator global;
+    private final String redditId;
     private int listPosition = -1;
     private int direction;
     private int netVote; // how the score will change after the vote is successful (ie. if already upvoted, downvoting causes -2 score change)
-    private int currentVote;
+    private final int currentVote;
     private RedditData.RedditApiException exception = null;
     private Callback voteCallback = null;
 

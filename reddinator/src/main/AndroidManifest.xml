@@ -224,7 +224,7 @@
             android:theme="@style/TransparentActivityUndimmed" />
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="au.com.wallaceit.reddinator.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

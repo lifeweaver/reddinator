@@ -2,7 +2,7 @@ package au.com.wallaceit.reddinator.core;
 
 import android.net.Uri;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;

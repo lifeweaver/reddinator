@@ -28,8 +28,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class LoadImageBitmapTask extends AsyncTask<Void, Integer, Bitmap> {
-    private String url;
-    private ImageCallback callback;
+    private final String url;
+    private final ImageCallback callback;
 
     public LoadImageBitmapTask(String url, ImageCallback callback) {
         this.url = url;

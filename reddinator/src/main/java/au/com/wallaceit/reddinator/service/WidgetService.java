@@ -27,7 +27,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -35,9 +34,11 @@ import android.widget.RemoteViewsService;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.preference.PreferenceManager;
+
 import com.joanzapata.android.iconify.Iconify;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,11 +65,11 @@ public class WidgetService extends RemoteViewsService {
 
 class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context mContext = null;
-    private int appWidgetId;
-    private Class providerClass;
+    private final int appWidgetId;
+    private final Class providerClass;
     private JSONArray data;
-    private Reddinator global;
-    private SharedPreferences mSharedPreferences;
+    private final Reddinator global;
+    private final SharedPreferences mSharedPreferences;
     private String titleFontSize = "16";
     private HashMap<String, Integer> themeColors;
     private boolean loadCached = false; // tells the ondatasetchanged function that it should not download any further items, cache is loaded
@@ -242,7 +243,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             row.setImageViewBitmap(R.id.commentsicon, images[1]);
             row.setBitmap(R.id.widget_item_options, "setImageBitmap", images[2]);
             row.setTextViewText(R.id.listheading, Utilities.fromHtml(title).toString());
-            row.setFloat(R.id.listheading, "setTextSize", Integer.valueOf(titleFontSize)); // use for compatibility setTextViewTextSize only introduced in API 16
+            row.setFloat(R.id.listheading, "setTextSize", Integer.parseInt(titleFontSize)); // use for compatibility setTextViewTextSize only introduced in API 16
             row.setTextColor(R.id.listheading, themeColors.get("headline_text"));
             row.setTextViewText(R.id.sourcetxt, (showItemSubreddit ? subreddit + " - " : "") + domain);
             row.setTextColor(R.id.sourcetxt, themeColors.get("source_text"));
@@ -318,7 +319,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 imageLoadFlag = 2;
                 row.setViewVisibility(thumbView, View.GONE);
                 row.setViewVisibility(R.id.thumbnail_expand, View.GONE);
-            } else if (loadThumbnails && !thumbnail.equals("")) {
+            } else if (loadThumbnails && !thumbnail.isEmpty()) {
                 // hide preview view
                 row.setViewVisibility(R.id.preview, View.GONE);
                 // check for default thumbnails
@@ -510,7 +511,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             }
         } else {
             global.triggerThunbnailCacheClean();
-            int limit = Integer.valueOf(mSharedPreferences.getString("numitemloadpref", "25"));
+            int limit = Integer.parseInt(mSharedPreferences.getString("numitemloadpref", "25"));
             try {
                 added = fetchFiltered(curFeed, sort, limit, "0", null, isAll);
             } catch (RedditData.RedditApiException e) {
@@ -578,12 +579,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         // show error text if available
         if (errorTxt != null) {
             Handler handler = new Handler(mContext.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, errorTxt, Toast.LENGTH_LONG).show();
-                }
-            });
+            handler.post(() -> Toast.makeText(mContext, errorTxt, Toast.LENGTH_LONG).show());
         }
     }
 }

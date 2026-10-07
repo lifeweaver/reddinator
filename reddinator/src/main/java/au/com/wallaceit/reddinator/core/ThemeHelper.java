@@ -65,43 +65,25 @@ public class ThemeHelper {
                                 callback.onThemeResult(false);
                             }
                         })
-                        .setNeutralButton(R.string.preview, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                if (global.mThemeManager.setPreviewTheme(themeJson)) {
-                                    //refreshTheme();
-                                    WidgetCommon.refreshAllWidgetViews(global);
-                                    new AlertDialog.Builder(context)
-                                            .setTitle(R.string.theme_preview)
-                                            .setMessage(R.string.theme_preview_applied_message)
-                                            .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                                @Override
-                                                public void onCancel(DialogInterface dialog) {
-                                                    callback.onThemeResult(true);
-                                                }
-                                            })
-                                            .show().setCanceledOnTouchOutside(true);
-                                } else {
-                                    Toast.makeText(context, R.string.theme_load_error, Toast.LENGTH_LONG).show();
-                                    callback.onThemeResult(false);
-                                }
+                        .setNeutralButton(R.string.preview, (dialog, which) -> {
+                            dialog.dismiss();
+                            if (global.mThemeManager.setPreviewTheme(themeJson)) {
+                                //refreshTheme();
+                                WidgetCommon.refreshAllWidgetViews(global);
+                                new AlertDialog.Builder(context)
+                                        .setTitle(R.string.theme_preview)
+                                        .setMessage(R.string.theme_preview_applied_message)
+                                        .setOnCancelListener(dialog1 -> callback.onThemeResult(true))
+                                        .show().setCanceledOnTouchOutside(true);
+                            } else {
+                                Toast.makeText(context, R.string.theme_load_error, Toast.LENGTH_LONG).show();
+                                callback.onThemeResult(false);
                             }
                         });
                 if (openPostRunnable != null) {
-                    builder.setNegativeButton(R.string.view_comments_noicon, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            openPostRunnable.run();
-                        }
-                    });
+                    builder.setNegativeButton(R.string.view_comments_noicon, (dialog, which) -> openPostRunnable.run());
                 }
-                builder.show().setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        callback.onThemeResult(false);
-                    }
-                });
+                builder.show().setOnCancelListener(dialog -> callback.onThemeResult(false));
                 return;
             }
 

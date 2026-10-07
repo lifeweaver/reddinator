@@ -25,27 +25,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
+
+import androidx.preference.PreferenceManager;
 
 import au.com.wallaceit.reddinator.R;
 
 public class MailCheckReceiver extends BroadcastReceiver {
 
-    private static String CHECK_ACTION = "reddinator.background.mailcheck";
-
     public static void setAlarm(Context context) {
 
         Intent intent = new Intent(context.getApplicationContext(), MailCheckReceiver.class);
         intent.setPackage(context.getPackageName());
+        String CHECK_ACTION = "reddinator.background.mailcheck";
         intent.setAction(CHECK_ACTION);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-        PendingIntent updateIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, intent, 0);
+        PendingIntent updateIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int refreshRate = Integer.valueOf(prefs.getString(context.getString(R.string.background_mail_pref), "43200000"));
+        int refreshRate = Integer.parseInt(prefs.getString(context.getString(R.string.background_mail_pref), "43200000"));
         String token = prefs.getString("oauthtoken", "");
-        boolean loggedIn = (!token.equals(""));
+        boolean loggedIn = (!token.isEmpty());
         if (refreshRate == 0 || !loggedIn) {
             alarmManager.cancel(updateIntent); // cancel if disabled or not logged in
         } else {

@@ -33,14 +33,14 @@ import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.service.WidgetCommon;
 
 public class WidgetVoteTask extends AsyncTask<String, Integer, Boolean> {
-    private Context context;
-    private Reddinator global;
-    private int widgetId;
+    private final Context context;
+    private final Reddinator global;
+    private final int widgetId;
     private String redditid;
     private int direction;
     private String curVote;
     private int netvote;
-    private int listposition;
+    private final int listposition;
     private RedditData.RedditApiException exception;
     private boolean archived = false;
 

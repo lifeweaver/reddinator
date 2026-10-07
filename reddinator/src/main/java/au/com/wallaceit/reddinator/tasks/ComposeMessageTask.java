@@ -25,10 +25,10 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class ComposeMessageTask extends AsyncTask<String, Integer, Boolean> {
-    private Reddinator global;
+    private final Reddinator global;
     private RedditData.RedditApiException exception = null;
     private Callback messageCallback = null;
-    private String[] args; // [to, subject, text, subreddit, optional args...]
+    private final String[] args; // [to, subject, text, subreddit, optional args...]
 
     public interface Callback {
         void onMessageSent(boolean result, RedditData.RedditApiException exception, String[] args);

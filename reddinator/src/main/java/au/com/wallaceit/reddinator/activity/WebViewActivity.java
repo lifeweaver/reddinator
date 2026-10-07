@@ -22,7 +22,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +31,9 @@ import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
@@ -63,7 +65,7 @@ public class WebViewActivity extends ActionbarActivity {
         setContentView(R.layout.activity_webview);
         mActivity.setTitle(R.string.loading);
         // set and load activity_webview
-        wv = (WebView) findViewById(R.id.webView);
+        wv = findViewById(R.id.webView);
         wv.setFocusable(true);
         wv.setFocusableInTouchMode(true);
         wv.requestFocus(View.FOCUS_DOWN);
@@ -131,8 +133,8 @@ public class WebViewActivity extends ActionbarActivity {
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+    public boolean onMenuOpened(int featureId, @NonNull Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) { // Keep null check due to google bug
             if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
                 try {
                     Method m = menu.getClass().getDeclaredMethod(

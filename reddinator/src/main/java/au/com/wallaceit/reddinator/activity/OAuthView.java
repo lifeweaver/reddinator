@@ -35,6 +35,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
@@ -65,7 +67,7 @@ public class OAuthView extends Activity {
         setContentView(R.layout.activity_webview);
         mActivity.setTitle(R.string.loading);
         // set and load activity_webview
-        wv = (WebView) findViewById(R.id.webView);
+        wv = findViewById(R.id.webView);
         wv.setFocusable(true);
         wv.setFocusableInTouchMode(true);
         wv.requestFocus(View.FOCUS_DOWN);
@@ -97,7 +99,7 @@ public class OAuthView extends Activity {
                 // System.out.println("Processing incoming oauth request: " + url);
                 Uri oauthUri = Uri.parse(url);
                 if (oauthUri.getQueryParameter("error") != null) {
-                    if (oauthUri.getQueryParameter("error").equals("access_denied")) {
+                    if (Objects.equals(oauthUri.getQueryParameter("error"), "access_denied")) {
                         OAuthView.this.finish();
                     } else {
                         Toast.makeText(OAuthView.this, resources.getString(R.string.reddit_login_failed) + oauthUri.getQueryParameter("error"), Toast.LENGTH_LONG).show();
@@ -188,12 +190,11 @@ public class OAuthView extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                wv.stopLoading();
-                wv.loadData("", "text/html", "utf-8");
-                this.finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            wv.stopLoading();
+            wv.loadData("", "text/html", "utf-8");
+            this.finish();
+            return true;
         }
         return false;
     }

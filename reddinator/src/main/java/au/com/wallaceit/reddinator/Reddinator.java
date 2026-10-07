@@ -24,16 +24,15 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.webkit.WebView;
+
+import androidx.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +45,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -104,10 +104,9 @@ public class Reddinator extends Application {
         mRedditData = new RedditData(Reddinator.this.getApplicationContext());
         mThemeManager = new ThemeManager(Reddinator.this.getApplicationContext(), mSharedPreferences);
         // make webviews debuggable when running debug version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
-                WebView.setWebContentsDebuggingEnabled(true);
-            }
+
+        if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+            WebView.setWebContentsDebuggingEnabled(true);
         }
     }
 
@@ -151,7 +150,7 @@ public class Reddinator extends Application {
     // set get current feeds from cache
     public void setFeed(int feedId, JSONArray feedData) {
         File feedFile = new File(getApplicationInfo().dataDir + FEED_DATA_DIR, "feed_" + feedId + ".json");
-        if (!feedFile.exists() && !feedFile.getParentFile().exists()) {
+        if (!feedFile.exists() && !Objects.requireNonNull(feedFile.getParentFile()).exists()) {
             //noinspection ResultOfMethodCallIgnored
             feedFile.getParentFile().mkdirs();
         }
@@ -170,13 +169,14 @@ public class Reddinator extends Application {
         if (feedFile.exists()) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(feedFile));
-                String line, result = "";
+                String line;
+                StringBuilder result = new StringBuilder();
                 while ((line = reader.readLine()) != null) {
-                    result += line;
+                    result.append(line);
                 }
                 reader.close();
 
-                return new JSONArray(result);
+                return new JSONArray(result.toString());
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
@@ -377,11 +377,7 @@ public class Reddinator extends Application {
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> dialog.dismiss())
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
@@ -418,7 +414,7 @@ public class Reddinator extends Application {
         Matcher matcher = pattern.matcher(url);
         Intent i;
         boolean match = matcher.find();
-        if (match && matcher.group(3) != null && !matcher.group(3).equals("")) {
+        if (match && matcher.group(3) != null && !Objects.equals(matcher.group(3), "")) {
             // reddit comment links
             i = new Intent(context, CommentsContextDialogActivity.class);
             i.setData(Uri.parse(url));
@@ -464,7 +460,7 @@ public class Reddinator extends Application {
     public boolean saveThumbnailToCache(Bitmap image, String imageId) {
         try {
             File file = new File(getCacheDir().getPath() + Reddinator.IMAGE_CACHE_DIR, imageId + ".png");
-            if (!file.getParentFile().exists()) {
+            if (!Objects.requireNonNull(file.getParentFile()).exists()) {
                 //noinspection ResultOfMethodCallIgnored
                 file.getParentFile().mkdirs();
             }
@@ -495,7 +491,7 @@ public class Reddinator extends Application {
 
     public void clearDir(File dir, int time) {
         if (dir.exists() && dir.isDirectory()) {
-            for (File file : dir.listFiles()) {
+            for (File file : Objects.requireNonNull(dir.listFiles())) {
                 if (time > 0) {
                     long diff = System.currentTimeMillis() - file.lastModified();
                     if (diff < time) // don't delete the image if age is less than specified

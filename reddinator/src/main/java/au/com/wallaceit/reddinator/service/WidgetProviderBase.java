@@ -17,17 +17,17 @@
  */
 package au.com.wallaceit.reddinator.service;
 
-import android.annotation.TargetApi;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+
+import androidx.preference.PreferenceManager;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -36,7 +36,6 @@ import au.com.wallaceit.reddinator.activity.ViewImageDialogActivity;
 import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.tasks.WidgetVoteTask;
 
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class WidgetProviderBase extends AppWidgetProvider {
 
     @Override
@@ -103,7 +102,7 @@ public class WidgetProviderBase extends AppWidgetProvider {
                         case WidgetCommon.ITEM_CLICK_OPEN:
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                             String clickPrefString = prefs.getString(context.getString(R.string.on_click_pref), "1");
-                            int clickPref = Integer.valueOf(clickPrefString);
+                            int clickPref = Integer.parseInt(clickPrefString);
                             switch (clickPref) {
                                 case 1:
                                     // open in the reddinator view

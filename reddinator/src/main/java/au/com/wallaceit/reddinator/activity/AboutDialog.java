@@ -27,13 +27,14 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.preference.PreferenceManager;
+import androidx.viewpager.widget.ViewPager;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -45,7 +46,7 @@ import de.cketti.library.changelog.ChangeLog;
 
 public class AboutDialog extends Dialog {
 
-    private Context context;
+    private final Context context;
     private boolean isUserInitiated = true;
 
     public static Dialog show(Context context, boolean isUserInitiated) {
@@ -71,12 +72,12 @@ public class AboutDialog extends Dialog {
         Resources resources = context.getResources();
         setContentView(R.layout.dialog_info);
         // setup view pager
-        final ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        final ViewPager pager = findViewById(R.id.pager);
         pager.setOffscreenPageLimit(3);
         pager.setAdapter(new SimpleTabsAdapter(
                 new String[]{resources.getString(R.string.about), resources.getString(R.string.credits), resources.getString(R.string.changelog)},
                 new int[]{R.id.info_about, R.id.info_credits, R.id.info_changelog}, context, findViewById(R.id.info_dialog)));
-        LinearLayout tabsLayout = (LinearLayout) findViewById(R.id.tab_widget);
+        LinearLayout tabsLayout = findViewById(R.id.tab_widget);
         SimpleTabsWidget tabs = new SimpleTabsWidget(context, tabsLayout);
         tabs.setViewPager(pager);
         ThemeManager.Theme theme = ((Reddinator) context.getApplicationContext()).mThemeManager.getActiveTheme("appthemepref");
@@ -100,7 +101,7 @@ public class AboutDialog extends Dialog {
             prefs.edit().putString("changelogLastVersion", Utilities.getPackageInfo(context).versionName).apply();
         }
         // setup about view
-        TextView version = ((TextView) findViewById(R.id.version));
+        TextView version = findViewById(R.id.version);
         version.setText(context.getResources().getString(R.string.version_label, Utilities.getPackageInfo(context).versionName));
         version.setTextColor(headerText2);
         findViewById(R.id.github).setOnClickListener(new View.OnClickListener() {
@@ -111,11 +112,11 @@ public class AboutDialog extends Dialog {
             }
         });
         // setup credits
-        WebView cwv = (WebView) findViewById(R.id.info_credits);
+        WebView cwv = findViewById(R.id.info_credits);
         cwv.loadUrl("file:///android_asset/credits.html");
         // setup changelog_master
         ChangeLog cl = new ChangeLog(context);
-        WebView wv = (WebView) findViewById(R.id.info_changelog);
+        WebView wv = findViewById(R.id.info_changelog);
         wv.loadData(cl.getLog(), "text/html", "UTF-8");
     }
 }

@@ -25,6 +25,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -32,7 +34,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class SubAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
-    private Reddinator global;
+    private final Reddinator global;
     private JSONArray suggestions = new JSONArray();
 
     public SubAutoCompleteAdapter(Context context, int resource) {
@@ -59,6 +61,7 @@ public class SubAutoCompleteAdapter extends ArrayAdapter<String> implements Filt
         return null;
     }
 
+    @NonNull
     @Override
     public Filter getFilter() {
         return new Filter() {

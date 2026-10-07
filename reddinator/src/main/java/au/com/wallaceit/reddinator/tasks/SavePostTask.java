@@ -29,10 +29,10 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
 
 public class SavePostTask extends AsyncTask<String, Long, Boolean> {
-    private Reddinator global;
+    private final Reddinator global;
     private RedditData.RedditApiException exception;
-    private Context context;
-    private Runnable callback;
+    private final Context context;
+    private final Runnable callback;
     private boolean fromWidget = false;
     private boolean unsave = false;
 

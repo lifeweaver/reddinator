@@ -25,9 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +34,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import androidx.preference.PreferenceManager;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
@@ -103,16 +103,11 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
             e.printStackTrace();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
-                @Override
-                public void onDismiss(PopupMenu menu) {
-                    if (!menuSelected) {
-                        WidgetMenuDialogActivity.this.finish();
-                    }
-                }
-            });
-        }
+        popupMenu.setOnDismissListener(menu1 -> {
+            if (!menuSelected) {
+                WidgetMenuDialogActivity.this.finish();
+            }
+        });
 
         int iconColor = Utilities.getActionbarIconColor();
         int inboxColor = global.mRedditData.getInboxCount() > 0 ? Color.parseColor("#E06B6C") : iconColor;
@@ -269,49 +264,44 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
 
         String path = global.getSubredditManager().getCurrentFeedPath(widgetId);
 
-        if (path.equals("") || path.equals("/default")) {
+        if (path.isEmpty() || path.equals("/default")) {
             sorts.add(5, "best");
         }
 
-        builder.setItems(sorts.toArray(new String[]{}), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                SharedPreferences.Editor prefsedit = prefs.edit();
-                String sort = "hot"; // default if fails
-                // find index
-                switch (which) {
-                    case 0:
-                        sort = "hot";
-                        break;
-                    case 1:
-                        sort = "new";
-                        break;
-                    case 2:
-                        sort = "rising";
-                        break;
-                    case 3:
-                        sort = "controversial";
-                        break;
-                    case 4:
-                        sort = "top";
-                        break;
-                    case 5:
-                        sort = "best";
-                        break;
-                }
-                prefsedit.putString("sort-" + widgetId, sort);
-                prefsedit.apply();
-                // set new text in button
-                WidgetCommon.showLoaderAndUpdate(WidgetMenuDialogActivity.this, widgetId, false);
-                dialog.dismiss();
-                WidgetMenuDialogActivity.this.finish();
+        builder.setItems(sorts.toArray(new String[]{}), (dialog, which) -> {
+            SharedPreferences.Editor prefsedit = prefs.edit();
+            String sort = "hot"; // default if fails
+            // find index
+            switch (which) {
+                case 0:
+                    sort = "hot";
+                    break;
+                case 1:
+                    sort = "new";
+                    break;
+                case 2:
+                    sort = "rising";
+                    break;
+                case 3:
+                    sort = "controversial";
+                    break;
+                case 4:
+                    sort = "top";
+                    break;
+                case 5:
+                    sort = "best";
+                    break;
             }
+            prefsedit.putString("sort-" + widgetId, sort);
+            prefsedit.apply();
+            // set new text in button
+            WidgetCommon.showLoaderAndUpdate(WidgetMenuDialogActivity.this, widgetId, false);
+            dialog.dismiss();
+            WidgetMenuDialogActivity.this.finish();
         });
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                dialog.dismiss();
-                WidgetMenuDialogActivity.this.finish();
-            }
+        builder.setOnCancelListener(dialog -> {
+            dialog.dismiss();
+            WidgetMenuDialogActivity.this.finish();
         });
         builder.show().setCanceledOnTouchOutside(true);
     }
@@ -326,42 +316,35 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
         final boolean[] initvalue = {prefs.getBoolean("imagepreviews-" + widgetIdStr, widgetId == 0), prefs.getBoolean("thumbnails-" + widgetIdStr, true), prefs.getBoolean("bigthumbs-" + widgetIdStr, false), prefs.getBoolean("hideinf-" + widgetIdStr, false)};
         AlertDialog.Builder builder = new AlertDialog.Builder(WidgetMenuDialogActivity.this);
         builder.setTitle(getString(R.string.widget_feed_prefs));
-        builder.setMultiChoiceItems(names, initvalue, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialogInterface, int item, boolean state) {
-                SharedPreferences.Editor prefsedit = prefs.edit();
-                switch (item) {
-                    case 0:
-                        prefsedit.putBoolean("imagepreviews-" + widgetId, state);
-                        break;
-                    case 1:
-                        prefsedit.putBoolean("thumbnails-" + widgetId, state);
-                        break;
-                    case 2:
-                        prefsedit.putBoolean("bigthumbs-" + widgetId, state);
-                        break;
-                    case 3:
-                        prefsedit.putBoolean("hideinf-" + widgetId, state);
-                        break;
-                }
-                prefsedit.apply();
-                needsUpdate = true;
+        builder.setMultiChoiceItems(names, initvalue, (dialogInterface, item, state) -> {
+            SharedPreferences.Editor prefsedit = prefs.edit();
+            switch (item) {
+                case 0:
+                    prefsedit.putBoolean("imagepreviews-" + widgetId, state);
+                    break;
+                case 1:
+                    prefsedit.putBoolean("thumbnails-" + widgetId, state);
+                    break;
+                case 2:
+                    prefsedit.putBoolean("bigthumbs-" + widgetId, state);
+                    break;
+                case 3:
+                    prefsedit.putBoolean("hideinf-" + widgetId, state);
+                    break;
             }
+            prefsedit.apply();
+            needsUpdate = true;
         });
-        builder.setPositiveButton(getString(R.string.close), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-                if (needsUpdate) {
-                    WidgetCommon.showLoaderAndUpdate(WidgetMenuDialogActivity.this, widgetId, false);
-                }
-                WidgetMenuDialogActivity.this.finish();
+        builder.setPositiveButton(getString(R.string.close), (dialog, id) -> {
+            dialog.cancel();
+            if (needsUpdate) {
+                WidgetCommon.showLoaderAndUpdate(WidgetMenuDialogActivity.this, widgetId, false);
             }
+            WidgetMenuDialogActivity.this.finish();
         });
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                dialog.dismiss();
-                WidgetMenuDialogActivity.this.finish();
-            }
+        builder.setOnCancelListener(dialog -> {
+            dialog.dismiss();
+            WidgetMenuDialogActivity.this.finish();
         });
         builder.show().setCanceledOnTouchOutside(true);
     }
@@ -384,12 +367,7 @@ public class WidgetMenuDialogActivity extends Activity implements PopupMenu.OnMe
                 String html = "&lt;p&gt;" + result.getString("subscribers") + " readers&lt;br/&gt;" + result.getString("accounts_active") + " users here now&lt;/p&gt;";
                 html += result.getString("description_html");
                 HtmlDialog.init(this, global.getSubredditManager().getCurrentFeedPath(widgetId), Utilities.fromHtml(html).toString())
-                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                WidgetMenuDialogActivity.this.finish();
-                            }
-                        });
+                        .setOnDismissListener(dialog -> WidgetMenuDialogActivity.this.finish());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

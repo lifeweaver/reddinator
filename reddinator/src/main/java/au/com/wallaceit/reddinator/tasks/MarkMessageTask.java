@@ -28,8 +28,8 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class MarkMessageTask extends AsyncTask<String, Integer, Boolean> {
-    private Reddinator global;
-    private ArrayList<String> redditIds;
+    private final Reddinator global;
+    private final ArrayList<String> redditIds;
     private RedditData.RedditApiException exception = null;
 
     public MarkMessageTask(Reddinator global, ArrayList<String> redditIds) {

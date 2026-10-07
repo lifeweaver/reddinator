@@ -29,9 +29,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.RemoteViews;
+
+import androidx.preference.PreferenceManager;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -156,8 +157,8 @@ public class WidgetCommon {
 
     private static int[] getAllAppWidgetIds(Context context) {
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        int listIds[] = mgr.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
-        int stackIds[] = mgr.getAppWidgetIds(new ComponentName(context, StackWidgetProvider.class));
+        int[] listIds = mgr.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
+        int[] stackIds = mgr.getAppWidgetIds(new ComponentName(context, StackWidgetProvider.class));
         return ArrayUtils.addAll(listIds, stackIds);
     }
 
@@ -170,14 +171,14 @@ public class WidgetCommon {
         PendingIntent updateIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, intent, Utilities.pendingFlags(false));
         final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        int ids[] = getAllAppWidgetIds(context);
+        int[] ids = getAllAppWidgetIds(context);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        long refreshRate = Long.valueOf(prefs.getString(context.getString(R.string.refresh_rate_pref), "43200000"));
+        long refreshRate = Long.parseLong(prefs.getString(context.getString(R.string.refresh_rate_pref), "43200000"));
 
         // If there are no widgets for the provider class, or refresh is disabled, cancel the alarm
         if (ids.length > 0 && refreshRate > 0) {
             long next = prefs.getLong("last_auto_refresh", 0) + refreshRate;
-            next = (next < System.currentTimeMillis() ? (System.currentTimeMillis()) : next);
+            next = (Math.max(next, System.currentTimeMillis()));
             alarmManager.setRepeating(AlarmManager.RTC, next, refreshRate, updateIntent);
             return;
         }

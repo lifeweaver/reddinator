@@ -39,7 +39,7 @@ import android.widget.Toast;
 
 import com.joanzapata.android.iconify.Iconify;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +48,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -60,13 +61,13 @@ import au.com.wallaceit.reddinator.tasks.VoteTask;
 
 public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callback {
 
-    private Context context;
-    private LayoutInflater inflater;
-    private Reddinator global;
-    private int feedId;
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final Reddinator global;
+    private final int feedId;
     private boolean canLoadMore = false;
     private JSONArray data;
-    private ActivityInterface feedInterface;
+    private final ActivityInterface feedInterface;
 
     private Bitmap[] images;
     private ThemeManager.Theme theme;
@@ -97,11 +98,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         this.showItemSubreddit = hasMultipleSubs;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // load the caches items
-        if (data != null) {
-            this.data = data;
-        } else {
-            this.data = new JSONArray();
-        }
+        this.data = Objects.requireNonNullElseGet(data, JSONArray::new);
         // load preferences
         loadTheme();
         loadFeedPrefs();
@@ -261,7 +258,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         if (position == data.length()) {
             // build load more item
             View loadmorerow = inflater.inflate(R.layout.listrowloadmore, parent, false);
-            TextView loadtxtview = (TextView) loadmorerow.findViewById(R.id.loadmoretxt);
+            TextView loadtxtview = loadmorerow.findViewById(R.id.loadmoretxt);
             if (canLoadMore) {
                 loadtxtview.setText(R.string.load_more);
             } else {
@@ -284,18 +281,18 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 row = inflater.inflate(R.layout.applistrow, parent, false);
                 ((ImageView) row.findViewById(R.id.votesicon)).setImageBitmap(images[0]);
                 ((ImageView) row.findViewById(R.id.commentsicon)).setImageBitmap(images[1]);
-                viewHolder.listheading = (TextView) row.findViewById(R.id.listheading);
-                viewHolder.sourcetxt = (TextView) row.findViewById(R.id.sourcetxt);
-                viewHolder.votestxt = (TextView) row.findViewById(R.id.votestxt);
-                viewHolder.commentstxt = (TextView) row.findViewById(R.id.commentstxt);
-                viewHolder.thumbview_top = (ImageView) row.findViewById(R.id.thumbnail_top);
-                viewHolder.thumbview = (ImageView) row.findViewById(R.id.thumbnail);
-                viewHolder.thumbview_expand = (ImageView) row.findViewById(R.id.thumbnail_expand);
-                viewHolder.preview = (ImageView) row.findViewById(R.id.preview);
+                viewHolder.listheading = row.findViewById(R.id.listheading);
+                viewHolder.sourcetxt = row.findViewById(R.id.sourcetxt);
+                viewHolder.votestxt = row.findViewById(R.id.votestxt);
+                viewHolder.commentstxt = row.findViewById(R.id.commentstxt);
+                viewHolder.thumbview_top = row.findViewById(R.id.thumbnail_top);
+                viewHolder.thumbview = row.findViewById(R.id.thumbnail);
+                viewHolder.thumbview_expand = row.findViewById(R.id.thumbnail_expand);
+                viewHolder.preview = row.findViewById(R.id.preview);
                 viewHolder.infview = row.findViewById(R.id.infbox);
-                viewHolder.upvotebtn = (ImageButton) row.findViewById(R.id.app_upvote);
-                viewHolder.downvotebtn = (ImageButton) row.findViewById(R.id.app_downvote);
-                viewHolder.nsfw = (TextView) row.findViewById(R.id.nsfwflag);
+                viewHolder.upvotebtn = row.findViewById(R.id.app_upvote);
+                viewHolder.downvotebtn = row.findViewById(R.id.app_downvote);
+                viewHolder.nsfw = row.findViewById(R.id.nsfwflag);
                 row.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) row.getTag();
@@ -342,7 +339,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             }
             // Update view
             viewHolder.listheading.setText(Utilities.fromHtml(name).toString());
-            viewHolder.listheading.setTextSize(Integer.valueOf(titleFontSize)); // use for compatibility setTextViewTextSize only introduced in API 16
+            viewHolder.listheading.setTextSize(Integer.parseInt(titleFontSize)); // use for compatibility setTextViewTextSize only introduced in API 16
             viewHolder.listheading.setTextColor(themeColors.get("headline_text"));
             String sourceText = (showItemSubreddit ? subreddit + " - " : "") + domain;
             viewHolder.sourcetxt.setText(sourceText);
@@ -367,18 +364,8 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 viewHolder.downvotebtn.setImageBitmap(images[4]);
             }
             // Set vote onclick listeners
-            viewHolder.upvotebtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    initialiseVote(position, 1);
-                }
-            });
-            viewHolder.downvotebtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    initialiseVote(position, -1);
-                }
-            });
+            viewHolder.upvotebtn.setOnClickListener(view -> initialiseVote(position, 1));
+            viewHolder.downvotebtn.setOnClickListener(view -> initialiseVote(position, -1));
             // Get thumbnail view & hide the other
             ImageView thumbView;
             if (bigThumbs) {
@@ -396,7 +383,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 imageLoadFlag = 2;
                 thumbView.setVisibility(View.GONE);
                 viewHolder.thumbview_expand.setVisibility(View.GONE);
-            } else if (loadThumbnails && thumbnail != null && !thumbnail.equals("")) {
+            } else if (loadThumbnails && !thumbnail.isEmpty()) {
                 // hide preview view
                 viewHolder.preview.setVisibility(View.GONE);
                 // check for default thumbnails

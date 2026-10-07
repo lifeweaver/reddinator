@@ -27,7 +27,7 @@ import android.widget.Toast;
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,7 +72,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
@@ -84,22 +84,16 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.theme_preview)
                     .setMessage(getString(R.string.theme_preview_clear_message, previewName))
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            global.mThemeManager.clearPreviewTheme();
-                            setResult(6); // indicate theme edit
-                            WidgetCommon.refreshAllWidgetViews(global);
-                        }
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                        global.mThemeManager.clearPreviewTheme();
+                        setResult(6); // indicate theme edit
+                        WidgetCommon.refreshAllWidgetViews(global);
                     })
-                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            global.mThemeManager.savePreviewTheme();
-                            refreshList();
-                            setResult(6); // indicate theme edit
-                            WidgetCommon.refreshAllWidgetViews(global);
-                        }
+                    .setPositiveButton(R.string.install, (dialog, which) -> {
+                        global.mThemeManager.savePreviewTheme();
+                        refreshList();
+                        setResult(6); // indicate theme edit
+                        WidgetCommon.refreshAllWidgetViews(global);
                     });
             builder.show().setCanceledOnTouchOutside(true);
         }
@@ -158,14 +152,11 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                 final HashMap<String, String> themesList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_ALL);
                 AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
                 builder.setTitle(resources.getString(R.string.choose_template))
-                        .setItems(themesList.values().toArray(new CharSequence[themesList.values().size()]), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                String themeId = (String) themesList.keySet().toArray()[i];
-                                Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
-                                intent.putExtra("templateId", themeId);
-                                startActivityForResult(intent, 1);
-                            }
+                        .setItems(themesList.values().toArray(new CharSequence[0]), (dialog, i) -> {
+                            String themeId = (String) themesList.keySet().toArray()[i];
+                            Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
+                            intent.putExtra("templateId", themeId);
+                            startActivityForResult(intent, 1);
                         });
                 builder.show();
                 break;
@@ -286,76 +277,56 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
             if (convertView == null || convertView.getTag() == null) {
                 convertView = getLayoutInflater().inflate(R.layout.themes_list_item, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.name = (TextView) convertView.findViewById(R.id.theme_name);
-                viewHolder.delete = (IconTextView) convertView.findViewById(R.id.theme_delete_btn);
-                viewHolder.share = (IconTextView) convertView.findViewById(R.id.theme_share_btn);
+                viewHolder.name = convertView.findViewById(R.id.theme_name);
+                viewHolder.delete = convertView.findViewById(R.id.theme_delete_btn);
+                viewHolder.share = convertView.findViewById(R.id.theme_share_btn);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             // setup the row
             final String themeId = (String) themesList.keySet().toArray()[position];
             viewHolder.name.setText(themesList.get(themeId));
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
-                    intent.putExtra("themeId", themeId);
-                    startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
-                }
+            convertView.setOnClickListener(v -> {
+                Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
+                intent.putExtra("themeId", themeId);
+                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
             });
-            viewHolder.delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
-                    builder.setTitle(resources.getString(R.string.delete_theme)).setMessage(resources.getString(R.string.delete_theme_message))
-                            .setPositiveButton(resources.getString(R.string.yes), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    global.mThemeManager.deleteCustomTheme(themeId);
-                                    refreshList();
-                                }
-                            }).setNegativeButton(resources.getString(R.string.no), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).show();
-                }
+            viewHolder.delete.setOnClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
+                builder.setTitle(resources.getString(R.string.delete_theme)).setMessage(resources.getString(R.string.delete_theme_message))
+                        .setPositiveButton(resources.getString(R.string.yes), (dialog, which) -> {
+                            global.mThemeManager.deleteCustomTheme(themeId);
+                            refreshList();
+                        }).setNegativeButton(resources.getString(R.string.no), (dialog, which) -> dialog.dismiss()).show();
             });
-            viewHolder.share.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!global.mRedditData.isLoggedIn()) {
-                        Toast.makeText(ThemesActivity.this, "Reddit Login Required", Toast.LENGTH_SHORT).show();
-                    }
-                    final EditText input = new EditText(ThemesActivity.this);
-                    input.setHint(R.string.title);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
-                    builder.setTitle(resources.getString(R.string.share_theme)).setMessage(resources.getString(R.string.share_theme_message))
-                            .setView(input)
-                            .setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String title = input.getText().toString();
-                                    if (title.length() > 292) {
-                                        Toast.makeText(ThemesActivity.this, getText(R.string.title_too_long_error), Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    if (title.length() == 0) {
-                                        Toast.makeText(ThemesActivity.this, getText(R.string.no_title_error), Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    String theme = global.mThemeManager.getThemeJSON(themeId).toString();
-                                    progressDialog = ProgressDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting), true);
-                                    new SubmitTask(global, "reddinator", "[Theme] " + title, "This theme was shared through Reddinator\n\r    reddinator_theme=" + theme, false, ThemesActivity.this).execute();
-                                }
-                            }).setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).show();
+            viewHolder.share.setOnClickListener(v -> {
+                if (!global.mRedditData.isLoggedIn()) {
+                    Toast.makeText(ThemesActivity.this, "Reddit Login Required", Toast.LENGTH_SHORT).show();
                 }
+                final EditText input = new EditText(ThemesActivity.this);
+                input.setHint(R.string.title);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
+                builder.setTitle(resources.getString(R.string.share_theme)).setMessage(resources.getString(R.string.share_theme_message))
+                        .setView(input)
+                        .setPositiveButton(resources.getString(R.string.ok), (dialog, which) -> {
+                            String title = input.getText().toString();
+                            if (title.length() > 292) {
+                                Toast.makeText(ThemesActivity.this, getText(R.string.title_too_long_error), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            if (title.isEmpty()) {
+                                Toast.makeText(ThemesActivity.this, getText(R.string.no_title_error), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            String theme = global.mThemeManager.getThemeJSON(themeId).toString();
+                            progressDialog = ProgressDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting), true);
+                            new SubmitTask(global, "reddinator", "[Theme] " + title, "This theme was shared through Reddinator\n\r    reddinator_theme=" + theme, false, ThemesActivity.this).execute();
+                        }).setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
             });
             return convertView;
         }
@@ -367,7 +338,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
 
         @Override
         public boolean isEmpty() {
-            return themesList.size() == 0;
+            return themesList.isEmpty();
         }
     }
 

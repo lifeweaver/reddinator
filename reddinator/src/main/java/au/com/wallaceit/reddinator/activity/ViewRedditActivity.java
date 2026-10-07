@@ -32,11 +32,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.SparseArray;
@@ -52,6 +47,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.preference.PreferenceManager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
@@ -104,7 +106,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     private RedditPageAdapter pageAdapter;
     private SimpleTabsWidget tabsIndicator;
     private Resources resources;
-    private int actionbarIconColor = Utilities.getActionbarIconColor();
+    private final int actionbarIconColor = Utilities.getActionbarIconColor();
     // info panel views
     private SlidingUpPanelLayout infoPanel;
     private TextView sourceText;
@@ -122,7 +124,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     /**
      * (non-Javadoc)
      *
-     * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
+     * @see androidx.core.app.FragmentActivity#onCreate(android.os.Bundle)
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +143,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        ImageView view = (ImageView) findViewById(android.R.id.home);
+        ImageView view = findViewById(android.R.id.home);
         if (view != null) {
             view.setPadding(5, 0, 5, 0);
         }
@@ -176,10 +178,10 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         // set content view
         setContentView(R.layout.activity_viewreddit);
         // Setup View Pager and widget
-        final RedditViewPager viewPager = (RedditViewPager) findViewById(R.id.tab_content);
+        final RedditViewPager viewPager = findViewById(R.id.tab_content);
         pageAdapter = new RedditPageAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pageAdapter);
-        LinearLayout tabLayout = (LinearLayout) findViewById(R.id.tab_widget);
+        LinearLayout tabLayout = findViewById(R.id.tab_widget);
         tabsIndicator = new SimpleTabsWidget(ViewRedditActivity.this, tabLayout);
         tabsIndicator.setViewPager(viewPager);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -205,21 +207,21 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             viewPager.setCurrentItem(0);
         }
         // setup info panel views
-        infoPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        infoPanel = findViewById(R.id.sliding_layout);
         infoPanel.setFadeOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 infoPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         });
-        sourceText = (TextView) findViewById(R.id.source_txt);
-        votesText = (TextView) findViewById(R.id.votes_txt);
-        votesIcon = (IconTextView) findViewById(R.id.votes_icon);
-        commentsText = (TextView) findViewById(R.id.comments_txt);
-        commentsIcon = (IconTextView) findViewById(R.id.comments_icon);
-        titleText = (TextView) findViewById(R.id.post_title);
-        infoText = (TextView) findViewById(R.id.info_txt);
-        lockButton = (IconTextView) findViewById(R.id.lockbutton);
+        sourceText = findViewById(R.id.source_txt);
+        votesText = findViewById(R.id.votes_txt);
+        votesIcon = findViewById(R.id.votes_icon);
+        commentsText = findViewById(R.id.comments_txt);
+        commentsIcon = findViewById(R.id.comments_icon);
+        titleText = findViewById(R.id.post_title);
+        infoText = findViewById(R.id.info_txt);
+        lockButton = findViewById(R.id.lockbutton);
         lockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,7 +230,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 viewPager.setPagingEnabled(!viewsLocked);
             }
         });
-        refreshButton = (IconTextView) findViewById(R.id.refresh_button);
+        refreshButton = findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,7 +238,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 loadPostTask = new LoadPostTask(global, ViewRedditActivity.this).execute(postPermalink, "best");
             }
         });
-        selfTextButton = (IconTextView) findViewById(R.id.selftext_button);
+        selfTextButton = findViewById(R.id.selftext_button);
         // theme
         updateTheme();
         // load post data; once loaded comment data is passed to the comment fragment
@@ -621,7 +623,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     /**
      * (non-Javadoc)
      *
-     * @see android.support.v4.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
+     * @see androidx.core.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
      */
     protected void onSaveInstanceState(Bundle outState) {
         //outState.putString("tab", mTabHost.getCurrentTabTag()); //save the tab selected
@@ -692,16 +694,13 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
             final String selftext = postInfo.getString("selftext_html");
             if (!selftext.equals("null")) {
-                selfTextButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                selfTextButton.setOnClickListener(v -> {
 
-                        String html = "<html><head><style type=\"text/css\"> a { word-wrap: break-word; } </style></head><body>";
-                        html += Utilities.fromHtml(selftext).toString();
-                        html += "</body></html>";
-                        HtmlDialog.init(ViewRedditActivity.this, getString(R.string.post_text), html);
+                    String html = "<html><head><style type=\"text/css\"> a { word-wrap: break-word; } </style></head><body>";
+                    html += Utilities.fromHtml(selftext).toString();
+                    html += "</body></html>";
+                    HtmlDialog.init(ViewRedditActivity.this, getString(R.string.post_text), html);
 
-                    }
                 });
                 selfTextButton.setVisibility(View.VISIBLE);
             }
@@ -779,15 +778,16 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
             return 2;
         }
 
+        @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             registeredFragments.put(position, fragment);
             return fragment;
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             registeredFragments.remove(position);
             super.destroyItem(container, position, object);
         }

@@ -27,9 +27,9 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
 public class CommentTask extends AsyncTask<String, Integer, JSONObject> {
-    private Reddinator global;
-    private String redditId;
-    private String messageText;
+    private final Reddinator global;
+    private final String redditId;
+    private final String messageText;
     private RedditData.RedditApiException exception = null;
     private Callback callback = null;
     private int action = 0; // 0=add, 1=edit, -1=delete

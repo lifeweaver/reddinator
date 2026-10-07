@@ -24,7 +24,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -37,7 +36,6 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -54,6 +52,7 @@ import com.joanzapata.android.iconify.Iconify;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import au.com.wallaceit.reddinator.R;
@@ -74,23 +73,20 @@ public class Utilities {
 
         int textWidth = (int) (paint.measureText(text) + pad * 2);
         int height = (int) (fontSize / 0.75);
-        Bitmap bitmap = Bitmap.createBitmap(textWidth, height, Bitmap.Config.ARGB_4444);
+        Bitmap bitmap = Bitmap.createBitmap(textWidth, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawText(text, (float) pad, fontSize, paint);
         return bitmap;
     }
 
     public static int getActionbarIconColor() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return Color.parseColor("#A5A5A5");
-        }
-        return Color.parseColor("#DBDBDB");
+        return Color.parseColor("#A5A5A5");
     }
 
     public static String getScoreText(int score) {
         // Since reddit changes their scoring system, we need to abbreviate high scores. eg. 17.3k
         if (score > 10000) {
-            return new BigDecimal((score / 1000)).setScale(1, BigDecimal.ROUND_HALF_UP).toString() + "k";
+            return new BigDecimal((score / 1000)).setScale(1, RoundingMode.HALF_UP).toString() + "k";
         }
         return String.valueOf(score);
     }
@@ -102,7 +98,10 @@ public class Utilities {
     public static PackageInfo getPackageInfo(Context context) {
         PackageInfo pInfo = null;
         try {
-            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            pInfo = context.getPackageManager().getPackageInfo(
+                    context.getPackageName(),
+                    PackageManager.PackageInfoFlags.of(0)
+            );
 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -134,6 +133,7 @@ public class Utilities {
         if (dir.exists()) {
             long result = 0;
             File[] fileList = dir.listFiles();
+
             for (File aFileList : fileList) {
                 // Recursive call if it's a directory
                 if (aFileList.isDirectory()) {
@@ -192,11 +192,7 @@ public class Utilities {
     }
 
     public static void executeJavascriptInWebview(WebView webView, String javascript) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webView.evaluateJavascript(javascript, null);
-        } else {
-            webView.loadUrl("javascript:" + javascript);
-        }
+        webView.evaluateJavascript(javascript, null);
     }
 
     public static ColorMatrixColorFilter getColorFilterFromColor(int color, int darken) {
@@ -217,12 +213,7 @@ public class Utilities {
     }
 
     public static Spanned fromHtml(String html) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            //noinspection deprecation
-            return Html.fromHtml(html);
-        }
+        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
 
     public static void updateActionbarOverflowIcon(final Activity context, final int iconColor) {
@@ -262,8 +253,6 @@ public class Utilities {
 
     public static int voteDirectionToInt(String vote) {
         switch (vote) {
-            case "null":
-                return 0;
             case "true":
                 return 1;
             case "false":
@@ -275,8 +264,6 @@ public class Utilities {
 
     public static String voteDirectionToString(int vote) {
         switch (vote) {
-            case 0:
-                return "null";
             case 1:
                 return "true";
             case -1:
@@ -289,20 +276,8 @@ public class Utilities {
     public static AlertDialog showPostShareDialog(final Context context, final String postUrl, final String postPermalink) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getString(R.string.share_url))
-                .setNegativeButton(context.getString(R.string.content), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        intentActionShareText(context, postUrl);
-                    }
-                }).setPositiveButton(context.getString(R.string.both), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        intentActionShareText(context, postUrl + "\nhttps://reddit.com" + postPermalink);
-                    }
-                })
-                .setNeutralButton(context.getString(R.string.reddit_page), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        intentActionShareText(context, "https://reddit.com" + postPermalink);
-                    }
-                });
+                .setNegativeButton(context.getString(R.string.content), (dialog, id) -> intentActionShareText(context, postUrl)).setPositiveButton(context.getString(R.string.both), (dialog, id) -> intentActionShareText(context, postUrl + "\nhttps://reddit.com" + postPermalink))
+                .setNeutralButton(context.getString(R.string.reddit_page), (dialog, id) -> intentActionShareText(context, "https://reddit.com" + postPermalink));
         AlertDialog dialog = builder.create();
         dialog.show();
         return dialog;
@@ -329,13 +304,10 @@ public class Utilities {
                     .setTitle(R.string.error)
                     .setMessage(ex.getMessage() + context.getString(R.string.reddit_server_error_message))
                     .setNegativeButton(R.string.cancel, null)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("http://www.redditstatus.com/"));
-                            context.startActivity(intent);
-                        }
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("http://www.redditstatus.com/"));
+                        context.startActivity(intent);
                     }).show().setCanceledOnTouchOutside(true);
             return;
         }
@@ -386,9 +358,9 @@ public class Utilities {
 
     public static int pendingFlags(boolean mutable) {
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && mutable) {
+        if (mutable) {
             flags |= PendingIntent.FLAG_MUTABLE;
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        } else {
             flags |= PendingIntent.FLAG_IMMUTABLE;
         }
         return flags;

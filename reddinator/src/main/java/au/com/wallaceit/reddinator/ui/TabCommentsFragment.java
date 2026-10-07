@@ -27,20 +27,22 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -122,7 +124,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
         }
         if (mFirstTime) {
             ll = (LinearLayout) inflater.inflate(R.layout.webtab, container, false);
-            mWebView = (WebView) ll.findViewById(R.id.webView1);
+            mWebView = ll.findViewById(R.id.webView1);
             int backgroundColor = Color.parseColor(((ViewRedditActivity) getActivity()).getCurrentTheme().getValue("background_color"));
             mWebView.setBackgroundColor(backgroundColor);
             WebSettings webSettings = mWebView.getSettings();
@@ -139,7 +141,8 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
             final String themeStr = global.mThemeManager.getActiveTheme("appthemepref").getValuesString(true);
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                    String url = request.getUrl().toString();
 
                     global.handleLink(getContext(), url);
                     return true; // always override url
@@ -364,7 +367,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
         CommentsLoader(String sort, String moreId, String children) {
             mSort = sort;
-            if (children != null && !children.equals("")) {
+            if (children != null && !children.isEmpty()) {
                 loadMore = true;
                 mMoreId = moreId;
                 mChildren = children;

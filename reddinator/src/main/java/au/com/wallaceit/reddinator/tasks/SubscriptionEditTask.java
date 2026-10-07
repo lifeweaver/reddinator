@@ -46,12 +46,12 @@ public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
     public static final int ACTION_SUBSCRIBE_BY_PATH = 11;
     public static final int ACTION_FILTER_SUB_ADD = 9;
     public static final int ACTION_FILTER_SUB_REMOVE = 10;
-    private Reddinator global;
-    private WeakReference<Context> contextRef;
-    private Callback callback;
+    private final Reddinator global;
+    private final WeakReference<Context> contextRef;
+    private final Callback callback;
     private JSONObject data;
     private RedditData.RedditApiException exception;
-    private int action;
+    private final int action;
     private Object[] params;
     private ProgressDialog progressDialog;
     private String loadingMessage = "";
