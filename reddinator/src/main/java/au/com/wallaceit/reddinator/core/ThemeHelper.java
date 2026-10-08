@@ -53,16 +53,13 @@ public class ThemeHelper {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle(R.string.install_theme_title)
                         .setMessage(R.string.install_theme_message)
-                        .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (global.mThemeManager.importTheme(themeJson)) {
-                                    Toast.makeText(context, R.string.theme_install_success, Toast.LENGTH_LONG).show();
-                                } else {
-                                    Toast.makeText(context, R.string.theme_load_error, Toast.LENGTH_LONG).show();
-                                }
-                                callback.onThemeResult(false);
+                        .setPositiveButton(R.string.install, (dialog, which) -> {
+                            if (global.mThemeManager.importTheme(themeJson)) {
+                                Toast.makeText(context, R.string.theme_install_success, Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(context, R.string.theme_load_error, Toast.LENGTH_LONG).show();
                             }
+                            callback.onThemeResult(false);
                         })
                         .setNeutralButton(R.string.preview, (dialog, which) -> {
                             dialog.dismiss();

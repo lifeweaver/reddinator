@@ -104,12 +104,9 @@ public class AboutDialog extends Dialog {
         TextView version = findViewById(R.id.version);
         version.setText(context.getResources().getString(R.string.version_label, Utilities.getPackageInfo(context).versionName));
         version.setTextColor(headerText2);
-        findViewById(R.id.github).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/micwallace/reddinator"));
-                context.startActivity(intent);
-            }
+        findViewById(R.id.github).setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/micwallace/reddinator"));
+            context.startActivity(intent);
         });
         // setup credits
         WebView cwv = findViewById(R.id.info_credits);

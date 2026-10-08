@@ -309,12 +309,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                             String theme = global.mThemeManager.getThemeJSON(themeId).toString();
                             progressDialog = ProgressDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting), true);
                             new SubmitTask(global, "reddinator", "[Theme] " + title, "This theme was shared through Reddinator\n\r    reddinator_theme=" + theme, false, ThemesActivity.this).execute();
-                        }).setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
+                        }).setNegativeButton(resources.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).show();
             });
             return convertView;
         }

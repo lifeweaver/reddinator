@@ -74,12 +74,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.activity_item_dialog);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                close(0);
-            }
-        });
+        dialog.setOnCancelListener(dialog -> close(0));
         // check if it is a self post and remove view domain option
 
         final ItemOptionsAdapter adapter = new ItemOptionsAdapter();
@@ -178,23 +173,15 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                     name.selectAll();
                     AlertDialog.Builder builder = new AlertDialog.Builder(FeedItemDialogActivity.this);
                     builder.setView(layout).setTitle(getString(R.string.copy_multi))
-                            .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
+                            .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel())
+                            .setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
+                                if (name.getText().toString().isEmpty()) {
+                                    Toast.makeText(FeedItemDialogActivity.this, getString(R.string.enter_multi_name_error), Toast.LENGTH_LONG).show();
+                                    return;
                                 }
-                            })
-                            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    if (name.getText().toString().isEmpty()) {
-                                        Toast.makeText(FeedItemDialogActivity.this, getString(R.string.enter_multi_name_error), Toast.LENGTH_LONG).show();
-                                        return;
-                                    }
-                                    new SubscriptionEditTask(global, FeedItemDialogActivity.this, FeedItemDialogActivity.this, SubscriptionEditTask.ACTION_MULTI_COPY)
-                                            .execute(name.getText().toString(), multiPath.replaceFirst(".*reddit.com", ""));
-                                    dialogInterface.dismiss();
-                                }
+                                new SubscriptionEditTask(global, FeedItemDialogActivity.this, FeedItemDialogActivity.this, SubscriptionEditTask.ACTION_MULTI_COPY)
+                                        .execute(name.getText().toString(), multiPath.replaceFirst(".*reddit.com", ""));
+                                dialogInterface.dismiss();
                             })
                             .setOnCancelListener(dialog -> close(0))
                             .show().setCanceledOnTouchOutside(true);

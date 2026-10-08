@@ -785,16 +785,8 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                         if (global.mRedditData.isLoggedIn() && (!sreddit.equals("Front Page") && !sreddit.equals("all"))) {
                             new AlertDialog.Builder(SubredditSelectActivity.this).setTitle(resources.getString(R.string.unsubscribe))
                                     .setMessage(resources.getString(R.string.confirm_unsubscribe, sreddit))
-                                    .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                        }
-                                    }).setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_UNSUBSCRIBE).execute(sreddit);
-                                        }
-                                    }).show().setCanceledOnTouchOutside(true);
+                                    .setNegativeButton(resources.getString(R.string.cancel), (dialogInterface, i) -> {
+                                    }).setPositiveButton(resources.getString(R.string.ok), (dialogInterface, i) -> new SubscriptionEditTask(global, SubredditSelectActivity.this, SubredditSelectActivity.this, SubscriptionEditTask.ACTION_UNSUBSCRIBE).execute(sreddit)).show().setCanceledOnTouchOutside(true);
                         } else {
                             global.getSubredditManager().removeSubreddit(sreddit);
                             subredditList.remove(sreddit);

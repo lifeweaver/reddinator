@@ -265,12 +265,9 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 loadtxtview.setText(R.string.nothing_more_here);
             }
             loadtxtview.setTextColor(themeColors.get("load_text"));
-            loadmorerow.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((TextView) view.findViewById(R.id.loadmoretxt)).setText(R.string.loading);
-                    feedInterface.loadMore();
-                }
+            loadmorerow.setOnClickListener(view -> {
+                ((TextView) view.findViewById(R.id.loadmoretxt)).setText(R.string.loading);
+                feedInterface.loadMore();
             });
             return loadmorerow;
         } else {
@@ -449,13 +446,10 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
                 }
                 // check if url is image, if so, add ViewImageDialog intent and show indicator
                 if (Utilities.isImageUrl(url)) {
-                    imageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(context, ViewImageDialogActivity.class);
-                            intent.putExtras(getItemExtras(position));
-                            context.startActivity(intent);
-                        }
+                    imageView.setOnClickListener(v -> {
+                        Intent intent = new Intent(context, ViewImageDialogActivity.class);
+                        intent.putExtras(getItemExtras(position));
+                        context.startActivity(intent);
                     });
                     viewHolder.thumbview_expand.setImageBitmap(images[6]);
                     viewHolder.thumbview_expand.setVisibility(View.VISIBLE);

@@ -461,26 +461,24 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         final boolean[] initvalue = {global.mSharedPreferences.getBoolean("imagepreviews-app", true), global.mSharedPreferences.getBoolean("thumbnails-app", true), global.mSharedPreferences.getBoolean("bigthumbs-app", false), global.mSharedPreferences.getBoolean("hideinf-app", false)};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.app_feed_prefs));
-        builder.setMultiChoiceItems(names, initvalue, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialogInterface, int item, boolean state) {
-                SharedPreferences.Editor prefsedit = global.mSharedPreferences.edit();
-                switch (item) {
-                    case 0:
-                        prefsedit.putBoolean("imagepreviews-app", state);
-                        break;
-                    case 1:
-                        prefsedit.putBoolean("thumbnails-app", state);
-                        break;
-                    case 2:
-                        prefsedit.putBoolean("bigthumbs-app", state);
-                        break;
-                    case 3:
-                        prefsedit.putBoolean("hideinf-app", state);
-                        break;
-                }
-                prefsedit.apply();
-                needsFeedViewUpdate = true;
+        builder.setMultiChoiceItems(names, initvalue, (dialogInterface, item, state) -> {
+            SharedPreferences.Editor prefsedit = global.mSharedPreferences.edit();
+            switch (item) {
+                case 0:
+                    prefsedit.putBoolean("imagepreviews-app", state);
+                    break;
+                case 1:
+                    prefsedit.putBoolean("thumbnails-app", state);
+                    break;
+                case 2:
+                    prefsedit.putBoolean("bigthumbs-app", state);
+                    break;
+                case 3:
+                    prefsedit.putBoolean("hideinf-app", state);
+                    break;
             }
+            prefsedit.apply();
+            needsFeedViewUpdate = true;
         });
         builder.setPositiveButton(getString(R.string.close), (dialog, id) -> dialog.cancel());
         builder.setOnCancelListener(dialog -> {

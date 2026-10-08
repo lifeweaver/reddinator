@@ -190,50 +190,47 @@ public class ThemeEditorActivity extends ListActivity {
                 viewHolder.colorOptions.setVisibility(View.VISIBLE);
 
                 final String finalKey = key;
-                convertView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final Dialog dialog = new Dialog(ThemeEditorActivity.this);
-                        dialog.setTitle(resources.getString(R.string.select_color));
-                        dialog.setContentView(R.layout.color_picker_dialog);
-                        // Initialise the color picker
-                        final ColorPicker picker = dialog.findViewById(R.id.picker);
-                        SaturationBar sBar = dialog.findViewById(R.id.saturationbar);
-                        ValueBar vBar = dialog.findViewById(R.id.valuebar);
-                        OpacityBar opacityBar = dialog.findViewById(R.id.opacitybar);
-                        picker.addSaturationBar(sBar);
-                        picker.addValueBar(vBar);
-                        // is opacity needed?
-                        final boolean useAlpha = theme.getValue(finalKey).length() > 7;
-                        if (useAlpha) {
-                            picker.addOpacityBar(opacityBar);
-                        } else {
-                            opacityBar.setVisibility(View.GONE);
-                        }
-                        // set current color
-                        int curColor;
-                        try {
-                            curColor = Color.parseColor(theme.getValue(finalKey));
-                        } catch (IllegalArgumentException iae) {
-                            curColor = Color.WHITE;
-                        }
-                        picker.setColor(curColor);
-                        picker.setOldCenterColor(curColor);
-
-                        Button okButton = dialog.findViewById(R.id.button_ok);
-                        okButton.setOnClickListener(v1 -> {
-                            String hexColor = useAlpha ? ("#" + Integer.toHexString(picker.getColor())) : String.format("#%06X", (0xFFFFFF & picker.getColor()));
-                            theme.setValue(finalKey, hexColor.toUpperCase());
-                            themeChanged = true;
-                            refreshList();
-                            dialog.dismiss();
-                        });
-
-                        Button cancelButton = dialog.findViewById(R.id.button_cancel);
-                        cancelButton.setOnClickListener(v2 -> dialog.dismiss());
-
-                        dialog.show();
+                convertView.setOnClickListener(v -> {
+                    final Dialog dialog = new Dialog(ThemeEditorActivity.this);
+                    dialog.setTitle(resources.getString(R.string.select_color));
+                    dialog.setContentView(R.layout.color_picker_dialog);
+                    // Initialise the color picker
+                    final ColorPicker picker = dialog.findViewById(R.id.picker);
+                    SaturationBar sBar = dialog.findViewById(R.id.saturationbar);
+                    ValueBar vBar = dialog.findViewById(R.id.valuebar);
+                    OpacityBar opacityBar = dialog.findViewById(R.id.opacitybar);
+                    picker.addSaturationBar(sBar);
+                    picker.addValueBar(vBar);
+                    // is opacity needed?
+                    final boolean useAlpha = theme.getValue(finalKey).length() > 7;
+                    if (useAlpha) {
+                        picker.addOpacityBar(opacityBar);
+                    } else {
+                        opacityBar.setVisibility(View.GONE);
                     }
+                    // set current color
+                    int curColor;
+                    try {
+                        curColor = Color.parseColor(theme.getValue(finalKey));
+                    } catch (IllegalArgumentException iae) {
+                        curColor = Color.WHITE;
+                    }
+                    picker.setColor(curColor);
+                    picker.setOldCenterColor(curColor);
+
+                    Button okButton = dialog.findViewById(R.id.button_ok);
+                    okButton.setOnClickListener(v1 -> {
+                        String hexColor = useAlpha ? ("#" + Integer.toHexString(picker.getColor())) : String.format("#%06X", (0xFFFFFF & picker.getColor()));
+                        theme.setValue(finalKey, hexColor.toUpperCase());
+                        themeChanged = true;
+                        refreshList();
+                        dialog.dismiss();
+                    });
+
+                    Button cancelButton = dialog.findViewById(R.id.button_cancel);
+                    cancelButton.setOnClickListener(v2 -> dialog.dismiss());
+
+                    dialog.show();
                 });
 
                 viewHolder.simplePickBtn.setOnClickListener(view -> {
@@ -250,12 +247,7 @@ public class ThemeEditorActivity extends ListActivity {
                                 refreshList();
                                 dialogInterface.dismiss();
                             })
-                            .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            }).show();
+                            .setNegativeButton(resources.getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.dismiss()).show();
                 });
                 viewHolder.customPickBtn.setOnClickListener(view -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ThemeEditorActivity.this);
@@ -278,12 +270,7 @@ public class ThemeEditorActivity extends ListActivity {
                                 themeChanged = true;
                                 refreshList();
                             })
-                            .setNegativeButton(resources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            }).show();
+                            .setNegativeButton(resources.getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.dismiss()).show();
                 });
             }
 

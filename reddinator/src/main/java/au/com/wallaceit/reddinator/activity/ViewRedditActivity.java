@@ -204,12 +204,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         }
         // setup info panel views
         infoPanel = findViewById(R.id.sliding_layout);
-        infoPanel.setFadeOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                infoPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            }
-        });
+        infoPanel.setFadeOnClickListener(v -> infoPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED));
         sourceText = findViewById(R.id.source_txt);
         votesText = findViewById(R.id.votes_txt);
         votesIcon = findViewById(R.id.votes_icon);
@@ -218,21 +213,15 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
         titleText = findViewById(R.id.post_title);
         infoText = findViewById(R.id.info_txt);
         lockButton = findViewById(R.id.lockbutton);
-        lockButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewsLocked = !viewsLocked;
-                lockButton.setTextColor(viewsLocked ? Color.parseColor("#E06B6C") : Color.parseColor("#DBDBDB"));
-                viewPager.setPagingEnabled(!viewsLocked);
-            }
+        lockButton.setOnClickListener(v -> {
+            viewsLocked = !viewsLocked;
+            lockButton.setTextColor(viewsLocked ? Color.parseColor("#E06B6C") : Color.parseColor("#DBDBDB"));
+            viewPager.setPagingEnabled(!viewsLocked);
         });
         refreshButton = findViewById(R.id.refresh_button);
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setTitle(R.string.loading);
-                loadPostTask = new LoadPostTask(global, ViewRedditActivity.this).execute(postPermalink, "best");
-            }
+        refreshButton.setOnClickListener(v -> {
+            setTitle(R.string.loading);
+            loadPostTask = new LoadPostTask(global, ViewRedditActivity.this).execute(postPermalink, "best");
         });
         selfTextButton = findViewById(R.id.selftext_button);
         // theme
@@ -503,16 +492,8 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     private void showOpenDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewRedditActivity.this);
         builder.setMessage(resources.getString(R.string.open_link))
-                .setNegativeButton(resources.getString(R.string.content), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Utilities.intentActionView(ViewRedditActivity.this, postUrl);
-                    }
-                })
-                .setPositiveButton(resources.getString(R.string.reddit_page), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Utilities.intentActionView(ViewRedditActivity.this, "https://reddit.com" + postPermalink);
-                    }
-                });
+                .setNegativeButton(resources.getString(R.string.content), (dialog, id) -> Utilities.intentActionView(ViewRedditActivity.this, postUrl))
+                .setPositiveButton(resources.getString(R.string.reddit_page), (dialog, id) -> Utilities.intentActionView(ViewRedditActivity.this, "https://reddit.com" + postPermalink));
         builder.create().show();
     }
 

@@ -79,43 +79,41 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
 
         final HitTestResult result = getHitTestResult();
 
-        MenuItem.OnMenuItemClickListener handler = new MenuItem.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
+        MenuItem.OnMenuItemClickListener handler = item -> {
 
-                Intent intent;
+            Intent intent;
 
-                switch (item.getItemId()) {
-                    case ID_COPYLINK:
-                        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText(result.getExtra(), result.getExtra());
-                        clipboard.setPrimaryClip(clip);
-                        Toast.makeText(getContext(), R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
-                        return true;
+            switch (item.getItemId()) {
+                case ID_COPYLINK:
+                    ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText(result.getExtra(), result.getExtra());
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getContext(), R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+                    return true;
 
-                    case ID_OPENLINK:
-                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(result.getExtra()));
-                        getContext().startActivity(intent);
-                        return true;
+                case ID_OPENLINK:
+                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(result.getExtra()));
+                    getContext().startActivity(intent);
+                    return true;
 
-                    case ID_SHARELINK:
-                        intent = new Intent(Intent.ACTION_SEND);
-                        intent.setType("text/plain");
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Shared from Reddinator");
-                        intent.putExtra(Intent.EXTRA_TEXT, result.getExtra());
-                        getContext().startActivity(intent);
-                        return true;
+                case ID_SHARELINK:
+                    intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Shared from Reddinator");
+                    intent.putExtra(Intent.EXTRA_TEXT, result.getExtra());
+                    getContext().startActivity(intent);
+                    return true;
 
-                    // This stuff needs additional permissions so saving it for next version
-                    case ID_SAVEIMAGE:
-                        downloadFile(result.getExtra());
-                        return true;
+                // This stuff needs additional permissions so saving it for next version
+                case ID_SAVEIMAGE:
+                    downloadFile(result.getExtra());
+                    return true;
 
-                    case ID_SHAREIMAGE:
-                        shareImage(result.getExtra());
-                        return true;
-                }
-                return false;
+                case ID_SHAREIMAGE:
+                    shareImage(result.getExtra());
+                    return true;
             }
+            return false;
         };
 
         if (result.getType() == HitTestResult.IMAGE_TYPE || result.getType() == HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
