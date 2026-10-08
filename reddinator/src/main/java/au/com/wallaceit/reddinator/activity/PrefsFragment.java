@@ -28,17 +28,13 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.service.MailCheckReceiver;
-import au.com.wallaceit.reddinator.service.WidgetCommon;
 import au.com.wallaceit.reddinator.tasks.SyncUserDataTask;
 
 public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, DirectoryChooserFragment.OnFragmentInteractionListener {
-    public int mAppWidgetId;
     private SharedPreferences mSharedPreferences;
-    private String mRefreshrate = "";
     private String mTitleFontSize = "";
     private String mAppTheme = "";
     private String mMailRefresh = "";
-    boolean isfromappview = false;
     private Reddinator global;
     private boolean themeChanged = false;
     private PreferenceCategory appearanceCat;
@@ -184,7 +180,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         switch (key) {
             case "appthemepref":
                 setupThemePrefs();
-            case "logoopenpref":
             case "commentslayoutpref":
             case "commentsborderpref":
                 themeChanged = true;
@@ -201,15 +196,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     @Override
     public void onResume() {
         super.onResume();
-        Intent intent = getActivity().getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            isfromappview = !intent.hasExtra(AppWidgetManager.EXTRA_APPWIDGET_ID);
-            if (!isfromappview) {
-                mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-            }
-        }
-        mRefreshrate = mSharedPreferences.getString(getString(R.string.refresh_rate_pref), "43200000");
         mTitleFontSize = mSharedPreferences.getString(getString(R.string.title_font_pref), "16");
         setupThemePrefs();
 
@@ -255,11 +241,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     }
 
     private void saveSettingsAndFinish() {
-        // check if refresh rate has changed and update if needed
-        if (!mRefreshrate.equals(mSharedPreferences.getString(getString(R.string.refresh_rate_pref), "43200000"))) {
-            //System.out.println("Refresh preference changed, updating alarm");
-            WidgetCommon.setUpdateSchedule(getActivity());
-        }
         // check if background mail check interval has changed
         if (!mMailRefresh.equals(mSharedPreferences.getString(getString(R.string.background_mail_pref), "43200000"))) {
             //System.out.println("Refresh preference changed, updating alarm");
@@ -271,12 +252,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             Intent intent = new Intent();
             intent.putExtra("themeupdate", true);
             getActivity().setResult(6, intent);
-            if (getActivity().getIntent().getIntExtra("requestCode", 0) != ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES) {
-                Reddinator global = ((Reddinator) getActivity().getApplicationContext());
-                if (global != null) {
-                    WidgetCommon.refreshAllWidgetViews(global);
-                }
-            }
         }
 
         getActivity().finish();

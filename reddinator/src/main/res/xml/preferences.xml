@@ -1,31 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Widgets">
-
-        <ListPreference
-            android:key="@string/on_click_pref"
-            android:title="@string/on_click_pref_title"
-            android:defaultValue="1"
-            android:summary="@string/on_click_pref_summary"
-            android:entries="@array/onclick_list_preference"
-            android:entryValues="@array/onclick_values_list_preference"
-            android:dialogTitle="@string/on_click_pref_summary" />
-        <ListPreference
-            android:key="@string/refresh_rate_pref"
-            android:title="@string/refresh_rate_pref_title"
-            android:defaultValue="43200000"
-            android:summary="@string/refresh_rate_pref_summary"
-            android:entries="@array/widget_refresh_list"
-            android:entryValues="@array/widget_refresh_values"
-            android:dialogTitle="@string/refresh_rate_pref_summary" />
-        <CheckBoxPreference
-            android:key="@string/logo_open_pref"
-            android:title="@string/logo_open_pref_title"
-            android:defaultValue="true"
-            android:summary="@string/logo_open_pref_summary" />
-
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="Feeds &amp; Filters">
 
         <CheckBoxPreference
@@ -87,15 +61,6 @@
             android:title="@string/theme_manager_pref_title"
             android:key="theme_manager_button"
             android:summary="@string/theme_manager_pref_summary" />
-
-        <ListPreference
-            android:key="@string/title_font_pref"
-            android:title="@string/title_font_pref_title"
-            android:defaultValue="16"
-            android:summary="@string/title_font_pref_summary"
-            android:entries="@array/widget_fontsize_preference"
-            android:entryValues="@array/widget_fontsize_preference"
-            android:dialogTitle="@string/title_font_pref_summary" />
 
         <ListPreference
             android:key="@string/comments_layout_pref"

@@ -22,7 +22,6 @@ package au.com.wallaceit.reddinator.service;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
@@ -51,10 +50,6 @@ public class UpgradeReceiver extends BroadcastReceiver {
         // Migrate feeds to new file storage and remove from preferences
         migrateFeedData(0); // app feed data
         AppWidgetManager mgr2 = AppWidgetManager.getInstance(context);
-        int[] appWidgetIds = mgr2.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
-        for (int appWidgetId : appWidgetIds) {
-            migrateFeedData(appWidgetId);
-        }
     }
 
     private void deleteRecursive(File fileOrDirectory) {

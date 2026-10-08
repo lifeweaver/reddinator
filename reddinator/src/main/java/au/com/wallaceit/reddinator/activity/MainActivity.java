@@ -146,12 +146,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
                 return;
             }
             feedId = -1;
-            srclick = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(MainActivity.this, "This is a temporary feed, change sort and preferences from the menu", Toast.LENGTH_LONG).show();
-                }
-            };
+            srclick = view -> Toast.makeText(MainActivity.this, "This is a temporary feed, change sort and preferences from the menu", Toast.LENGTH_LONG).show();
             findViewById(R.id.appcaret).setVisibility(View.GONE);
             // put into theme viewing mode if view_themes extra is provided
             if (getIntent().getBooleanExtra("view_themes", false)) {

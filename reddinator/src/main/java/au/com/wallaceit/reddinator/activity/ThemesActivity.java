@@ -39,7 +39,6 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-import au.com.wallaceit.reddinator.service.WidgetCommon;
 import au.com.wallaceit.reddinator.tasks.SubmitTask;
 import au.com.wallaceit.reddinator.ui.ActionbarActivity;
 
@@ -87,13 +86,11 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                     .setNegativeButton(R.string.cancel, (dialog, which) -> {
                         global.mThemeManager.clearPreviewTheme();
                         setResult(6); // indicate theme edit
-                        WidgetCommon.refreshAllWidgetViews(global);
                     })
                     .setPositiveButton(R.string.install, (dialog, which) -> {
                         global.mThemeManager.savePreviewTheme();
                         refreshList();
                         setResult(6); // indicate theme edit
-                        WidgetCommon.refreshAllWidgetViews(global);
                     });
             builder.show().setCanceledOnTouchOutside(true);
         }
@@ -111,15 +108,6 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
             themesEdited = true;
             setResult(RESULT_CODE_THEME_UPDATED);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (themesEdited && (getIntent().hasExtra("requestCode") && getIntent().getExtras().getInt("requestCode") != REQUEST_CODE_NO_WIDGET_UPDATES)) {
-            // update widgets straight away if the requesting activity does not process the result
-            WidgetCommon.refreshAllWidgetViews(global);
-        }
-        super.onBackPressed();
     }
 
     private void refreshList() {

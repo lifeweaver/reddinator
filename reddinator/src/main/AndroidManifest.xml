@@ -59,9 +59,6 @@
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activity.ViewAllSubredditsActivity"
@@ -125,54 +122,10 @@
             android:windowSoftInputMode="adjustResize" />
 
         <service
-            android:name=".service.WidgetService"
-            android:enabled="true"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <service
             android:name=".service.MailCheckService"
             android:enabled="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver
-            android:name=".service.WidgetProvider"
-            android:enabled="true"
-            android:exported="true"
-            android:label="@string/list_widget">
-            <intent-filter>
-                <action android:name="wallaceit.redinator.action.APPWIDGET_ITEM_CLICK" />
-                <action android:name="wallaceit.redinator.action.APPWIDGET_AUTO_UPDATE" />
-                <action android:name="wallaceit.redinator.action.APPWIDGET_UPDATE_FEED" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/app_widget_provider_info" />
-        </receiver>
-        <receiver
-            android:name=".service.StackWidgetProvider"
-            android:enabled="true"
-            android:exported="true"
-            android:label="@string/stack_widget">
-            <intent-filter>
-                <action android:name="wallaceit.redinator.action.APPWIDGET_ITEM_CLICK" />
-                <action android:name="wallaceit.redinator.action.APPWIDGET_AUTO_UPDATE" />
-                <action android:name="wallaceit.redinator.action.APPWIDGET_UPDATE_FEED" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/app_widget_stack_provider_info" />
-        </receiver>
         <receiver
             android:name=".service.MailCheckReceiver"
             android:enabled="true" />
@@ -214,14 +167,6 @@
             </intent-filter>
             -->
         </activity>
-        <activity
-            android:name=".activity.WidgetMenuDialogActivity"
-            android:configChanges="orientation|screenSize"
-            android:excludeFromRecents="true"
-            android:label="@string/app_name"
-            android:noHistory="true"
-            android:taskAffinity=".WidgetMenuDialogActivity"
-            android:theme="@style/TransparentActivityUndimmed" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

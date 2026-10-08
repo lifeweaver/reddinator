@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
-import au.com.wallaceit.reddinator.service.WidgetCommon;
 
 public class ThemeHelper {
 
@@ -69,7 +68,6 @@ public class ThemeHelper {
                             dialog.dismiss();
                             if (global.mThemeManager.setPreviewTheme(themeJson)) {
                                 //refreshTheme();
-                                WidgetCommon.refreshAllWidgetViews(global);
                                 new AlertDialog.Builder(context)
                                         .setTitle(R.string.theme_preview)
                                         .setMessage(R.string.theme_preview_applied_message)

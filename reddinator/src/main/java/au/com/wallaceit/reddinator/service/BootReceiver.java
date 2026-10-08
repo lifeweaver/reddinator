@@ -33,7 +33,5 @@ public class BootReceiver extends BroadcastReceiver {
         }
         // set mail check alarm
         MailCheckReceiver.setAlarm(context);
-        // set widget update alarm if widgets enabled
-        WidgetCommon.setUpdateSchedule(context);
     }
 }

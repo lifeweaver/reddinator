@@ -17,7 +17,6 @@
  */
 package au.com.wallaceit.reddinator.activity;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -30,7 +29,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -74,7 +72,6 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.service.MailCheckService;
-import au.com.wallaceit.reddinator.service.WidgetCommon;
 import au.com.wallaceit.reddinator.tasks.LoadPostTask;
 import au.com.wallaceit.reddinator.tasks.SavePostTask;
 import au.com.wallaceit.reddinator.tasks.VoteTask;
@@ -126,7 +123,6 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
      *
      * @see androidx.core.app.FragmentActivity#onCreate(android.os.Bundle)
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     protected void onCreate(Bundle savedInstanceState) {
         // set window flags
         getWindow().requestFeature(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -247,6 +243,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 6) {
             updateTheme();
             if (pageAdapter.getRegisteredFragment(1) != null && pageAdapter.getRegisteredFragment(1) instanceof TabCommentsFragment) {
@@ -317,12 +314,6 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
 
     @Override
     public void finish() {
-        // update widget voting icons if a vote has been placed
-        if (widgetId > 0) {
-            if (global.getItemUpdate() != null) {
-                WidgetCommon.hideLoaderAndRefreshViews(this, widgetId, false);
-            }
-        }
         if (loadPostTask != null) {
             loadPostTask.cancel(false);
         }
@@ -625,7 +616,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
      *
      * @see androidx.core.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
      */
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         //outState.putString("tab", mTabHost.getCurrentTabTag()); //save the tab selected
         super.onSaveInstanceState(outState);
     }

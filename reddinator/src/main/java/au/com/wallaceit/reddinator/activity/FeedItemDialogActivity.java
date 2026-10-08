@@ -51,11 +51,9 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeHelper;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-import au.com.wallaceit.reddinator.service.WidgetCommon;
 import au.com.wallaceit.reddinator.tasks.HidePostTask;
 import au.com.wallaceit.reddinator.tasks.SavePostTask;
 import au.com.wallaceit.reddinator.tasks.SubscriptionEditTask;
-import au.com.wallaceit.reddinator.tasks.WidgetVoteTask;
 
 public class FeedItemDialogActivity extends Activity implements SubscriptionEditTask.Callback, ThemeHelper.ThemeInstallInterface {
     public static final String EXTRA_CURRENT_FEED_PATH = "feedPath";
@@ -100,16 +98,11 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                         global.getSubredditManager().addPostFilter(widgetId, redditId);
                     }
                     global.removePostFromFeed(widgetId, feedPos, redditId);
-                    if (widgetId > 0) {
-                        WidgetCommon.hideLoaderAndRefreshViews(FeedItemDialogActivity.this, widgetId, false);
-                    } else {
-                        close(5); // tell main activity to refresh views
-                        return;
-                    }
-                    break;
+                    close(5); // tell main activity to refresh views
+                    return;
                 case "save_post":
                     redditId = getIntent().getStringExtra(Reddinator.ITEM_ID);
-                    (new SavePostTask(FeedItemDialogActivity.this, widgetId > 0, null)).execute("link", redditId);
+                    (new SavePostTask(FeedItemDialogActivity.this, false, null)).execute("link", redditId);
                     break;
                 case "share_post":
                     Utilities.showPostShareDialog(
@@ -145,12 +138,8 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                         }
                     } else {
                         global.getSubredditManager().setFeedSubreddit(widgetId, subreddit, null);
-                        if (widgetId > 0) {
-                            WidgetCommon.showLoaderAndUpdate(FeedItemDialogActivity.this, widgetId, false);
-                        } else {
-                            close(2); // tell main activity to update
-                            return;
-                        }
+                        close(2); // tell main activity to update
+                        return;
                     }
                     break;
                 case "open_subreddit":
@@ -176,12 +165,8 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                         }
                     } else {
                         global.getSubredditManager().setFeedDomain(widgetId, domain);
-                        if (widgetId > 0) {
-                            WidgetCommon.showLoaderAndUpdate(FeedItemDialogActivity.this, widgetId, false);
-                        } else {
-                            close(2);
-                            return;
-                        }
+                        close(2);
+                        return;
                     }
                     break;
                 case "copy_multi":
@@ -237,31 +222,13 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
             }
         }
         upvote.setOnClickListener(v -> {
-            if (widgetId > 0) {
-                new WidgetVoteTask(
-                        FeedItemDialogActivity.this,
-                        getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0),
-                        1,
-                        getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1),
-                        getIntent().getStringExtra(Reddinator.ITEM_ID)
-                ).execute();
-            }
             close(3);
         });
         downvote.setOnClickListener(v -> {
-            if (widgetId > 0) {
-                new WidgetVoteTask(
-                        FeedItemDialogActivity.this,
-                        getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0),
-                        -1,
-                        getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1),
-                        getIntent().getStringExtra(Reddinator.ITEM_ID)
-                ).execute();
-            }
             close(4);
         });
         // setup theme, use widget theme if coming from a widget
-        ThemeManager.Theme theme = global.mThemeManager.getActiveTheme((widgetId > 0 ? "widgettheme-" + widgetId : "appthemepref"));
+        ThemeManager.Theme theme = global.mThemeManager.getActiveTheme("appthemepref");
         dialog.findViewById(R.id.dialog).setBackgroundColor(Color.parseColor(theme.getValue("header_color")));
         ((TextView) dialog.findViewById(R.id.title)).setTextColor(Color.parseColor(theme.getValue("header_text")));
         // show the dialog

@@ -130,7 +130,7 @@ public class Reddinator extends Application {
         itemupdate.putInt("netvote", netVote);
     }
 
-    // methods for setting/getting vote statuses, this keeps vote status persistent accross apps and widgets
+    // methods for setting/getting vote statuses, this keeps vote status persistent accross apps
     public void setItemVote(int feedId, int position, String id, String val, int netVote) {
         try {
             JSONArray data = getFeed(feedId);
@@ -224,20 +224,6 @@ public class Reddinator extends Application {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    // used when appwidgets are destroyed
-    public void clearFeedDataAndPreferences(int feedId) {
-        deleteFeed(feedId);
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.remove("currentfeed-" + feedId);
-        editor.remove("widgettheme-" + feedId);
-        String widgetIdStr = (feedId == 0 ? "app" : String.valueOf(feedId));
-        editor.remove("sort-" + widgetIdStr);
-        editor.remove("thumbnails-" + widgetIdStr);
-        editor.remove("bigthumbs-" + widgetIdStr);
-        editor.remove("hideinf-" + widgetIdStr);
-        editor.apply();
     }
 
     // cached popular subreddits
@@ -345,32 +331,6 @@ public class Reddinator extends Application {
         // Also clear notification that may be present (created in CheckMailService)
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(1);
-    }
-
-    // widget data loadtype functions; a bypass for androids restrictive widget api
-    public int getLoadType() {
-        return loadtype;
-    }
-
-    public void setLoadMore() {
-        loadtype = LOADTYPE_LOADMORE;
-    }
-
-    public void setLoad() {
-        loadtype = LOADTYPE_LOAD;
-    }
-
-    public void setRefreshView() {
-        loadtype = LOADTYPE_REFRESH_VIEW;
-    }
-
-    // data cache functions
-    public boolean getBypassCache() {
-        return bypassCache;
-    }
-
-    public void setBypassCache(boolean bypassed) {
-        bypassCache = bypassed;
     }
 
     public void showAlertDialog(Context context, String title, String message) {

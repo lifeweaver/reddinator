@@ -49,7 +49,6 @@ import android.widget.EditText;
 import android.widget.IconTextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RemoteViews;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,8 +78,6 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-import au.com.wallaceit.reddinator.service.WidgetCommon;
-import au.com.wallaceit.reddinator.service.WidgetProvider;
 import au.com.wallaceit.reddinator.tasks.LoadRandomTask;
 import au.com.wallaceit.reddinator.tasks.SubscriptionEditTask;
 import au.com.wallaceit.reddinator.tasks.SyncUserDataTask;
@@ -96,7 +93,6 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     private SharedPreferences mSharedPreferences;
     private Reddinator global;
     private Button sortBtn;
-    private boolean widgetFirstTimeSetup = false;
     private boolean needsThemeUpdate = false;
     private boolean needsFeedUpdate = false;
     private boolean needsFeedViewUpdate = false;
@@ -141,13 +137,13 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 // 1. current sort is best and the subreddit isn't the front page. OR
                 // 2. The reset sort preference is enabled and the user hasn't specified a sort.
                 String path = global.getSubredditManager().getCurrentFeedPath(mAppWidgetId);
-                String curSort = mSharedPreferences.getString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), "");
+                String curSort = mSharedPreferences.getString("sort-app", "");
 
                 if (("best".equals(curSort) && !path.isEmpty() && !path.equals("/default")) ||
                         (!userSelSort && mSharedPreferences.getBoolean("resetsortpref", false))) {
 
                     String sort = (path.isEmpty() || path.equals("/default") ? "best" : "hot");
-                    global.mSharedPreferences.edit().putString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), sort).apply();
+                    global.mSharedPreferences.edit().putString("sort-app", sort).apply();
                 }
 
                 updateFeedAndFinish();
@@ -159,18 +155,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         subsAdapter.sort(subComparator);
 
         startupTasks();
-
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-            if (mAppWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                String action = getIntent().getAction();
-                widgetFirstTimeSetup = action != null && action.equals("android.appwidget.action.APPWIDGET_CONFIGURE");
-            }
-        } else {
-            mAppWidgetId = 0;
-        }
+        mAppWidgetId = 0;
 
         final ViewPager pager = findViewById(R.id.pager);
         pager.setAdapter(new SimpleTabsAdapter(new String[]{resources.getString(R.string.my_subreddits), resources.getString(R.string.my_multis)}, new int[]{R.id.sublist, R.id.multilist}, SubredditSelectActivity.this, null));
@@ -203,7 +188,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         });
         // sort button
         sortBtn = findViewById(R.id.sortselect);
-        String sortTxt = resources.getString(R.string.sort_label) + mSharedPreferences.getString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), "hot");
+        String sortTxt = resources.getString(R.string.sort_label) + mSharedPreferences.getString("sort-app", "hot");
         sortBtn.setText(sortTxt);
         sortBtn.setOnClickListener(arg0 -> showSortDialog());
 
@@ -370,17 +355,10 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     }
 
     private void updateFeedAndFinish() {
-        if (widgetFirstTimeSetup) {
-            finishWidgetSetup();
-            return;
-        }
-        if (mAppWidgetId != 0) {
-            WidgetCommon.showLoaderAndUpdate(this, mAppWidgetId, false);
-        } else {
-            Intent intent = new Intent();
-            intent.putExtra("themeupdate", needsThemeUpdate);
-            setResult(2, intent); // update feed prefs + reload feed
-        }
+        Intent intent = new Intent();
+        intent.putExtra("themeupdate", needsThemeUpdate);
+        setResult(2, intent); // update feed prefs + reload feed
+
         finish();
     }
 
@@ -394,42 +372,14 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
     // save changes on back press
     public void onBackPressed() {
-        if (widgetFirstTimeSetup) {
-            finishWidgetSetup();
-            return;
-        }
         // check if sort has changed
         if (needsFeedUpdate || needsFeedViewUpdate || needsThemeUpdate) {
-            // refresh widget and close activity (NOTE: clean this up and use updateFeedAndFinish function or methods in WidgetProvider to handle widget update)
-            if (mAppWidgetId != 0) {
-                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(SubredditSelectActivity.this);
-                RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget);
-                views.setViewVisibility(R.id.srloader, View.VISIBLE);
-                views.setViewVisibility(R.id.erroricon, View.INVISIBLE);
-                views.setRelativeScrollPosition(R.id.adapterview, 0); // Reset scroll offset for API >= 25
-                // bypass the cached entrys only if the sorting preference has changed
-                if (needsFeedUpdate) {
-                    global.setBypassCache(true);
-                } else {
-                    global.setRefreshView();
-                }
-                if (needsThemeUpdate) {
-                    WidgetProvider.updateAppWidgets(SubredditSelectActivity.this, appWidgetManager, new int[]{mAppWidgetId});
-                } else {
-                    appWidgetManager.partiallyUpdateAppWidget(mAppWidgetId, views);
-                }
-                appWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.adapterview);
+            Intent intent = new Intent();
+            intent.putExtra("themeupdate", needsThemeUpdate);
+            if (needsFeedUpdate) {
+                setResult(2, intent); // reload feed and prefs
             } else {
-                Intent intent = new Intent();
-                intent.putExtra("themeupdate", needsThemeUpdate);
-                if (needsFeedUpdate) {
-                    setResult(2, intent); // reload feed and prefs
-                } else {
-                    setResult(1, intent); // tells main activity to update feed prefs
-                }
-                if (needsThemeUpdate) {
-                    WidgetCommon.refreshAllWidgetViews(global);
-                }
+                setResult(1, intent); // tells main activity to update feed prefs
             }
         } else {
             setResult(0);
@@ -448,11 +398,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
         (menu.findItem(R.id.menu_submit)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_pencil).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_feedprefs)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_list_alt).color(iconColor).actionBarSize());
-        if (mAppWidgetId == 0) {
-            (menu.findItem(R.id.menu_widgettheme)).setVisible(false);
-        } else {
-            (menu.findItem(R.id.menu_widgettheme)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_paint_brush).color(iconColor).actionBarSize());
-        }
+        (menu.findItem(R.id.menu_widgettheme)).setVisible(false);
         (menu.findItem(R.id.menu_thememanager)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_cogs).color(iconColor).actionBarSize());
         MenuItem accountItem = (menu.findItem(R.id.menu_account));
         if (global.mRedditData.isLoggedIn()) {
@@ -633,7 +579,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                     sort = "best";
                     break;
             }
-            prefsedit.putString("sort-" + (mAppWidgetId == 0 ? "app" : mAppWidgetId), sort);
+            prefsedit.putString("sort-app", sort);
             prefsedit.apply();
             // set new text in button
             String sorttxt = resources.getString(R.string.sort_label) + sort;
@@ -647,31 +593,29 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
     private void showFeedPrefsDialog() {
         final CharSequence[] names = {getString(R.string.image_previews), resources.getString(R.string.thumbnails), resources.getString(R.string.thumbnails_on_top), resources.getString(R.string.hide_post_info)};
-        final String widgetId = (mAppWidgetId == 0 ? "app" : String.valueOf(mAppWidgetId));
+        final String widgetId = "app";
         // previews disabled by default in widgets due to listview dynamic height issue (causes views to jump around when scrolling up)
-        final boolean[] initvalue = {mSharedPreferences.getBoolean("imagepreviews-" + widgetId, mAppWidgetId == 0), mSharedPreferences.getBoolean("thumbnails-" + widgetId, true), mSharedPreferences.getBoolean("bigthumbs-" + widgetId, false), mSharedPreferences.getBoolean("hideinf-" + widgetId, false)};
+        final boolean[] initvalue = {mSharedPreferences.getBoolean("imagepreviews-" + widgetId, true), mSharedPreferences.getBoolean("thumbnails-" + widgetId, true), mSharedPreferences.getBoolean("bigthumbs-" + widgetId, false), mSharedPreferences.getBoolean("hideinf-" + widgetId, false)};
         AlertDialog.Builder builder = new AlertDialog.Builder(SubredditSelectActivity.this);
-        builder.setTitle(mAppWidgetId == 0 ? resources.getString(R.string.app_feed_prefs) : resources.getString(R.string.widget_feed_prefs));
-        builder.setMultiChoiceItems(names, initvalue, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialogInterface, int item, boolean state) {
-                Editor prefsedit = mSharedPreferences.edit();
-                switch (item) {
-                    case 0:
-                        prefsedit.putBoolean("imagepreviews-" + widgetId, state);
-                        break;
-                    case 1:
-                        prefsedit.putBoolean("thumbnails-" + widgetId, state);
-                        break;
-                    case 2:
-                        prefsedit.putBoolean("bigthumbs-" + widgetId, state);
-                        break;
-                    case 3:
-                        prefsedit.putBoolean("hideinf-" + widgetId, state);
-                        break;
-                }
-                prefsedit.apply();
-                needsFeedViewUpdate = true;
+        builder.setTitle(resources.getString(R.string.app_feed_prefs));
+        builder.setMultiChoiceItems(names, initvalue, (dialogInterface, item, state) -> {
+            Editor prefsedit = mSharedPreferences.edit();
+            switch (item) {
+                case 0:
+                    prefsedit.putBoolean("imagepreviews-" + widgetId, state);
+                    break;
+                case 1:
+                    prefsedit.putBoolean("thumbnails-" + widgetId, state);
+                    break;
+                case 2:
+                    prefsedit.putBoolean("bigthumbs-" + widgetId, state);
+                    break;
+                case 3:
+                    prefsedit.putBoolean("hideinf-" + widgetId, state);
+                    break;
             }
+            prefsedit.apply();
+            needsFeedViewUpdate = true;
         });
         builder.setPositiveButton(resources.getString(R.string.close), (dialog, id) -> dialog.cancel());
         builder.show().setCanceledOnTouchOutside(true);
