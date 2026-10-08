@@ -19,10 +19,8 @@ package au.com.wallaceit.reddinator.activity;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -158,8 +156,8 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                 return;
             }
         } else {
-            // from widget, app or account feed post click
-            widgetId = getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+            // from app or account feed post click
+            widgetId = getIntent().getIntExtra(Reddinator.ITEM_FEED_ID, -1);
             feedposition = getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1);
 
             redditItemId = getIntent().getStringExtra(Reddinator.ITEM_ID);

@@ -84,6 +84,7 @@ public class Reddinator extends Application {
     public static final String ITEM_DOMAIN = "ITEM_DOMAIN";
     public static final String ITEM_SUBREDDIT = "ITEM_SUBREDDIT";
     public static final String ITEM_USERLIKES = "ITEM_USERLIKES";
+    public static final String ITEM_FEED_ID = "ITEM_FEED_ID";
 
     private int loadtype = 0; // tells the service what to do when notifyAppDataChanged is fired
     private boolean bypassCache = false; // tells the factory to bypass the cache when creating a new remoteviewsfacotry

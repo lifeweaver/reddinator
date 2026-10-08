@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.appwidget.AppWidgetManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -62,20 +61,19 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
 
     private Reddinator global;
     private Dialog dialog;
-    private int widgetId;
+    private int feedId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         global = (Reddinator) getApplicationContext();
-        widgetId = getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+        feedId = getIntent().getIntExtra(Reddinator.ITEM_FEED_ID, -1);
         dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.activity_item_dialog);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setOnCancelListener(dialog -> close(0));
-        // check if it is a self post and remove view domain option
 
         final ItemOptionsAdapter adapter = new ItemOptionsAdapter();
         ListView listview = dialog.findViewById(R.id.opt_list);
@@ -90,9 +88,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                     if (global.mRedditData.isLoggedIn()) {
                         new HidePostTask(FeedItemDialogActivity.this, false, null).execute(redditId);
                     } else {
-                        global.getSubredditManager().addPostFilter(widgetId, redditId);
+                        global.getSubredditManager().addPostFilter(feedId, redditId);
                     }
-                    global.removePostFromFeed(widgetId, feedPos, redditId);
+                    global.removePostFromFeed(feedId, feedPos, redditId);
                     close(5); // tell main activity to refresh views
                     return;
                 case "save_post":
@@ -118,9 +116,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                 case "view_subreddit":
                     // view subreddit of this item
                     String subreddit = getIntent().getStringExtra(Reddinator.ITEM_SUBREDDIT);
-                    if (widgetId < 0) {
+                    if (feedId < 0) {
                         String feedPath = "/r/" + subreddit;
-                        if (widgetId == -2) {
+                        if (feedId == -2) {
                             // If currently in search activity, open a temp feed on the main activity
                             global.openSubredditFeed(FeedItemDialogActivity.this, Reddinator.REDDIT_BASE_URL + feedPath);
                             close(0);
@@ -132,7 +130,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                             close(2, intent);
                         }
                     } else {
-                        global.getSubredditManager().setFeedSubreddit(widgetId, subreddit, null);
+                        global.getSubredditManager().setFeedSubreddit(feedId, subreddit, null);
                         close(2); // tell main activity to update
                         return;
                     }
@@ -147,9 +145,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                 case "view_domain":
                     // view listings for the domain of this item
                     String domain = getIntent().getStringExtra(Reddinator.ITEM_DOMAIN);
-                    if (widgetId < 0) {
+                    if (feedId < 0) {
                         String feedPath = "/domain/" + domain;
-                        if (widgetId == -2) {
+                        if (feedId == -2) {
                             global.openSubredditFeed(FeedItemDialogActivity.this, Reddinator.REDDIT_BASE_URL + feedPath);
                             close(0);
                         } else {
@@ -159,7 +157,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                             close(2, intent);
                         }
                     } else {
-                        global.getSubredditManager().setFeedDomain(widgetId, domain);
+                        global.getSubredditManager().setFeedDomain(feedId, domain);
                         close(2);
                         return;
                     }
@@ -214,7 +212,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
         downvote.setOnClickListener(v -> {
             close(4);
         });
-        // setup theme, use widget theme if coming from a widget
+        // setup theme
         ThemeManager.Theme theme = global.mThemeManager.getActiveTheme("appthemepref");
         dialog.findViewById(R.id.dialog).setBackgroundColor(Color.parseColor(theme.getValue("header_color")));
         ((TextView) dialog.findViewById(R.id.title)).setTextColor(Color.parseColor(theme.getValue("header_text")));
@@ -275,7 +273,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
             String domain = getIntent().getStringExtra(Reddinator.ITEM_DOMAIN);
             // determine whether subreddit and domain options are shown
             // (ie. subreddit domain option shouldn't be shown if the user is currently viewing the feed)
-            if (widgetId < 0) {
+            if (feedId < 0) {
                 // for temp feeds and searches this needs to be calculated
                 String feedPath = getIntent().getStringExtra(EXTRA_CURRENT_FEED_PATH);
                 if (feedPath != null && !feedPath.equals("/r/all") && feedPath.contains("/r/")) {
@@ -285,9 +283,9 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
                     canViewDomain = false;
                 }
             } else {
-                // for the widget and app feeds this data is available readily
-                canViewSubreddit = global.getSubredditManager().isFeedMulti(widgetId);
-                canViewDomain = (domain != null && domain.indexOf("self.") != 0 && !global.getSubredditManager().getCurrentFeedName(widgetId).equals(domain));
+                // for the main app feed this data is available readily
+                canViewSubreddit = global.getSubredditManager().isFeedMulti(feedId);
+                canViewDomain = (domain != null && domain.indexOf("self.") != 0 && !global.getSubredditManager().getCurrentFeedName(feedId).equals(domain));
             }
 
             if (canViewSubreddit) {
@@ -354,7 +352,7 @@ public class FeedItemDialogActivity extends Activity implements SubscriptionEdit
             dialog.dismiss();
         }
 
-        if (result == 3 || result == 4 || (widgetId < 0 && result == 5)) {
+        if (result == 3 || result == 4 || (feedId < 0 && result == 5)) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(Reddinator.ITEM_FEED_POSITION, getIntent().getIntExtra(Reddinator.ITEM_FEED_POSITION, -1));
             setResult(result, intent);

@@ -21,7 +21,6 @@ package au.com.wallaceit.reddinator.ui;
  */
 
 import android.app.Activity;
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -181,7 +180,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
             return null;
         }
         try {
-            extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, feedId);
+            extras.putInt(Reddinator.ITEM_FEED_ID, feedId);
             extras.putString(Reddinator.ITEM_ID, item.getString("name"));
             extras.putInt(Reddinator.ITEM_FEED_POSITION, position);
             extras.putString(Reddinator.ITEM_URL, StringEscapeUtils.unescapeHtml4(item.getString("url")));
