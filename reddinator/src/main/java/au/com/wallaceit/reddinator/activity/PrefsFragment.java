@@ -1,6 +1,5 @@
 package au.com.wallaceit.reddinator.activity;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -88,7 +87,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         Preference themeManagerButton = findPreference("theme_manager_button");
         themeManagerButton.setOnPreferenceClickListener(preference -> {
             Intent intent = new Intent(getActivity(), ThemesActivity.class);
-            startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+            startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_UPDATES);
             return true;
         });
 
@@ -96,7 +95,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         themeEditorButton.setOnPreferenceClickListener(preference -> {
             Intent intent = new Intent(getActivity(), ThemeEditorActivity.class);
             intent.putExtra("themeId", mAppTheme);
-            startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+            startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_UPDATES);
             return true;
         });
 

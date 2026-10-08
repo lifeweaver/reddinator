@@ -21,9 +21,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -69,7 +67,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,7 +94,8 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     private boolean needsFeedUpdate = false;
     private boolean needsFeedViewUpdate = false;
     private boolean userSelSort = false;
-    private int mAppWidgetId;
+    // Feed slot for the in-app feed (other ids were used by the old widgets)
+    private static final int FEED_ID = 0;
     private SimpleTabsWidget tabs;
     private Button refreshButton;
     private Resources resources;
@@ -131,12 +129,12 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             try {
                 JSONObject subData = global.getSubredditManager().getSubredditData(subreddit);
                 String url = subData.has("url") ? subData.getString("url") : null;
-                global.getSubredditManager().setFeedSubreddit(mAppWidgetId, subreddit, url);
+                global.getSubredditManager().setFeedSubreddit(FEED_ID, subreddit, url);
 
                 // Only reset sort if:
                 // 1. current sort is best and the subreddit isn't the front page. OR
                 // 2. The reset sort preference is enabled and the user hasn't specified a sort.
-                String path = global.getSubredditManager().getCurrentFeedPath(mAppWidgetId);
+                String path = global.getSubredditManager().getCurrentFeedPath(FEED_ID);
                 String curSort = mSharedPreferences.getString("sort-app", "");
 
                 if (("best".equals(curSort) && !path.isEmpty() && !path.equals("/default")) ||
@@ -155,7 +153,6 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         subsAdapter.sort(subComparator);
 
         startupTasks();
-        mAppWidgetId = 0;
 
         final ViewPager pager = findViewById(R.id.pager);
         pager.setAdapter(new SimpleTabsAdapter(new String[]{resources.getString(R.string.my_subreddits), resources.getString(R.string.my_multis)}, new int[]{R.id.sublist, R.id.multilist}, SubredditSelectActivity.this, null));
@@ -235,7 +232,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                     try {
                         String name = multiObj.getString("display_name");
                         String path = multiObj.getString("path");
-                        global.getSubredditManager().setFeed(mAppWidgetId, name, path, true);
+                        global.getSubredditManager().setFeed(FEED_ID, name, path, true);
                         updateFeedAndFinish();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -331,7 +328,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                         }
                         break;
                     case ViewAllSubredditsActivity.RESULT_SET_SUBREDDIT:
-                        global.getSubredditManager().setFeedSubreddit(mAppWidgetId, name, subreddit.getString("url"));
+                        global.getSubredditManager().setFeedSubreddit(FEED_ID, name, subreddit.getString("url"));
                         updateFeedAndFinish();
                         break;
 
@@ -359,14 +356,6 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         intent.putExtra("themeupdate", needsThemeUpdate);
         setResult(2, intent); // update feed prefs + reload feed
 
-        finish();
-    }
-
-    private void finishWidgetSetup() {
-        // for first time setup, widget provider receives this intent in onWidgetOptionsChanged();
-        Intent resultValue = new Intent();
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-        setResult(RESULT_OK, resultValue);
         finish();
     }
 
@@ -398,7 +387,6 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         messageIcon.setIcon(new IconDrawable(this, Iconify.IconValue.fa_envelope).color(inboxColor).actionBarSize());
         (menu.findItem(R.id.menu_submit)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_pencil).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_feedprefs)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_list_alt).color(iconColor).actionBarSize());
-        (menu.findItem(R.id.menu_widgettheme)).setVisible(false);
         (menu.findItem(R.id.menu_thememanager)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_cogs).color(iconColor).actionBarSize());
         MenuItem accountItem = (menu.findItem(R.id.menu_account));
         if (global.mRedditData.isLoggedIn()) {
@@ -465,8 +453,8 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
             case R.id.menu_search:
                 Intent searchIntent = new Intent(SubredditSelectActivity.this, SearchActivity.class);
-                if (!global.getSubredditManager().isFeedMulti(mAppWidgetId)) {
-                    searchIntent.putExtra("feed_path", global.getSubredditManager().getCurrentFeedPath(mAppWidgetId));
+                if (!global.getSubredditManager().isFeedMulti(FEED_ID)) {
+                    searchIntent.putExtra("feed_path", global.getSubredditManager().getCurrentFeedPath(FEED_ID));
                 }
                 startActivity(searchIntent);
                 break;
@@ -495,18 +483,14 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 showFeedPrefsDialog();
                 break;
 
-            case R.id.menu_widgettheme:
-                showWidgetThemeDialog();
-                break;
-
             case R.id.menu_thememanager:
                 Intent intent = new Intent(SubredditSelectActivity.this, ThemesActivity.class);
-                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_UPDATES);
                 break;
 
             case R.id.menu_prefs:
                 Intent intent2 = new Intent(SubredditSelectActivity.this, PrefsActivity.class);
-                startActivityForResult(intent2, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+                startActivityForResult(intent2, ThemesActivity.REQUEST_CODE_NO_UPDATES);
                 break;
 
             case R.id.menu_about:
@@ -532,7 +516,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             Matcher m = r.matcher(domain);
             if (m.find()) {
                 dialog.dismiss();
-                global.getSubredditManager().setFeedDomain(mAppWidgetId, domain);
+                global.getSubredditManager().setFeedDomain(FEED_ID, domain);
                 updateFeedAndFinish();
             } else {
                 Toast.makeText(SubredditSelectActivity.this, getString(R.string.enter_valid_domain), Toast.LENGTH_LONG).show();
@@ -549,7 +533,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
         ArrayList<String> sorts = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.reddit_sorts)));
 
-        String path = global.getSubredditManager().getCurrentFeedPath(mAppWidgetId);
+        String path = global.getSubredditManager().getCurrentFeedPath(FEED_ID);
 
         if (path.isEmpty() || path.equals("/default")) {
             sorts.add(5, "best");
@@ -593,25 +577,23 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
     private void showFeedPrefsDialog() {
         final CharSequence[] names = {getString(R.string.image_previews), resources.getString(R.string.thumbnails), resources.getString(R.string.thumbnails_on_top), resources.getString(R.string.hide_post_info)};
-        final String widgetId = "app";
-        // previews disabled by default in widgets due to listview dynamic height issue (causes views to jump around when scrolling up)
-        final boolean[] initvalue = {mSharedPreferences.getBoolean("imagepreviews-" + widgetId, true), mSharedPreferences.getBoolean("thumbnails-" + widgetId, true), mSharedPreferences.getBoolean("bigthumbs-" + widgetId, false), mSharedPreferences.getBoolean("hideinf-" + widgetId, false)};
+        final boolean[] initvalue = {mSharedPreferences.getBoolean("imagepreviews-app", true), mSharedPreferences.getBoolean("thumbnails-app", true), mSharedPreferences.getBoolean("bigthumbs-app", false), mSharedPreferences.getBoolean("hideinf-app", false)};
         AlertDialog.Builder builder = new AlertDialog.Builder(SubredditSelectActivity.this);
         builder.setTitle(resources.getString(R.string.app_feed_prefs));
         builder.setMultiChoiceItems(names, initvalue, (dialogInterface, item, state) -> {
             Editor prefsedit = mSharedPreferences.edit();
             switch (item) {
                 case 0:
-                    prefsedit.putBoolean("imagepreviews-" + widgetId, state);
+                    prefsedit.putBoolean("imagepreviews-app", state);
                     break;
                 case 1:
-                    prefsedit.putBoolean("thumbnails-" + widgetId, state);
+                    prefsedit.putBoolean("thumbnails-app", state);
                     break;
                 case 2:
-                    prefsedit.putBoolean("bigthumbs-" + widgetId, state);
+                    prefsedit.putBoolean("bigthumbs-app", state);
                     break;
                 case 3:
-                    prefsedit.putBoolean("hideinf-" + widgetId, state);
+                    prefsedit.putBoolean("hideinf-app", state);
                     break;
             }
             prefsedit.apply();
@@ -619,33 +601,6 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         });
         builder.setPositiveButton(resources.getString(R.string.close), (dialog, id) -> dialog.cancel());
         builder.show().setCanceledOnTouchOutside(true);
-    }
-
-    private void showWidgetThemeDialog() {
-
-        // set themes list
-        LinkedHashMap<String, String> themeList = global.mThemeManager.getThemeList(ThemeManager.LISTMODE_ALL);
-        themeList.put("app_select", resources.getString(R.string.use_app_theme));
-        final String[] keys = themeList.keySet().toArray(new String[0]);
-        String curTheme = mSharedPreferences.getString("widgettheme-" + mAppWidgetId, "app_select");
-        int curIndex = 0;
-        for (int i = 0; i < keys.length; i++) {
-            if (keys[i].equals(curTheme)) {
-                curIndex = i;
-                break;
-            }
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(resources.getString(R.string.select_widget_theme))
-                .setSingleChoiceItems(themeList.values().toArray(new String[0]), curIndex,
-                        (dialogInterface, i) -> {
-                            needsThemeUpdate = true;
-                            Editor editor = mSharedPreferences.edit();
-                            editor.putString("widgettheme-" + mAppWidgetId, keys[i]);
-                            editor.apply();
-                            dialogInterface.cancel();
-                        }
-                ).setPositiveButton(resources.getString(R.string.close), (dialog, id) -> dialog.cancel()).show().setCanceledOnTouchOutside(true);
     }
 
     private void refreshSubredditsList() {
@@ -681,7 +636,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
     public void onRandomSubredditLoaded(JSONObject result, RedditData.RedditApiException exception) {
         if (result != null) {
             try {
-                global.getSubredditManager().setFeedSubreddit(mAppWidgetId, result.getString("title"), result.getString("url"));
+                global.getSubredditManager().setFeedSubreddit(FEED_ID, result.getString("title"), result.getString("url"));
                 updateFeedAndFinish();
                 return;
             } catch (JSONException e) {
@@ -752,7 +707,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                         if (global.mRedditData.isLoggedIn()) {
                             viewHolder.defaultIcon.setVisibility(View.VISIBLE);
                             viewHolder.defaultIcon.setOnClickListener(v -> {
-                                global.getSubredditManager().setFeed(mAppWidgetId, "Default Front Page", "/default", true);
+                                global.getSubredditManager().setFeed(FEED_ID, "Default Front Page", "/default", true);
                                 updateFeedAndFinish();
                             });
                         } else {
@@ -1212,8 +1167,8 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
                 subsList.add(subreddit);
                 global.getSubredditManager().setAllFilter(subsList);
-                System.out.println(global.getSubredditManager().getCurrentFeedName(mAppWidgetId));
-                if ("all".equals(global.getSubredditManager().getCurrentFeedName(mAppWidgetId))) {
+                System.out.println(global.getSubredditManager().getCurrentFeedName(FEED_ID));
+                if ("all".equals(global.getSubredditManager().getCurrentFeedName(FEED_ID))) {
                     needsFeedUpdate = true;
                 }
                 notifyDataSetChanged();
@@ -1229,7 +1184,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
                 }
                 subsList.remove(subreddit);
                 global.getSubredditManager().setAllFilter(subsList);
-                if ("all".equals(global.getSubredditManager().getCurrentFeedName(mAppWidgetId))) {
+                if ("all".equals(global.getSubredditManager().getCurrentFeedName(FEED_ID))) {
                     needsFeedUpdate = true;
                 }
                 notifyDataSetChanged();

@@ -72,7 +72,6 @@
     <string name="replace_current_list">Replace current list</string>
     <string name="share">Share</string>
     <string name="feed_prefs">Feed Preferences</string>
-    <string name="widget_theme">Widget Theme</string>
     <string name="menu_theme_manager">Theme Manager</string>
     <string name="entries_not_empty">Entries cannot be empty!</string>
     <string name="action_settings">Settings</string>
@@ -165,8 +164,6 @@
     <string name="thumbnails_on_top">Thumbnails On Top</string>
     <string name="hide_post_info">Hide Post Info</string>
     <string name="close">Close</string>
-    <string name="use_app_theme">Use App theme</string>
-    <string name="select_widget_theme">Select Widget Theme</string>
     <string name="refreshing_subreddits">Refreshing Subreddits</string>
     <string name="one_moment">One moment…</string>
     <string name="refreshing_multis">Refreshing Multis</string>
@@ -340,7 +337,6 @@
     <string name="post_text">Post Text</string>
     <string name="image_previews">Image Previews</string>
     <string name="app_feed_prefs">App Feed Preferences</string>
-    <string name="widget_feed_prefs">Widget Feed Preferences</string>
     <string name="comments_layout_pref_title">Comments Layout</string>
     <string name="comments_border_pref_title">Comments Border Style</string>
     <string name="comments_layout_pref_summary">Change the layout of the comments feed</string>
@@ -380,8 +376,6 @@
     <string name="view">View</string>
     <string name="archived_post_error">This post is archived and\ncannot be voted or commented on</string>
     <string name="browse">Browse</string>
-    <string name="list_widget">List Widget</string>
-    <string name="stack_widget">Stack Widget (BETA!)</string>
     <string name="copy_multi">Copy multireddit</string>
     <string name="copy_multi_success">Successfully copied multi to your account</string>
     <string name="open_theme">Preview or install theme</string>

@@ -20,7 +20,6 @@ package au.com.wallaceit.reddinator.service;
  * Created by michael on 3/10/16.
  */
 
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -49,7 +48,6 @@ public class UpgradeReceiver extends BroadcastReceiver {
         }
         // Migrate feeds to new file storage and remove from preferences
         migrateFeedData(0); // app feed data
-        AppWidgetManager mgr2 = AppWidgetManager.getInstance(context);
     }
 
     private void deleteRecursive(File fileOrDirectory) {

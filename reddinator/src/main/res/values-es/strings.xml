@@ -23,7 +23,6 @@
     <string name="replace_current_list">Reemplazar la lista Actual</string>
     <string name="share">Compartir</string>
     <string name="feed_prefs">Preferencias del Feed</string>
-    <string name="widget_theme">Tema del Widget</string>
     <string name="menu_theme_manager">Administrador de los Widget </string>
     <string name="entries_not_empty">Las entradas no pueden estar vacias!</string>
     <string name="action_settings">Preferencias</string>
@@ -105,8 +104,6 @@
     <string name="thumbnails_on_top">Minituras arriba de todo</string>
     <string name="hide_post_info">esconder la informacion del Post</string>
     <string name="close">Cerrar</string>
-    <string name="use_app_theme">Uusar el tema de la aplicacion</string>
-    <string name="select_widget_theme">Seleccionar un tema para el Widget</string>
     <string name="refreshing_subreddits">Actualizando Subreddits</string>
     <string name="one_moment">un momento…</string>
     <string name="refreshing_multis">Actualizando Multis</string>
@@ -269,7 +266,6 @@
     <string name="post_text">Mensaje de texto</string>
     <string name="image_previews">previas de imágenes</string>
     <string name="app_feed_prefs">Preferencias de la aplicación de piensos</string>
-    <string name="widget_feed_prefs">Preferencias de piensos Widget</string>
     <string name="comments_border_pref_summary">Elija un patrón de color para los bordes anidadas</string>
     <string name="comments_border_pref_title">Comentarios del estilo de borde</string>
     <string name="comments_layout_pref_title">Comentarios del diseño</string>
@@ -313,9 +309,7 @@
     <string name="copy_multi">Copia multireddit</string>
     <string name="copy_multi_success">Copiado con éxito multi a su cuenta</string>
     <string name="image_cache_cleared">Caché de imágenes se ha borrado con éxito</string>
-    <string name="list_widget">Lista Widget</string>
     <string name="open_theme">Vista previa o instalar el tema</string>
-    <string name="stack_widget">Pila Widget (BETA!)</string>
     <string name="subscribe">Suscribir</string>
     <string name="view">Ver</string>
     <string name="feed_data_cleared">los datos de alimentación se ha borrado con éxito</string>

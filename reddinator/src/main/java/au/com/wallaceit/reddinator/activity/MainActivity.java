@@ -22,7 +22,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -436,12 +435,12 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
 
             case R.id.menu_thememanager:
                 Intent intent = new Intent(this, ThemesActivity.class);
-                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_UPDATE_WIDGETS);
+                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_UPDATE);
                 break;
 
             case R.id.menu_prefs:
                 Intent intent2 = new Intent(this, PrefsActivity.class);
-                startActivityForResult(intent2, ThemesActivity.REQUEST_CODE_UPDATE_WIDGETS);
+                startActivityForResult(intent2, ThemesActivity.REQUEST_CODE_UPDATE);
                 break;
 
             case R.id.menu_about:

@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -49,8 +48,8 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
     private HashMap<String, String> themesList;
     private ProgressDialog progressDialog;
     private boolean themesEdited = false;
-    public final static int REQUEST_CODE_UPDATE_WIDGETS = 1;
-    public final static int REQUEST_CODE_NO_WIDGET_UPDATES = 2; // the parent activity will handle widget updates when the theme is changed
+    public final static int REQUEST_CODE_UPDATE = 1;
+    public final static int REQUEST_CODE_NO_UPDATES = 2; // the parent activity will handle widget updates when the theme is changed
     public final static int RESULT_CODE_THEME_UPDATED = 6;
     private ThemesListAdapter adapter;
 
@@ -277,7 +276,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
             convertView.setOnClickListener(v -> {
                 Intent intent = new Intent(ThemesActivity.this, ThemeEditorActivity.class);
                 intent.putExtra("themeId", themeId);
-                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_WIDGET_UPDATES);
+                startActivityForResult(intent, ThemesActivity.REQUEST_CODE_NO_UPDATES);
             });
             viewHolder.delete.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ThemesActivity.this);
