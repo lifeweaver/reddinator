@@ -65,6 +65,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
     private final Reddinator global;
     private final int feedId;
     private boolean canLoadMore = false;
+    private boolean loaded = false; // true once setFeed() has delivered a result, even an empty one
     private JSONArray data;
     private final ActivityInterface feedInterface;
 
@@ -108,6 +109,7 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
         this.data = data;
         this.canLoadMore = canLoadMore;
         this.showItemSubreddit = hasMultipleSubs;
+        this.loaded = true;
         notifyDataSetChanged();
     }
 
@@ -245,7 +247,9 @@ public class SubredditFeedAdapter extends BaseAdapter implements VoteTask.Callba
 
     @Override
     public int getCount() {
-        return data.length() > 0 ? (data.length() + 1) : 0; // plus 1 advertises the "load more" item to the listview without having to add it to the data source
+        // plus 1 advertises the "load more" item to the listview without having to add it to the data source.
+        // Once loaded, the footer is always present so the list can never be a dead end.
+        return (data.length() > 0 || loaded) ? (data.length() + 1) : 0;
     }
 
     @Override

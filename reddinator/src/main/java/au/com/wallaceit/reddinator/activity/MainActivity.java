@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
     private String lastItemId = "0";
     private boolean endOfFeed = false;
     private int seenMarkedUpTo = 0; // feed positions below this have been marked seen
-    private static final int MAX_FILL_PAGES = 5;
+    private static final int MAX_FILL_PAGES = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -753,6 +753,10 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             boolean isAll = subredditName.equals("all");
             String sort = subredditSort;
             int pageSize = loadMore ? 25 : Integer.parseInt(global.mSharedPreferences.getString("numitemloadpref", "25"));
+            // When hiding seen posts many of each page gets discarded, so ask Reddit for its maximum (100)
+            // per request instead of pageSize. This usually fills the page in one call instead of several.
+            int fetchSize = global.mSharedPreferences.getBoolean("hideseenpref", false) ? Math.max(pageSize, 100) : pageSize;
+
             String after = loadMore ? lastItemId : "0";
             JSONArray added = new JSONArray();
             boolean end = false;
@@ -760,7 +764,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             for (int page = 0; page < MAX_FILL_PAGES && added.length() < pageSize && !end; page++) {
                 JSONArray raw;
                 try {
-                    raw = global.mRedditData.getRedditFeed(curFeed, sort, pageSize, after);
+                    raw = global.mRedditData.getRedditFeed(curFeed, sort, fetchSize, after);
                 } catch (RedditData.RedditApiException e) {
                     e.printStackTrace();
                     exception = e;
