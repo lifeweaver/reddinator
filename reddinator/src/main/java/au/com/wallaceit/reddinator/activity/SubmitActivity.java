@@ -210,7 +210,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
     }
 
     private boolean validateInput() {
-        String subText = title.getText().toString();
+        String subText = subreddit.getText().toString();
         if (subText.isEmpty()) {
             global.showAlertDialog(SubmitActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_subreddit_error));
             return false;

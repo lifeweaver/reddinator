@@ -92,7 +92,7 @@ public class ComposeMessageActivity extends Activity implements ComposeMessageTa
     }
 
     private boolean validateInput() {
-        String toText = subjectField.getText().toString();
+        String toText = toField.getText().toString();
         if (toText.isEmpty()) {
             global.showAlertDialog(ComposeMessageActivity.this, resources.getString(R.string.whoa), resources.getString(R.string.no_recipient_error));
             return false;

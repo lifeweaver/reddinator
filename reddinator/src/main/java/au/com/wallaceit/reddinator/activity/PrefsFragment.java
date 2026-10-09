@@ -3,7 +3,6 @@ package au.com.wallaceit.reddinator.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.ListPreference;
@@ -165,12 +164,8 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     }
 
     private void clearWebviewCookies() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().removeAllCookies(null);
-        } else {
-            //noinspection deprecation
-            CookieManager.getInstance().removeAllCookie();
-        }
+        CookieManager.getInstance().removeAllCookies(null);
+
         clearCookiesBtn.setEnabled(false);
     }
 

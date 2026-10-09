@@ -279,12 +279,6 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         ColorMatrixColorFilter filter = Utilities.getColorFilterFromColor(headerColor, 210);
         sortBtn.getBackground().setColorFilter(filter);
         refreshButton.getBackground().setColorFilter(filter);
-        // TODO: For material design theme
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            sortBtn.getBackground().setTint(headerColor);
-            addButton.getBackground().setTint(headerColor);
-            refreshButton.getBackground().setTint(headerColor);
-        }*/
 
         refreshButton.setTextColor(headerText);
         tabs.setBackgroundColor(headerColor);
