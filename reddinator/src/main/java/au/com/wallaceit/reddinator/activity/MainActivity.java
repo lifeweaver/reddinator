@@ -755,6 +755,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             int pageSize = loadMore ? 25 : Integer.parseInt(global.mSharedPreferences.getString("numitemloadpref", "25"));
             // When hiding seen posts many of each page gets discarded, so ask Reddit for its maximum (100)
             // per request instead of pageSize. This usually fills the page in one call instead of several.
+            // Over-fetch when hiding seen posts so filtering still leaves a full page
             int fetchSize = global.mSharedPreferences.getBoolean("hideseenpref", false) ? Math.max(pageSize, 100) : pageSize;
 
             String after = loadMore ? lastItemId : "0";
@@ -784,12 +785,21 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
                 JSONArray filtered = viewThemes
                         ? filterThemes(raw)
                         : global.getSubredditManager().filterFeed(0, raw, loadMore ? data : null, isAll, !global.mRedditData.isLoggedIn());
-                for (int i = 0; i < filtered.length(); i++) {
-                    try {
-                        added.put(filtered.get(i));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+
+                // take only as many as we still need
+                int taken = 0;
+                try {
+                    while (taken < filtered.length() && added.length() < pageSize) {
+                        added.put(filtered.get(taken));
+                        taken++;
                     }
+                    if (taken > 0 && taken < filtered.length()) {
+                        // truncated: resume right after the last item actually shown
+                        after = filtered.getJSONObject(taken - 1).getJSONObject("data").getString("name");
+                        end = false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
             endOfFeed = end;
