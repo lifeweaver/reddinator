@@ -56,6 +56,7 @@ import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.activity.WebViewActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.SeenPostStore;
+import au.com.wallaceit.reddinator.core.SeenImageStore;
 import au.com.wallaceit.reddinator.core.SubredditManager;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
@@ -252,7 +253,11 @@ public class Reddinator extends Application {
 
     public synchronized SeenPostStore getSeenPostStore() {
         if (mSeenStore == null) {
-            mSeenStore = new SeenPostStore(new File(getApplicationInfo().dataDir, "seen_posts.txt"));
+            SeenImageStore images = new SeenImageStore(
+                    new File(getApplicationInfo().dataDir, "seen_images.txt"),
+                    new File(getCacheDir().getPath() + IMAGE_CACHE_DIR),
+                    mSharedPreferences);
+            mSeenStore = new SeenPostStore(new File(getApplicationInfo().dataDir, "seen_posts.txt"), images);
         }
 
         return mSeenStore;

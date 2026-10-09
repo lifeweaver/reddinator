@@ -35,6 +35,12 @@
             android:defaultValue="false"
             android:summary="@string/hide_seen_summary" />
 
+        <CheckBoxPreference
+            android:key="@string/hide_seen_images_pref"
+            android:title="@string/hide_seen_images_title"
+            android:defaultValue="true"
+            android:summary="@string/hide_seen_images_summary" />
+
         <Preference
             android:title="@string/clear_post_filter_title"
             android:key="clear_post_filter"

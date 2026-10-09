@@ -312,6 +312,9 @@ public class SubredditManager {
         }
         // filter the new feed
         JSONArray filtered = new JSONArray();
+        if (filterSeen) {
+            seenStore.prefetchImages(feedArray);
+        }
         ArrayList<String> filter = null;
         if (filterAll) {
             filter = getAllFilter();

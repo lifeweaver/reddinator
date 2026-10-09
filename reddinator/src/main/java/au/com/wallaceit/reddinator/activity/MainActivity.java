@@ -18,12 +18,14 @@
 
 package au.com.wallaceit.reddinator.activity;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -101,6 +103,10 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         global = ((Reddinator) getApplicationContext());
         global.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
+        if (global.mRedditData.isLoggedIn()
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
+        };
         // Setup actionbar
         appView = findViewById(R.id.appview);
         actionBar = getActionBar();

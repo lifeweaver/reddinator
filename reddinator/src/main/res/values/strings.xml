@@ -398,4 +398,8 @@
     <string name="hide_seen_pref" translatable="false">hideseenpref</string>
     <string name="hide_seen_title">Hide Seen Posts</string>
     <string name="hide_seen_summary">Hide posts (and reposts) you have already opened</string>
+    <string name="hide_seen_images_pref" translatable="false">hideseenimagespref</string>
+    <string name="hide_seen_images_title">Match Seen Images</string>
+    <string name="hide_seen_images_summary">With Hide Seen Posts on, also hide image posts that look like ones you have seen, even under a different link. Uses extra data.</string>
+    <string name="mail_channel_name">New messages</string>
 </resources>

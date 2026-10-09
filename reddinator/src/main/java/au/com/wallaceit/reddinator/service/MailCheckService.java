@@ -19,6 +19,7 @@
 package au.com.wallaceit.reddinator.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -41,6 +42,7 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
 
 public class MailCheckService extends JobIntentService {
+    private static final String CHANNEL_ID = "mail";
     public static String MAIL_CHECK_COMPLETE = "reddinator.mail.check.complete";
     public static String ACTIVITY_CHECK_ACTION = "reddinator.mail.check";
     public static String NOTIFY_CHECK_ACTION = "reddinator.mail.check.notify";
@@ -137,7 +139,10 @@ public class MailCheckService extends JobIntentService {
             int nummessages = global.mRedditData.getInboxCount();
             Intent notifyIntent = new Intent(global, MessagesActivity.class);
             notifyIntent.setAction(MessagesActivity.ACTION_UNREAD);
-            Notification notification = new NotificationCompat.Builder(global)
+            NotificationManager notificationManager = (NotificationManager) global.getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(new NotificationChannel(
+                    CHANNEL_ID, global.getString(R.string.mail_channel_name), NotificationManager.IMPORTANCE_DEFAULT));
+            Notification notification = new NotificationCompat.Builder(global, CHANNEL_ID)
                     .setContentTitle(global.getResources().getQuantityString(R.plurals.new_messages, nummessages, nummessages))
                     .setContentText(global.getResources().getString(R.string.new_messages_text))
                     .setLargeIcon(BitmapFactory.decodeResource(global.getResources(), R.drawable.reddinator_logo))
@@ -145,7 +150,6 @@ public class MailCheckService extends JobIntentService {
                     .setContentIntent(PendingIntent.getActivity(global, 0, notifyIntent, Utilities.pendingFlags(false)))
                     .build();
 
-            NotificationManager notificationManager = (NotificationManager) global.getSystemService(NOTIFICATION_SERVICE);
             notificationManager.notify(1, notification);
         }
     }

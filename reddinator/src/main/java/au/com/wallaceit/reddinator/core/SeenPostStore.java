@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,11 +28,14 @@ import java.util.concurrent.Executors;
 public class SeenPostStore {
     private static final int MAX_ENTRIES = 5000;
     private final File file;
+    private final SeenImageStore images;
     private final LinkedHashSet<String> seen = new LinkedHashSet<>(); // insertion order = age
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
 
-    public SeenPostStore(File file) {
+
+    public SeenPostStore(File file, SeenImageStore images) {
         this.file = file;
+        this.images = images;
         load();
     }
 
@@ -51,9 +55,18 @@ public class SeenPostStore {
         }
     }
 
-    public synchronized boolean isSeen(JSONObject post) {
+    public boolean isSeen(JSONObject post) {
+        return isKeySeen(post) || images.isSeen(post);
+    }
+
+    private synchronized boolean isKeySeen(JSONObject post) {
         String key = keyFor(post);
         return key != null && seen.contains(key);
+    }
+
+    // Hashes the feed's image posts so isSeen() never hits the network. Blocks; call off the UI thread.
+    public void prefetchImages(JSONArray feed) {
+        images.prefetch(feed);
     }
 
     public void markSeen(JSONObject post) {
@@ -61,6 +74,7 @@ public class SeenPostStore {
     }
 
     public void markSeenAll(List<JSONObject> posts) {
+        images.markSeenAll(posts);
         final String snapshot;
         synchronized (this) {
             boolean changed = false;
