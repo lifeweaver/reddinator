@@ -143,6 +143,11 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                     String url = request.getUrl().toString();
+                    // Don't navigate if normal clicking on a user. Just long click.
+                    // TODO: maybe make the UI better to indicate that somehow if anyone else would use this.
+                    if(url.contains("reddit") && (url.contains("/user/") || url.contains("/u/"))) {
+                        return true;
+                    }
 
                     global.handleLink(getContext(), url);
                     return true; // always override url
