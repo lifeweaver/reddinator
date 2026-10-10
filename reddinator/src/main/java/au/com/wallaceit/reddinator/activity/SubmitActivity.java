@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
@@ -37,6 +36,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.SubmitTask;
 import au.com.wallaceit.reddinator.ui.SimpleTabsAdapter;
 import au.com.wallaceit.reddinator.ui.SimpleTabsWidget;
@@ -248,7 +248,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
         }
     }
 
-    class SubmitTextTask extends AsyncTask<String, Long, Boolean> {
+    class SubmitTextTask extends BackgroundTask<String, Long, Boolean> {
         String submitHtml;
 
         @Override

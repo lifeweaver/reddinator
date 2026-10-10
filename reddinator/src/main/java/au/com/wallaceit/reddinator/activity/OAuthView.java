@@ -24,7 +24,6 @@ import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +40,7 @@ import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.service.MailCheckReceiver;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 
 public class OAuthView extends Activity {
     private WebView wv;
@@ -114,7 +114,7 @@ public class OAuthView extends Activity {
 
     private ProgressDialog loginDialog;
 
-    class LoginTask extends AsyncTask<Uri, String, Boolean> {
+    class LoginTask extends BackgroundTask<Uri, String, Boolean> {
         RedditData.RedditApiException exception;
         boolean loginSuccess = false;
 

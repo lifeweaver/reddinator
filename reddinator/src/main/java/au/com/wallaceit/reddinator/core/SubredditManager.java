@@ -22,7 +22,6 @@
 package au.com.wallaceit.reddinator.core;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -32,6 +31,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 
 public class SubredditManager {
     private final SharedPreferences prefs;
@@ -83,7 +84,7 @@ public class SubredditManager {
         saveMultis();
     }
 
-    private class LoadDefaultSubredditsTask extends AsyncTask<Void, Void, JSONArray> {
+    private class LoadDefaultSubredditsTask extends BackgroundTask<Void, Void, JSONArray> {
 
         @Override
         protected JSONArray doInBackground(Void... params) {

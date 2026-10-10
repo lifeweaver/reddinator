@@ -3,8 +3,8 @@ package au.com.wallaceit.reddinator.core;
 import android.net.Uri;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Remembers content keys of posts the user has opened, so reposts can be filtered from feeds.
- * Thread-safe: filterFeed runs on widget service and AsyncTask threads.
+ * Thread-safe: filterFeed runs on widget service and BackgroundTask threads.
  */
 public class SeenPostStore {
     private static final int MAX_ENTRIES = 5000;

@@ -20,7 +20,6 @@
 package au.com.wallaceit.reddinator.tasks;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.widget.Toast;
 
 import au.com.wallaceit.reddinator.R;
@@ -28,7 +27,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
 
-public class SavePostTask extends AsyncTask<String, Long, Boolean> {
+public class SavePostTask extends BackgroundTask<String, Long, Boolean> {
     private final Reddinator global;
     private RedditData.RedditApiException exception;
     private final Context context;

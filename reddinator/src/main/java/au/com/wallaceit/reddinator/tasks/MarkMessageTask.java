@@ -19,7 +19,6 @@ package au.com.wallaceit.reddinator.tasks;
  * Created by michael on 7/02/16.
  */
 
-import android.os.AsyncTask;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class MarkMessageTask extends AsyncTask<String, Integer, Boolean> {
+public class MarkMessageTask extends BackgroundTask<String, Integer, Boolean> {
     private final Reddinator global;
     private final ArrayList<String> redditIds;
     private RedditData.RedditApiException exception = null;

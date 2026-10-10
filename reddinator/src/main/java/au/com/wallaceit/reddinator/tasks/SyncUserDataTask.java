@@ -21,14 +21,13 @@ package au.com.wallaceit.reddinator.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
 
-public class SyncUserDataTask extends AsyncTask<String, String, Boolean> {
+public class SyncUserDataTask extends BackgroundTask<String, String, Boolean> {
     public static int MODE_SUBREDDITS = 1;
     public static int MODE_MULTIS = 2;
 

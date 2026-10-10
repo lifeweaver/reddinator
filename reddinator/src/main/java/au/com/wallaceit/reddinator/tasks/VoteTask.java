@@ -19,12 +19,10 @@ package au.com.wallaceit.reddinator.tasks;
  * Created by michael on 6/02/16.
  */
 
-import android.os.AsyncTask;
-
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class VoteTask extends AsyncTask<String, Integer, Boolean> {
+public class VoteTask extends BackgroundTask<String, Integer, Boolean> {
     private final Reddinator global;
     private final String redditId;
     private int listPosition = -1;

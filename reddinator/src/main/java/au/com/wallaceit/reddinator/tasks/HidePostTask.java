@@ -20,13 +20,12 @@
 package au.com.wallaceit.reddinator.tasks;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
 
-public class HidePostTask extends AsyncTask<String, Long, Boolean> {
+public class HidePostTask extends BackgroundTask<String, Long, Boolean> {
     private final Reddinator global;
     private RedditData.RedditApiException exception;
     private final Context context;

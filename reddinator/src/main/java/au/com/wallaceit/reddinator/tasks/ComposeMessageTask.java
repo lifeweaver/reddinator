@@ -19,12 +19,10 @@ package au.com.wallaceit.reddinator.tasks;
  * Created by michael on 9/02/16.
  */
 
-import android.os.AsyncTask;
-
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class ComposeMessageTask extends AsyncTask<String, Integer, Boolean> {
+public class ComposeMessageTask extends BackgroundTask<String, Integer, Boolean> {
     private final Reddinator global;
     private RedditData.RedditApiException exception = null;
     private Callback messageCallback = null;

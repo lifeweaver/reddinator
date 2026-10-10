@@ -19,14 +19,12 @@ package au.com.wallaceit.reddinator.tasks;
  * Created by michael on 6/02/16.
  */
 
-import android.os.AsyncTask;
-
 import org.json.JSONObject;
 
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class CommentTask extends AsyncTask<String, Integer, JSONObject> {
+public class CommentTask extends BackgroundTask<String, Integer, JSONObject> {
     private final Reddinator global;
     private final String redditId;
     private final String messageText;

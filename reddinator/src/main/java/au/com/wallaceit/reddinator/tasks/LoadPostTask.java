@@ -19,14 +19,12 @@ package au.com.wallaceit.reddinator.tasks;
  * Created by michael on 27/03/16.
  */
 
-import android.os.AsyncTask;
-
 import org.json.JSONArray;
 
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class LoadPostTask extends AsyncTask<String, Integer, JSONArray> {
+public class LoadPostTask extends BackgroundTask<String, Integer, JSONArray> {
     private final Reddinator global;
     private RedditData.RedditApiException exception = null;
     private Callback voteCallback = null;

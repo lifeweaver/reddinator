@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +57,7 @@ import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.CommentTask;
 import au.com.wallaceit.reddinator.tasks.ComposeMessageTask;
 import au.com.wallaceit.reddinator.tasks.HidePostTask;
@@ -378,7 +378,7 @@ public class AccountFeedFragment extends Fragment implements VoteTask.Callback, 
         feedLoader.execute();
     }
 
-    class FeedLoader extends AsyncTask<Void, Integer, String> {
+    class FeedLoader extends BackgroundTask<Void, Integer, String> {
 
         private boolean loadMore = false;
         private String mSort = "best";

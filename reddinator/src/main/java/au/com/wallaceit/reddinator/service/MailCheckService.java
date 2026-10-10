@@ -25,7 +25,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -39,6 +38,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.activity.MessagesActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 
 public class MailCheckService extends JobIntentService {
     private static final String CHANNEL_ID = "mail";
@@ -75,7 +75,7 @@ public class MailCheckService extends JobIntentService {
         }
     }
 
-    private static class MailCheckTask extends AsyncTask<String, Void, Boolean> {
+    private static class MailCheckTask extends BackgroundTask<String, Void, Boolean> {
 
         Reddinator global;
         String action;

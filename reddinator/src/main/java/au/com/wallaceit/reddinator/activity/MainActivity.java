@@ -28,7 +28,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,6 +62,7 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeHelper;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.LoadSubredditInfoTask;
 import au.com.wallaceit.reddinator.tasks.SubscriptionEditTask;
 import au.com.wallaceit.reddinator.ui.HtmlDialog;
@@ -106,7 +106,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         if (global.mRedditData.isLoggedIn()
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
-        };
+        }
         // Setup actionbar
         appView = findViewById(R.id.appview);
         actionBar = getActionBar();
@@ -744,7 +744,7 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         this.invalidateOptionsMenu();
     }
 
-    private class FeedLoader extends AsyncTask<Void, Integer, JSONArray> {
+    private class FeedLoader extends BackgroundTask<Void, Integer, JSONArray> {
 
         private final Boolean loadMore;
         private RedditData.RedditApiException exception;

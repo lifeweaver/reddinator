@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -52,6 +51,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 
 public class ViewAllSubredditsActivity extends ListActivity {
     public static final int RESULT_ADD_TO_MULTI = 3;
@@ -313,7 +313,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
 
     private DLTask dlpopulartask;
 
-    private class DLTask extends AsyncTask<String, Integer, ArrayList<JSONObject>> {
+    private class DLTask extends BackgroundTask<String, Integer, ArrayList<JSONObject>> {
         RedditData.RedditApiException exception;
 
         @Override

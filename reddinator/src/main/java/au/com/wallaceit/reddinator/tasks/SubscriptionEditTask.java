@@ -21,7 +21,6 @@ package au.com.wallaceit.reddinator.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +32,7 @@ import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class SubscriptionEditTask extends AsyncTask<Object, Long, Boolean> {
+public class SubscriptionEditTask extends BackgroundTask<Object, Long, Boolean> {
     public static final int ACTION_MULTI_COPY = 0;
     public static final int ACTION_MULTI_CREATE = 1;
     public static final int ACTION_MULTI_EDIT = 2;

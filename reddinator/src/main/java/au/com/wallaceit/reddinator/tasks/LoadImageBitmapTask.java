@@ -21,13 +21,12 @@ package au.com.wallaceit.reddinator.tasks;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.net.URL;
 import java.net.URLConnection;
 
-public class LoadImageBitmapTask extends AsyncTask<Void, Integer, Bitmap> {
+public class LoadImageBitmapTask extends BackgroundTask<Void, Integer, Bitmap> {
     private final String url;
     private final ImageCallback callback;
 

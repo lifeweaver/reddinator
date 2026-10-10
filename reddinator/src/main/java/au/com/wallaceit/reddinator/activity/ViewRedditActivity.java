@@ -26,7 +26,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -70,6 +69,7 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.service.MailCheckService;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.LoadPostTask;
 import au.com.wallaceit.reddinator.tasks.SavePostTask;
 import au.com.wallaceit.reddinator.tasks.VoteTask;
@@ -87,7 +87,7 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
     private MenuItem upvote;
     private MenuItem downvote;
     private MenuItem messageIcon;
-    private AsyncTask loadPostTask;
+    private BackgroundTask loadPostTask;
     private JSONObject postInfo;
     private String userLikes = "null"; // string version of curvote, parsed when options menu generated.
     private String redditItemId;

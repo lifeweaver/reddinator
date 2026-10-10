@@ -22,7 +22,6 @@ package au.com.wallaceit.reddinator.core;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.widget.Toast;
 
 import org.json.JSONException;

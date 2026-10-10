@@ -27,7 +27,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.LinearLayout;

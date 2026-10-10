@@ -19,14 +19,12 @@
  */
 package au.com.wallaceit.reddinator.tasks;
 
-import android.os.AsyncTask;
-
 import org.json.JSONObject;
 
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 
-public class LoadRandomTask extends AsyncTask<String, Integer, JSONObject> {
+public class LoadRandomTask extends BackgroundTask<String, Integer, JSONObject> {
     private final Reddinator global;
     private RedditData.RedditApiException exception = null;
     private Callback randomCallback = null;

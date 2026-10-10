@@ -55,8 +55,8 @@ import au.com.wallaceit.reddinator.activity.MainActivity;
 import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.activity.WebViewActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
-import au.com.wallaceit.reddinator.core.SeenPostStore;
 import au.com.wallaceit.reddinator.core.SeenImageStore;
+import au.com.wallaceit.reddinator.core.SeenPostStore;
 import au.com.wallaceit.reddinator.core.SubredditManager;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
@@ -87,8 +87,8 @@ public class Reddinator extends Application {
     public static final String ITEM_USERLIKES = "ITEM_USERLIKES";
     public static final String ITEM_FEED_ID = "ITEM_FEED_ID";
 
-    private int loadtype = 0; // tells the service what to do when notifyAppDataChanged is fired
-    private boolean bypassCache = false; // tells the factory to bypass the cache when creating a new remoteviewsfacotry
+    private final int loadtype = 0; // tells the service what to do when notifyAppDataChanged is fired
+    private final boolean bypassCache = false; // tells the factory to bypass the cache when creating a new remoteviewsfacotry
     public RedditData mRedditData;
     public ThemeManager mThemeManager;
     private SubredditManager mSubManager;

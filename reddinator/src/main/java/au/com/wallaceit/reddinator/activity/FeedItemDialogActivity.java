@@ -22,7 +22,6 @@ import static android.content.Intent.ACTION_VIEW;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;

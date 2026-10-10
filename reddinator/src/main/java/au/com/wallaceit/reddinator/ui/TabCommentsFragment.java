@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +53,7 @@ import au.com.wallaceit.reddinator.activity.ViewRedditActivity;
 import au.com.wallaceit.reddinator.activity.WebViewActivity;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.CommentTask;
 import au.com.wallaceit.reddinator.tasks.VoteTask;
 
@@ -354,7 +354,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
 
     private JSONObject subData;
 
-    class CommentsLoader extends AsyncTask<Void, Integer, String> {
+    class CommentsLoader extends BackgroundTask<Void, Integer, String> {
 
         private boolean loadMore = false;
         private String mSort = "best";

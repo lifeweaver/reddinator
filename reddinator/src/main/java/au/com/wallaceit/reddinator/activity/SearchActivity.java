@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.ColorMatrixColorFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +53,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.ui.SubAutoCompleteAdapter;
 import au.com.wallaceit.reddinator.ui.SubredditFeedAdapter;
 
@@ -373,7 +373,7 @@ public class SearchActivity extends Activity implements SubredditFeedAdapter.Act
         new SearchFeedLoader(true).execute();
     }
 
-    class SearchFeedLoader extends AsyncTask<Void, Integer, Long> {
+    class SearchFeedLoader extends BackgroundTask<Void, Integer, Long> {
 
         private final Boolean loadMore;
         private RedditData.RedditApiException exception;

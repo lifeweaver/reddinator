@@ -23,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -60,6 +59,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.ui.AccountFeedFragment;
 import au.com.wallaceit.reddinator.ui.ActionbarFragmentActivity;
 import au.com.wallaceit.reddinator.ui.HtmlDialog;
@@ -350,7 +350,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         HtmlDialog.init(this, global.mRedditData.getUsername(), html);
     }
 
-    private class LoadUserDetailsTask extends AsyncTask<Void, Void, JSONObject[]> {
+    private class LoadUserDetailsTask extends BackgroundTask<Void, Void, JSONObject[]> {
         private RedditData.RedditApiException exception = null;
         ProgressDialog progressDialog;
 
@@ -392,7 +392,7 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
         }
     }
 
-    private class RefreshUserInfoTask extends AsyncTask<Void, Void, Boolean> {
+    private class RefreshUserInfoTask extends BackgroundTask<Void, Void, Boolean> {
         private RedditData.RedditApiException exception = null;
 
         @Override

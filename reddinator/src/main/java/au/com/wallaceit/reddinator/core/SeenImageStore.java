@@ -89,7 +89,9 @@ public class SeenImageStore {
         }
     }
 
-    /** Cache lookup only, never touches the network. Call prefetch() first. */
+    /**
+     * Cache lookup only, never touches the network. Call prefetch() first.
+     */
     public boolean isSeen(JSONObject post) {
         if (!enabled()) {
             return false;
@@ -113,7 +115,9 @@ public class SeenImageStore {
         return best <= MAX_DISTANCE;
     }
 
-    /** Hashes the image posts in a feed page in parallel. Blocks up to the budget; call off the UI thread. */
+    /**
+     * Hashes the image posts in a feed page in parallel. Blocks up to the budget; call off the UI thread.
+     */
     public void prefetch(JSONArray feed) {
         if (!enabled()) {
             return;
