@@ -29,7 +29,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 
@@ -62,6 +61,7 @@ public class MailCheckService extends JobIntentService {
 
     @Override
     public void onCreate() {
+        super.onCreate();
         global = ((Reddinator) getApplicationContext());
     }
 
@@ -73,11 +73,6 @@ public class MailCheckService extends JobIntentService {
                 (new MailCheckTask(global, action)).execute();
             }
         }
-    }
-
-    @Override
-    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        return START_NOT_STICKY;
     }
 
     private static class MailCheckTask extends AsyncTask<String, Void, Boolean> {
