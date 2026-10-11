@@ -9,7 +9,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.view.MenuItem;
 import android.webkit.CookieManager;
 import android.widget.Toast;
 
@@ -221,17 +220,6 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
 
     public void onBackPressed() {
         saveSettingsAndFinish();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                saveSettingsAndFinish();
-                return true;
-        }
-        return false;
     }
 
     private void saveSettingsAndFinish() {
