@@ -129,6 +129,13 @@
             android:entryValues="@array/fontsize_list_preference"
             android:defaultValue="18"
             android:dialogTitle="@string/comment_font_pref_title" />
+
+        <EditTextPreference
+            android:key="@string/hide_first_comment_pref"
+            android:title="@string/hide_first_comment_title"
+            android:summary="@string/hide_first_comment_summary"
+            android:defaultValue=""
+            android:dialogTitle="@string/hide_first_comment_title" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Web Views">

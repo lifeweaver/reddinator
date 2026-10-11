@@ -406,4 +406,7 @@
     <string name="regex_filters_title">Hide posts in /r/%1$s</string>
     <string name="regex_filters_hint">One regex per line. Case-insensitive, matched against title and post text.</string>
     <string name="regex_filter_invalid">Invalid regex: %1$s</string>
+    <string name="hide_first_comment_pref" translatable="false">hidefirstcommentusers</string>
+    <string name="hide_first_comment_title">Hide first comment from</string>
+    <string name="hide_first_comment_summary">Comma-separated usernames, e.g. AutoModerator. Only hides the top comment of a thread.</string>
 </resources>

@@ -45,6 +45,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.util.Log;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -440,7 +441,33 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
         }
     }
 
+    private String dropHiddenFirstComment(String data) {
+        try {
+            JSONArray arr = new JSONArray(data);
+            if (arr.length() == 0) {
+                return data;
+            }
+            JSONObject first = arr.getJSONObject(0);
+            if (!"t1".equals(first.optString("kind"))) { // leave "more" stubs alone
+                return data;
+            }
+            String author = first.getJSONObject("data").optString("author");
+            if (!global.getSubredditManager().shouldHideFirstComment(author)) {
+                return data;
+            }
+            JSONArray rest = new JSONArray();
+            for (int i = 1; i < arr.length(); i++) {
+                rest.put(arr.get(i));
+            }
+            return rest.toString();
+        } catch (JSONException e) {
+            Log.w("TabCommentsFragment", "Could not filter first comment", e);
+            return data;
+        }
+    }
+
     private void populateCommentsFromData(String data) {
+        data = dropHiddenFirstComment(data);
         String author = "";
         boolean archived = false;
         try {

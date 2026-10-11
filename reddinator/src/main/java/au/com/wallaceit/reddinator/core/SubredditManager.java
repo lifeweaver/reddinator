@@ -295,6 +295,18 @@ public class SubredditManager {
         savePostFilters();
     }
 
+    // Global list of usernames whose comment is hidden when it is the first top-level comment.
+    public boolean shouldHideFirstComment(String author) {
+        String raw = prefs.getString("hidefirstcommentusers", "");
+        for (String u : raw.split(",")) {
+            String name = u.trim().replaceFirst("(?i)^/?u/", ""); // accept "/u/Name", "u/Name" or "Name"
+            if (!name.isEmpty() && name.equalsIgnoreCase(author)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // per subreddit regex filters
     public ArrayList<String> getRegexFilters(String subreddit) {
         ArrayList<String> list = new ArrayList<>();
