@@ -19,13 +19,13 @@
  */
 package au.com.wallaceit.reddinator.tasks;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.Utilities;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 
 public class SyncUserDataTask extends BackgroundTask<String, String, Boolean> {
     public static int MODE_SUBREDDITS = 1;
@@ -36,7 +36,7 @@ public class SyncUserDataTask extends BackgroundTask<String, String, Boolean> {
     private final Context context;
     private final Runnable callback;
     private final boolean showUI;
-    private ProgressDialog progressDialog = null;
+    private BusyDialog progressDialog = null;
     private final int mode;
 
     public SyncUserDataTask(Context context, Runnable callback, boolean showUI, int mode) {
@@ -50,7 +50,7 @@ public class SyncUserDataTask extends BackgroundTask<String, String, Boolean> {
     @Override
     protected void onPreExecute() {
         if (showUI) {
-            progressDialog = ProgressDialog.show(context, context.getString(R.string.loading), "", true);
+            progressDialog = BusyDialog.show(context, context.getString(R.string.loading), "");
         }
     }
 

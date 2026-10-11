@@ -20,7 +20,6 @@ package au.com.wallaceit.reddinator.activity;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -41,6 +40,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.service.MailCheckReceiver;
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 
 public class OAuthView extends Activity {
     private WebView wv;
@@ -112,7 +112,7 @@ public class OAuthView extends Activity {
         }
     }
 
-    private ProgressDialog loginDialog;
+    private BusyDialog loginDialog;
 
     class LoginTask extends BackgroundTask<Uri, String, Boolean> {
         RedditData.RedditApiException exception;
@@ -121,7 +121,7 @@ public class OAuthView extends Activity {
         @Override
         protected void onPreExecute() {
             wv.setVisibility(View.INVISIBLE);
-            loginDialog = ProgressDialog.show(OAuthView.this, resources.getString(R.string.authenticating), resources.getString(R.string.connecting_reddit_account), true);
+            loginDialog = BusyDialog.show(OAuthView.this, resources.getString(R.string.authenticating), resources.getString(R.string.connecting_reddit_account));
         }
 
         protected Boolean doInBackground(Uri... uris) {

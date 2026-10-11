@@ -19,7 +19,6 @@ package au.com.wallaceit.reddinator.tasks;
  * Created by michael on 6/02/16.
  */
 
-import android.app.ProgressDialog;
 import android.content.Context;
 
 import org.json.JSONArray;
@@ -31,6 +30,7 @@ import java.lang.ref.WeakReference;
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 
 public class SubscriptionEditTask extends BackgroundTask<Object, Long, Boolean> {
     public static final int ACTION_MULTI_COPY = 0;
@@ -52,7 +52,7 @@ public class SubscriptionEditTask extends BackgroundTask<Object, Long, Boolean> 
     private RedditData.RedditApiException exception;
     private final int action;
     private Object[] params;
-    private ProgressDialog progressDialog;
+    private BusyDialog progressDialog;
     private String loadingMessage = "";
 
     public interface Callback {
@@ -96,7 +96,7 @@ public class SubscriptionEditTask extends BackgroundTask<Object, Long, Boolean> 
 
     protected void onPreExecute() {
         if (contextRef.get() != null) {
-            progressDialog = ProgressDialog.show(contextRef.get(), loadingMessage, loadingMessage, true);
+            progressDialog = BusyDialog.show(contextRef.get(), "", loadingMessage);
         }
     }
 

@@ -20,7 +20,6 @@ package au.com.wallaceit.reddinator.activity;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -79,6 +78,7 @@ import au.com.wallaceit.reddinator.tasks.LoadRandomTask;
 import au.com.wallaceit.reddinator.tasks.SubscriptionEditTask;
 import au.com.wallaceit.reddinator.tasks.SyncUserDataTask;
 import au.com.wallaceit.reddinator.ui.ActionbarActivity;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 import au.com.wallaceit.reddinator.ui.SimpleTabsAdapter;
 import au.com.wallaceit.reddinator.ui.SimpleTabsWidget;
 import au.com.wallaceit.reddinator.ui.SubAutoCompleteAdapter;
@@ -624,7 +624,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
         }
     };
 
-    private ProgressDialog randomProg = null;
+    private BusyDialog randomProg = null;
 
     @Override
     public void onRandomSubredditLoaded(JSONObject result, RedditData.RedditApiException exception) {
@@ -632,6 +632,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
             try {
                 global.getSubredditManager().setFeedSubreddit(FEED_ID, result.getString("title"), result.getString("url"));
                 updateFeedAndFinish();
+                randomProg.dismiss();
                 return;
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -710,9 +711,7 @@ public class SubredditSelectActivity extends ActionbarActivity implements Subscr
 
                         viewHolder.randomIcon.setVisibility(View.VISIBLE);
                         viewHolder.randomIcon.setOnClickListener(v -> {
-                            randomProg = new ProgressDialog(SubredditSelectActivity.this);
-                            randomProg.setTitle(R.string.loading);
-                            randomProg.show();
+                            randomProg = BusyDialog.show(SubredditSelectActivity.this, "", getString(R.string.loading), true);
                             new LoadRandomTask(global, SubredditSelectActivity.this).execute();
                         });
 

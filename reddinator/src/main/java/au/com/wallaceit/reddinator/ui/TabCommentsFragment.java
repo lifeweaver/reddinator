@@ -26,6 +26,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import android.util.Log;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -146,7 +146,7 @@ public class TabCommentsFragment extends Fragment implements VoteTask.Callback, 
                     String url = request.getUrl().toString();
                     // Don't navigate if normal clicking on a user. Just long click.
                     // TODO: maybe make the UI better to indicate that somehow if anyone else would use this.
-                    if(url.contains("reddit") && (url.contains("/user/") || url.contains("/u/"))) {
+                    if (url.contains("reddit") && (url.contains("/user/") || url.contains("/u/"))) {
                         return true;
                     }
 

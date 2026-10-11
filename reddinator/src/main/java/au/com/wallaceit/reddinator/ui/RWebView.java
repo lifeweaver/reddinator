@@ -22,7 +22,6 @@ package au.com.wallaceit.reddinator.ui;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -213,7 +212,7 @@ public class RWebView extends android.webkit.WebView implements DirectoryChooser
     }*/
 
     private void shareImage(final String url) {
-        final ProgressDialog dialog = ProgressDialog.show(getContext(), "Downloading", "Please wait...", true);
+        final BusyDialog dialog = BusyDialog.show(getContext(), "Downloading", "Please wait...");
         new LoadImageBitmapTask(url, new LoadImageBitmapTask.ImageCallback() {
             @Override
             public void run() {

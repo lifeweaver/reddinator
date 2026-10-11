@@ -21,7 +21,6 @@ import static android.content.Intent.ACTION_VIEW;
 
 import android.app.ActionBar;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -52,6 +51,7 @@ import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 
 public class ViewAllSubredditsActivity extends ListActivity {
     public static final int RESULT_ADD_TO_MULTI = 3;
@@ -176,7 +176,7 @@ public class ViewAllSubredditsActivity extends ListActivity {
             dlpopulartask.cancel(true);
         }
         // use a thread for searching
-        final ProgressDialog sdialog = ProgressDialog.show(ViewAllSubredditsActivity.this, "", resources.getString(R.string.searching), true);
+        final BusyDialog sdialog = BusyDialog.show(ViewAllSubredditsActivity.this, "", resources.getString(R.string.searching));
         Thread t = new Thread(() -> {
             // get all popular subreddits
             try {

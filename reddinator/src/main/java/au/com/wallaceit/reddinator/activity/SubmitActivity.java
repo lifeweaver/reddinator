@@ -2,7 +2,6 @@ package au.com.wallaceit.reddinator.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -38,6 +37,7 @@ import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.SubmitTask;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 import au.com.wallaceit.reddinator.ui.SimpleTabsAdapter;
 import au.com.wallaceit.reddinator.ui.SimpleTabsWidget;
 import au.com.wallaceit.reddinator.ui.SubAutoCompleteAdapter;
@@ -54,7 +54,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
     private EditText text;
     private ViewPager pager;
     private Resources resources;
-    private ProgressDialog progressDialog;
+    private BusyDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +141,7 @@ public class SubmitActivity extends Activity implements SubmitTask.Callback {
                 if (validateInput()) {
                     boolean isLink = pager.getCurrentItem() == 0;
                     String data = isLink ? link.getText().toString() : text.getText().toString();
-                    progressDialog = ProgressDialog.show(SubmitActivity.this, "", resources.getString(R.string.submitting), true);
+                    progressDialog = BusyDialog.show(SubmitActivity.this, "", resources.getString(R.string.submitting));
                     new SubmitTask(global, subreddit.getText().toString(), title.getText().toString(), data, isLink, SubmitActivity.this).execute();
                 }
             }

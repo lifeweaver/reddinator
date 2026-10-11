@@ -22,18 +22,19 @@ import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AbsListView;
+import android.widget.EditText;
 import android.widget.IconTextView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -53,11 +54,9 @@ import org.json.JSONObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import android.text.InputType;
-import android.widget.EditText;
-import java.util.List;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -68,6 +67,7 @@ import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.LoadSubredditInfoTask;
 import au.com.wallaceit.reddinator.tasks.SubscriptionEditTask;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 import au.com.wallaceit.reddinator.ui.HtmlDialog;
 import au.com.wallaceit.reddinator.ui.SubredditFeedAdapter;
 
@@ -663,14 +663,10 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         reloadReddits();
     }
 
-    private ProgressDialog sidebarProg;
+    private BusyDialog sidebarProg;
 
     private void openSidebar() {
-        sidebarProg = new ProgressDialog(this);
-        sidebarProg.setIndeterminate(true);
-        sidebarProg.setTitle(R.string.loading);
-        sidebarProg.setMessage(getString(R.string.loading_sidebar));
-        sidebarProg.show();
+        sidebarProg = BusyDialog.show(this, getString(R.string.loading), getString(R.string.loading_sidebar), true);
         new LoadSubredditInfoTask(global, this).execute(subredditName);
     }
 

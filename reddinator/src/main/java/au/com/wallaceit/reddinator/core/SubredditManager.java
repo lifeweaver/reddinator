@@ -22,6 +22,7 @@
 package au.com.wallaceit.reddinator.core;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -30,16 +31,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-
-import au.com.wallaceit.reddinator.tasks.BackgroundTask;
-import android.util.Log;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 
 public class SubredditManager {
     private final SharedPreferences prefs;

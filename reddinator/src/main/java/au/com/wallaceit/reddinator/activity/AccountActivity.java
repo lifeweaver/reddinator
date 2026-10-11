@@ -18,7 +18,6 @@
 package au.com.wallaceit.reddinator.activity;
 
 import android.app.ActionBar;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -62,6 +61,7 @@ import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.ui.AccountFeedFragment;
 import au.com.wallaceit.reddinator.ui.ActionbarFragmentActivity;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 import au.com.wallaceit.reddinator.ui.HtmlDialog;
 import au.com.wallaceit.reddinator.ui.SimpleTabsWidget;
 
@@ -352,10 +352,10 @@ public class AccountActivity extends ActionbarFragmentActivity implements Accoun
 
     private class LoadUserDetailsTask extends BackgroundTask<Void, Void, JSONObject[]> {
         private RedditData.RedditApiException exception = null;
-        ProgressDialog progressDialog;
+        BusyDialog progressDialog;
 
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(AccountActivity.this, resources.getString(R.string.loading), resources.getString(R.string.one_moment), true);
+            progressDialog = BusyDialog.show(AccountActivity.this, resources.getString(R.string.loading), resources.getString(R.string.one_moment));
         }
 
         @Override

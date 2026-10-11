@@ -2,7 +2,6 @@ package au.com.wallaceit.reddinator.activity;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -40,13 +39,14 @@ import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
 import au.com.wallaceit.reddinator.tasks.SubmitTask;
 import au.com.wallaceit.reddinator.ui.ActionbarActivity;
+import au.com.wallaceit.reddinator.ui.BusyDialog;
 
 
 public class ThemesActivity extends ActionbarActivity implements SubmitTask.Callback {
     private Reddinator global;
     private Resources resources;
     private HashMap<String, String> themesList;
-    private ProgressDialog progressDialog;
+    private BusyDialog progressDialog;
     private boolean themesEdited = false;
     public final static int REQUEST_CODE_UPDATE = 1;
     public final static int REQUEST_CODE_NO_UPDATES = 2; // the parent activity will handle widget updates when the theme is changed
@@ -306,7 +306,7 @@ public class ThemesActivity extends ActionbarActivity implements SubmitTask.Call
                                 return;
                             }
                             String theme = global.mThemeManager.getThemeJSON(themeId).toString();
-                            progressDialog = ProgressDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting), true);
+                            progressDialog = BusyDialog.show(ThemesActivity.this, "", resources.getString(R.string.submitting));
                             new SubmitTask(global, "reddinator", "[Theme] " + title, "This theme was shared through Reddinator\n\r    reddinator_theme=" + theme, false, ThemesActivity.this).execute();
                         }).setNegativeButton(resources.getString(R.string.cancel), (dialog, which) -> dialog.dismiss()).show();
             });
