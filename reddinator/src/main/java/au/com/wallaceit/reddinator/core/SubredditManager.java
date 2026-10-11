@@ -33,6 +33,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
+import android.util.Log;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class SubredditManager {
     private final SharedPreferences prefs;
@@ -40,6 +47,9 @@ public class SubredditManager {
     private JSONObject subreddits;
     private JSONObject multis;
     private JSONObject postFilters;
+    private static final String TAG = "SubredditManager";
+    private JSONObject regexFilters = new JSONObject(); // subreddit (lowercase) -> JSONArray of regex strings
+    private volatile Map<String, List<Pattern>> compiledRegex = new HashMap<>();
     private final SeenPostStore seenStore;
     public final static String defaultSubreddits = "{\"Front Page\":{\"display_name\"=\"Front Page\", \"public_description\"=\"Your reddit front page\",\"url\"=\"\"}, \"Popular\":{\"display_name\"=\"Popular\", \"public_description\"=\"Popular Post\",\"url\"=\"/r/popular\"}, \"all\":{\"display_name\"=\"all\", \"public_description\"=\"The best of reddit\",\"url\"=\"/r/all\"}}";
     private final static String defaultFeed = "{\"name\":\"Front Page\",\"path\":\"\",\"is_multi\":\"true\"}"; // default subs are also "multi"
@@ -68,6 +78,13 @@ public class SubredditManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        try {
+            regexFilters = new JSONObject(prefs.getString("regexFilters", "{}"));
+        } catch (JSONException e) {
+            Log.w(TAG, "Could not load regex filters", e);
+        }
+        rebuildRegexCache();
     }
 
     public void loadDefaultSubreddits() {
@@ -278,6 +295,81 @@ public class SubredditManager {
         savePostFilters();
     }
 
+    // per subreddit regex filters
+    public ArrayList<String> getRegexFilters(String subreddit) {
+        ArrayList<String> list = new ArrayList<>();
+        JSONArray arr = regexFilters.optJSONArray(subreddit.toLowerCase(Locale.ROOT));
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                list.add(arr.optString(i));
+            }
+        }
+        return list;
+    }
+
+    // Saves the list for a subreddit. Returns the first invalid pattern, or null on success.
+    public String setRegexFilters(String subreddit, List<String> patterns) {
+        for (String p : patterns) {
+            try {
+                Pattern.compile(p);
+            } catch (PatternSyntaxException e) {
+                return p;
+            }
+        }
+        String key = subreddit.toLowerCase(Locale.ROOT);
+        if (patterns.isEmpty()) {
+            regexFilters.remove(key);
+        } else {
+            try {
+                regexFilters.put(key, new JSONArray(patterns));
+            } catch (JSONException e) {
+                Log.w(TAG, "Could not save regex filters", e);
+                return null;
+            }
+        }
+        prefs.edit().putString("regexFilters", regexFilters.toString()).apply();
+        rebuildRegexCache();
+        return null;
+    }
+
+    private void rebuildRegexCache() {
+        HashMap<String, List<Pattern>> map = new HashMap<>();
+        Iterator<String> keys = regexFilters.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            JSONArray arr = regexFilters.optJSONArray(key);
+            if (arr == null) {
+                continue;
+            }
+            ArrayList<Pattern> patterns = new ArrayList<>();
+            for (int i = 0; i < arr.length(); i++) {
+                try {
+                    patterns.add(Pattern.compile(arr.getString(i), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE));
+                } catch (JSONException | PatternSyntaxException e) {
+                    Log.w(TAG, "Skipping bad regex in " + key, e);
+                }
+            }
+            if (!patterns.isEmpty()) {
+                map.put(key, patterns);
+            }
+        }
+        compiledRegex = map;
+    }
+
+    private boolean matchesRegexFilter(JSONObject post) {
+        List<Pattern> patterns = compiledRegex.get(post.optString("subreddit").toLowerCase(Locale.ROOT));
+        if (patterns == null) {
+            return false;
+        }
+        String text = post.optString("title") + "\n" + post.optString("selftext");
+        for (Pattern p : patterns) {
+            if (p.matcher(text).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void savePostFilters() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("postFilters", postFilters.toString());
@@ -289,6 +381,7 @@ public class SubredditManager {
         // determine filter requirements
         boolean filterDuplicates = prefs.getBoolean("filterduplicatespref", true) && currentFeed != null;
         boolean filterSeen = prefs.getBoolean("hideseenpref", false);
+        boolean filterRegex = !compiledRegex.isEmpty();
         JSONObject postFilters = null;
         if (filterPosts) {
             postFilters = getPostFilters(getCurrentFeedPath(feedId));
@@ -297,7 +390,7 @@ public class SubredditManager {
         if (filterAll) {
             filterAll = !prefs.getString("allFilter", "").isEmpty();
         }
-        if (!filterAll && !filterDuplicates && !filterPosts && !filterSeen) {
+        if (!filterAll && !filterDuplicates && !filterPosts && !filterSeen && !filterRegex) {
             return feedArray; // no filters applied
         }
         // collect current ids
@@ -339,6 +432,9 @@ public class SubredditManager {
                     }
                 }
                 if (filterSeen && seenStore.isSeen(feedObj.getJSONObject("data"))) {
+                    continue;
+                }
+                if (filterRegex && matchesRegexFilter(feedObj.getJSONObject("data"))) {
                     continue;
                 }
                 if (filterAll) {

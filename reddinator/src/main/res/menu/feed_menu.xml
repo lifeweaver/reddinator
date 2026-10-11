@@ -59,6 +59,12 @@
         reddinator:showAsAction="never" />
 
     <item
+        android:id="@+id/menu_regexfilter"
+        android:title="@string/regex_filters_menu"
+        android:showAsAction="never"
+        reddinator:showAsAction="never" />
+
+    <item
         android:id="@+id/menu_thememanager"
         android:title="@string/menu_theme_manager"
         android:showAsAction="never"

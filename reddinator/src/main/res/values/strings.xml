@@ -402,4 +402,8 @@
     <string name="hide_seen_images_title">Match Seen Images</string>
     <string name="hide_seen_images_summary">With Hide Seen Posts on, also hide image posts that look like ones you have seen, even under a different link. Uses extra data.</string>
     <string name="mail_channel_name">New messages</string>
+    <string name="regex_filters_menu">Hide posts (regex)</string>
+    <string name="regex_filters_title">Hide posts in /r/%1$s</string>
+    <string name="regex_filters_hint">One regex per line. Case-insensitive, matched against title and post text.</string>
+    <string name="regex_filter_invalid">Invalid regex: %1$s</string>
 </resources>

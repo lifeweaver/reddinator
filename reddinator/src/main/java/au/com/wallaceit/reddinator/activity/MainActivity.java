@@ -55,6 +55,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import android.text.InputType;
+import android.widget.EditText;
+import java.util.List;
 
 import au.com.wallaceit.reddinator.R;
 import au.com.wallaceit.reddinator.Reddinator;
@@ -331,6 +334,9 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
         (menu.findItem(R.id.menu_search)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_search).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_prefs)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_wrench).color(iconColor).actionBarSize());
         (menu.findItem(R.id.menu_about)).setIcon(new IconDrawable(this, Iconify.IconValue.fa_info_circle).color(iconColor).actionBarSize());
+        MenuItem regexItem = menu.findItem(R.id.menu_regexfilter);
+        regexItem.setIcon(new IconDrawable(this, Iconify.IconValue.fa_filter).color(iconColor).actionBarSize());
+        regexItem.setVisible(!hasMultipleSubs); // only meaningful when viewing a single subreddit
 
         int subCap = global.getSubredditManager().getSubredditSubscribeCapability(subredditName);
 
@@ -439,6 +445,10 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
                 showFeedPrefsDialog();
                 break;
 
+            case R.id.menu_regexfilter:
+                showRegexFilterDialog();
+                break;
+
             case R.id.menu_thememanager:
                 Intent intent = new Intent(this, ThemesActivity.class);
                 startActivityForResult(intent, ThemesActivity.REQUEST_CODE_UPDATE);
@@ -494,6 +504,39 @@ public class MainActivity extends Activity implements LoadSubredditInfoTask.Call
             }
         });
         builder.show().setCanceledOnTouchOutside(true);
+    }
+
+    private void showRegexFilterDialog() {
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        input.setMinLines(4);
+        input.setHint(R.string.regex_filters_hint);
+        input.setText(String.join("\n", global.getSubredditManager().getRegexFilters(subredditName)));
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.regex_filters_title, subredditName))
+                .setView(input)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.ok, null) // overridden below so the dialog stays open on invalid input
+                .create();
+        dialog.show();
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            List<String> patterns = new ArrayList<>();
+            for (String line : input.getText().toString().split("\n")) {
+                String trimmed = line.trim();
+                if (!trimmed.isEmpty()) {
+                    patterns.add(trimmed);
+                }
+            }
+            String invalid = global.getSubredditManager().setRegexFilters(subredditName, patterns);
+            if (invalid != null) {
+                Toast.makeText(MainActivity.this, getString(R.string.regex_filter_invalid, invalid), Toast.LENGTH_LONG).show();
+                return;
+            }
+            dialog.dismiss();
+            reloadReddits();
+        });
     }
 
     // show sort select dialog
