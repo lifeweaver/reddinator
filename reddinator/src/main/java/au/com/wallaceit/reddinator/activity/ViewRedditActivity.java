@@ -68,7 +68,7 @@ import au.com.wallaceit.reddinator.Reddinator;
 import au.com.wallaceit.reddinator.core.RedditData;
 import au.com.wallaceit.reddinator.core.ThemeManager;
 import au.com.wallaceit.reddinator.core.Utilities;
-import au.com.wallaceit.reddinator.service.MailCheckService;
+import au.com.wallaceit.reddinator.service.MailCheckWorker;
 import au.com.wallaceit.reddinator.tasks.BackgroundTask;
 import au.com.wallaceit.reddinator.tasks.LoadPostTask;
 import au.com.wallaceit.reddinator.tasks.SavePostTask;
@@ -281,10 +281,10 @@ public class ViewRedditActivity extends ActionbarFragmentActivity implements Loa
                     }
                 };
                 IntentFilter filter = new IntentFilter();
-                filter.addAction(MailCheckService.MAIL_CHECK_COMPLETE);
+                filter.addAction(MailCheckWorker.MAIL_CHECK_COMPLETE);
                 registerReceiver(inboxReceiver, filter);
 
-                MailCheckService.checkMail(ViewRedditActivity.this, MailCheckService.ACTIVITY_CHECK_ACTION);
+                MailCheckWorker.checkMail(ViewRedditActivity.this, MailCheckWorker.ACTIVITY_CHECK_ACTION);
             }
         }
 

@@ -55,6 +55,6 @@ public class MailCheckReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        MailCheckService.checkMail(context, MailCheckService.NOTIFY_CHECK_ACTION);
+        MailCheckWorker.checkMail(context, MailCheckWorker.NOTIFY_CHECK_ACTION);
     }
 }
