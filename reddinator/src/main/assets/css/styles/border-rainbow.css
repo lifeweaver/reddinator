@@ -25,7 +25,7 @@
     border-color: #98CF19 !important;
 }
 
-#base .border .border .border .border .border .border
+#base .border .border .border .border .border .border,
 #base .border .border .border .border .border .border .sub-border{
     border-color: #CCE717 !important;
 }
